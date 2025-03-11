@@ -148,10 +148,11 @@ def driver(k_inc, E_inc):
     
 
 
-k_inc = np.array([1,1,1])
+k_inc = np.array([1,0,2])
 E_inc = lambda r : np.array([2,-1,-1])
 r = np.array([2,2,2])
+R = [np.random.rand(3) for _ in range(10)]
 
 E_tot = driver(k_inc, E_inc)
 
-print(E_tot(r))
+print([E_tot(R[i]) for i in range(10)])
