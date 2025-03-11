@@ -31,21 +31,25 @@ def azimutal_angle(k_inc):
     return cos_phi, sin_phi
 
 
-def rotate(k_inc, E_inc, cos_phi, sin_phi, inverse = False):
-    if inverse:
-        Rz = np.array([[cos_phi, sin_phi, 0],
-                        [-sin_phi, cos_phi, 0],
-                        [0, 0, 1]])
-    else:
-        Rz = np.array([[cos_phi, -sin_phi, 0],
-                        [sin_phi, cos_phi, 0],
-                        [0, 0, 1]])
+def rotate(k_inc, E_inc, cos_phi, sin_phi):
+    Rz = np.array([[cos_phi, -sin_phi, 0],
+                    [sin_phi, cos_phi, 0],
+                    [0, 0, 1]])
 
     
     k_rot = Rz @ k_inc
-    E_rot = Rz @ E_inc
+    E_rot = lambda r : Rz @ E_inc(r)
 
     return k_rot, E_rot 
+
+def rotate_inverse(E_rot, cos_phi, sin_phi):
+    Rz_inv = np.array([[cos_phi, sin_phi, 0],
+                        [-sin_phi, cos_phi, 0],
+                        [0, 0, 1]])
+    
+    E = lambda r : Rz_inv @ E_rot(r)
+    
+    return E
 
 
 def polar_angle(k_rot):
@@ -74,32 +78,24 @@ def fresnel_coeffs_TM(cos_theta_inc, sin_theta_inc, epsilon1 = epsilon_air, epsi
     return Gamma_r, Gamma_t
 
 
-def decomposition(E_rot): #, cos_theta_inc, sin_theta_inc
-    E0 = np.linalg.norm(E_rot)
+def decomposition(E_rot): 
+    E0 = lambda r : np.linalg.norm(E_rot(r))
 
-    cos_beta = E_rot[1] / E0
-    sin_beta = np.sqrt(1 - cos_beta**2)
+    cos_beta = lambda r : E_rot(r)[1] / E0(r)
+    sin_beta = lambda r : np.sqrt(1 - cos_beta(r)**2)
 
-    # E_inc_TE_amp = E_inc[1] / cos_beta
-    # E_inc_TM_amp = E_inc[0] / (sin_beta * cos_theta_inc)
-
-    # E0 = np.sqrt(np.abs(E_inc[0])**2 + np.abs(E_inc[1])**2 + np.abs(E_inc[2])**2)
-
-    # E_inc_TE = yhat * E0
-    # E_inc_TM = (xhat * cos_theta_inc + zhat * sin_theta_inc) * E0
-
-    return E0, cos_beta, sin_beta # E_inc_TE, E_inc_TM
+    return E0, cos_beta, sin_beta 
 
 
 
 def reflected_field_TE(Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1 = k_air):
-    E_ref = lambda r : (yhat * Gamma_r * E0 
+    E_ref = lambda r : (yhat * Gamma_r * E0(r) 
                         * np.exp(- j * k1 * (r[0] * sin_theta_inc - r[2] * cos_theta_inc)))
     return E_ref
 
 
 def reflected_field_TM(Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1 = k_air):
-    E_ref = lambda r : ((xhat * cos_theta_inc + zhat * sin_theta_inc) * Gamma_r * E0 
+    E_ref = lambda r : ((xhat * cos_theta_inc + zhat * sin_theta_inc) * Gamma_r * E0(r) 
                         * np.exp(- j * k1 * (r[0] * sin_theta_inc - r[2] * cos_theta_inc)))
     return E_ref
 
@@ -108,7 +104,7 @@ def transmitted_field_TE(Gamma_t, sin_theta_inc, E0, k1 = k_air, k2 = k_substrat
     sin_theta_trans = k1/k2 * sin_theta_inc
     cos_theta_trans = np.sqrt(1 - sin_theta_trans**2) # 1/k2 * np.sqrt(k2**2 - k1**2 * sin_theta_trans**2)
 
-    E_trans = lambda r : (yhat * Gamma_t * E0 
+    E_trans = lambda r : (yhat * Gamma_t * E0(r) 
                         * np.exp(- j * k2 * (r[0] * sin_theta_trans + r[2] * cos_theta_trans)))
     return E_trans
 
@@ -117,12 +113,12 @@ def transmitted_field_TM(Gamma_t, sin_theta_inc, E0, k1 = k_air, k2 = k_substrat
     sin_theta_trans = k1/k2 * sin_theta_inc
     cos_theta_trans = np.sqrt(1 - sin_theta_trans**2) # 1/k2 * np.sqrt(k2**2 - k1**2 * sin_theta_trans**2)
 
-    E_trans = lambda r : ((xhat * cos_theta_trans - zhat * sin_theta_trans) * Gamma_t * E0 
+    E_trans = lambda r : ((xhat * cos_theta_trans - zhat * sin_theta_trans) * Gamma_t * E0(r)
                         * np.exp(- j * k2 * (r[0] * sin_theta_trans + r[2] * cos_theta_trans)))
     return E_trans
 
 
-def driver(k_inc, E_inc, r):
+def driver(k_inc, E_inc):
     cos_phi, sin_phi = azimutal_angle(k_inc)
 
     k_rot, E_rot = rotate(k_inc, E_inc, cos_phi, sin_phi)
@@ -134,5 +130,28 @@ def driver(k_inc, E_inc, r):
 
     E0, cos_beta, sin_beta = decomposition(E_rot)
 
+    E_ref_TE = reflected_field_TE(Gamma_r_TE, cos_theta_inc, sin_theta_inc, E0)
+    E_ref_TM = reflected_field_TM(Gamma_r_TM, cos_theta_inc, sin_theta_inc, E0)
+    E_ref_rot = lambda r : cos_beta(r) * E_ref_TE(r) + sin_beta(r) * E_ref_TM(r)
+
+    E_trans_TE = transmitted_field_TE(Gamma_t_TE, sin_theta_inc, E0)
+    E_trans_TM = transmitted_field_TM(Gamma_t_TM, sin_theta_inc, E0)
+    E_trans_rot = lambda r : cos_beta(r) * E_trans_TE(r) + sin_beta(r) * E_trans_TM(r)
+
+    E_ref = rotate_inverse(E_ref_rot, cos_phi, sin_phi)
+    E_trans = rotate_inverse(E_trans_rot, cos_phi, sin_phi)
+
+    E_tot = lambda r : (E_trans(r)) * (r[2] > 0) + (E_ref(r) + E_inc(r)) * (r[2] < 0)
+
+    return E_tot
+
     
-    
+
+
+k_inc = np.array([1,1,1])
+E_inc = lambda r : np.array([2,-1,-1])
+r = np.array([2,2,2])
+
+E_tot = driver(k_inc, E_inc)
+
+print(E_tot(r))
