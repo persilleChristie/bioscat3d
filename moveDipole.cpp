@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <Eigen/Dense>
 
+//g++ moveDipole.cpp -o mD.exe -I"D:/vcpkg/installed/x64-windows/include/eigen3"
+
 using namespace std;
 
 // =========================================
