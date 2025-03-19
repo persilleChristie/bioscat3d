@@ -3,7 +3,7 @@
 #include <array>
 #include <vector>
 #include <algorithm>
-#include <Eigen>
+#include <Eigen/Dense>
 
 using namespace std;
 
@@ -59,14 +59,14 @@ inline double sin_phi(const Eigen::Vector3d& rPrime) {
                    [-sin_theta, 0, cos_theta]])
 */
 
-array<array<double, 3>, 3> rotation_matrix_y(const Eigen::Vector3d& rPrime) {
+Eigen::Matrix3d rotation_matrix_y(const Eigen::Vector3d& rPrime) {
     double cosT = cos_theta(rPrime);
     double sinT = sin_theta(rPrime);
-    return {{
-        { cosT,  0, sinT },
-        { 0,     1,   0  },
-        { -sinT, 0, cosT }
-    }};
+    Eigen::Matrix3d Ry {{ cosT,  0, sinT },
+                        { 0,     1,   0  },
+                        { -sinT, 0, cosT }
+                        };
+    return Ry;
 }
 
 /*
@@ -79,11 +79,11 @@ array<array<double, 3>, 3> rotation_matrix_y(const Eigen::Vector3d& rPrime) {
 Eigen::Matrix3d rotation_matrix_z(const Eigen::Vector3d& rPrime) {
     double cosP = cos_phi(rPrime);
     double sinP = sin_phi(rPrime);
-    return {{
-        { cosP, -sinP, 0 },
-        { sinP,  cosP, 0 },
-        { 0,      0,   1 }
-    }};
+    Eigen::Matrix3d Rz {{cosP, -sinP, 0} ,
+                        {sinP,  cosP, 0} ,
+                        {0,      0,   1}
+                        };
+    return Rz;
 }
 
 // =========================================
