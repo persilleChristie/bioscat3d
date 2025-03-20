@@ -1,8 +1,11 @@
 #include <iostream>
 #include <cmath>
 #include <complex>
-#include <array>
 #include <algorithm>
+#include <Eigen/Dense>
+
+
+//g++ hertzianDipole.cpp -o hD.exe -I"D:/vcpkg/installed/x64-windows/include/eigen3"
 
 using namespace std;
 
@@ -11,21 +14,38 @@ const double eta0 = 1.0;
 const double k0 = 1.0;
 
 // =========================================
-//  Compute the norm of a 3D vector
-// =========================================
-double norm(const array<double, 3>& x) {
-    return std::hypot(x[0], x[1], x[2]);
-}
-
-// =========================================
 //  Compute Angular Components
 // =========================================
-inline double cos_theta(const array<double, 3>& x) {
-    double r = norm(x);
+
+inline void compute_angles(const Eigen::Vector3d& x, double r, double& cosTheta, double& sinTheta, double& cosPhi, double& sinPhi) {
+    if (r == 0) {
+        cosTheta = 0.0;
+        sinTheta = 0.0;
+        cosPhi = 1.0; // Default to x-axis
+        sinPhi = 0.0;
+        return;
+    }
+
+    cosTheta = x[2] / r;
+    sinTheta = sqrt(1 - cosTheta * cosTheta); // Avoid separate call to cosTheta
+    double xy_norm = std::hypot(x[0], x[1]);
+
+    if (xy_norm == 0) {
+        cosPhi = 1.0;
+        sinPhi = 0.0;
+    } else {
+        cosPhi = x[0] / xy_norm;
+        sinPhi = x[1] / xy_norm;
+    }
+}
+
+/*
+inline double cos_theta(const Eigen::Vector3d& x) {
+    double r = x.norm();
     return (r == 0) ? 0.0 : x[2] / r;
 }
 
-inline double sin_theta(const array<double, 3>& x) {
+inline double sin_theta(const Eigen::Vector3d& x) {
     double cosT = cos_theta(x);
     cosT = std::clamp(cosT, -1.0, 1.0);
     return sqrt(1 - cosT * cosT);
@@ -34,75 +54,73 @@ inline double sin_theta(const array<double, 3>& x) {
 
 
 // Compute cos(φ) and sin(φ)
-inline double cos_phi(const array<double, 3>& x) {
+inline double cos_phi(const Eigen::Vector3d& x) {
     double phi = atan2(x[1], x[0]);
     double cos_phi = cos(phi);
     return cos_phi;
 }
 
 // Compute cos(φ) and sin(φ)
-inline double sin_phi(const array<double, 3>& x) {
+inline double sin_phi(const Eigen::Vector3d& x) {
     double phi = atan2(x[1], x[0]);
     double sin_phi = sin(phi);
     return sin_phi;
     
 }
-
+*/
 
 // =========================================
 //  Compute E-Field Components (Spherical)
 // =========================================
-complex<double> E_r(const array<double, 3>& x, double Iel) {
-    double r = norm(x);
-    return (r == 0) ? 0.0 : eta0 * Iel * cos_theta(x) / (2.0 * M_PI * r * r) * (1.0 + 1.0 / (j * k0 * r)) * exp(-j * k0 * r);
+complex<double> E_r(const Eigen::Vector3d& x, double r, double Iel, double cos_theta) {
+    return (r == 0) ? 0.0 : eta0 * Iel * cos_theta / (2.0 * M_PI * r * r) * (1.0 + 1.0 / (j * k0 * r)) * exp(-j * k0 * r);
 }
 
-complex<double> E_theta(const array<double, 3>& x, double Iel) {
-    double r = norm(x);
-    return (r == 0) ? 0.0 : (j * eta0 * Iel * sin_theta(x) / (4.0 * M_PI * r)) *
+complex<double> E_theta(const Eigen::Vector3d& x, double r, double Iel, double sin_theta) {
+    return (r == 0) ? 0.0 : (j * eta0 * Iel * sin_theta / (4.0 * M_PI * r)) *
            (1.0 + 1.0 / (j * k0 * r) - 1.0 / (k0 * r * r)) * exp(-j * k0 * r);
 }
 
 // =========================================
 //  Compute E-Field Components Cartesian cooerdinates
 // =========================================
-complex<double> E_x(const array<double, 3>& x, double Iel) {
-    return E_r(x, Iel) * sin_theta(x) * cos_phi(x) + E_theta(x, Iel) * cos_theta(x) * cos_phi(x);
+complex<double> E_x(const Eigen::Vector3d& x, double r, double Iel, double cos_theta, double sin_theta, double cos_phi, double sin_phi) {
+    return E_r(x, r, Iel, cos_theta) * sin_theta * cos_phi + E_theta(x, r, Iel, sin_theta) * cos_theta * cos_phi;
 }
 
-complex<double> E_y(const array<double, 3>& x, double Iel) {
-    return E_r(x, Iel) * sin_theta(x) * sin_phi(x) + E_theta(x, Iel) * cos_theta(x) * sin_phi(x);
+complex<double> E_y(const Eigen::Vector3d& x, double r, double Iel, double cos_theta, double sin_theta, double cos_phi, double sin_phi) {
+    return E_r(x, r, Iel, cos_theta) * sin_theta * sin_phi + E_theta(x, r, Iel, sin_theta) * cos_theta * sin_phi;
 }
 
-complex<double> E_z(const array<double, 3>& x, double Iel) {
-    return E_r(x, Iel) * cos_theta(x) - E_theta(x, Iel) * sin_theta(x);
+complex<double> E_z(const Eigen::Vector3d& x, double r, double Iel, double cos_theta, double sin_theta) {
+    return E_r(x, r, Iel, cos_theta) * cos_theta - E_theta(x, r, Iel, sin_theta) * sin_theta;
 }
 
 // =========================================
 //  Compute H-Field Components (Spherical)
 // =========================================
-complex<double> H_phi(const array<double, 3>& x, double Iel) {
-    double r = norm(x);
-    return (r == 0) ? 0.0 : j * k0 * Iel * sin_theta(x) / (4.0 * M_PI * r) * (1.0 + 1.0 / (j * k0 * r)) * exp(-j * k0 * r);
+complex<double> H_phi(const Eigen::Vector3d& x, double r, double Iel, double sin_theta) {
+    return (r == 0) ? 0.0 : j * k0 * Iel * sin_theta / (4.0 * M_PI * r) * (1.0 + 1.0 / (j * k0 * r)) * exp(-j * k0 * r);
 }
 
 // =========================================
 //  Compute H-Field Components Cartesian cooerdinates
 // =========================================
-complex<double> H_x(const array<double, 3>& x, double Iel) {
-    return - H_phi(x, Iel) * sin_phi(x);
+complex<double> H_x(const Eigen::Vector3d& x, double r, double Iel, double cos_theta, double sin_theta, double cos_phi, double sin_phi) {
+    return - H_phi(x, r, Iel, sin_theta) * sin_phi;
 }
 
-complex<double> H_y(const array<double, 3>& x, double Iel) {
-    return H_phi(x, Iel) * cos_phi(x);
+complex<double> H_y(const Eigen::Vector3d& x, double r, double Iel, double cos_theta, double sin_theta, double cos_phi, double sin_phi) {
+    return H_phi(x, r, Iel, sin_theta) * cos_phi;
 }
 
 // =========================================
 //  Compute Both E and H Fields (Spherical)
 // =========================================
-pair<array<complex<double>, 3>, array<complex<double>, 3>> fieldDipole(const array<double, 3>& x, double Iel) {
-    array<complex<double>, 3> E = {E_x(x, Iel), E_y(x, Iel), E_z(x, Iel)};
-    array<complex<double>, 3> H = {H_x(x, Iel), H_y(x, Iel), 0.0};
+pair<Eigen::Vector3cd, Eigen::Vector3cd> fieldDipole(const Eigen::Vector3d& x, double r, double Iel, double cos_theta, double sin_theta, double cos_phi, double sin_phi) {
+    compute_angles(x, r, cos_theta, sin_theta, cos_phi, sin_phi);
+    Eigen::Vector3cd E = {E_x(x, r, Iel, cos_theta, sin_theta, cos_phi, sin_phi), E_y(x, r, Iel, cos_theta, sin_theta, cos_phi, sin_phi), E_z(x, r, Iel, cos_theta, sin_theta)};    
+    Eigen::Vector3cd H = {H_x(x, r, Iel, cos_theta, sin_theta, cos_phi, sin_phi), H_y(x, r, Iel, cos_theta, sin_theta, cos_phi, sin_phi), 0.0};
     return {E, H};
 }
 
@@ -111,16 +129,23 @@ pair<array<complex<double>, 3>, array<complex<double>, 3>> fieldDipole(const arr
 // =========================================
 int main() {
     double Iel = 5.0;
-    array<double, 3> x = {0.1, 0.1, 0.1}; // Test position
+    Eigen::Vector3d x = {0.1, 0.1, 0.1}; // Test position
+    double r = x.norm();
+    double cos_theta = 0.0;
+    double sin_theta = 0.0;
+    double cos_phi = 0.0;
+    double sin_phi = 0.0;
 
+    
     // Compute E and H fields
-    auto [E, H] = fieldDipole(x, Iel);
+    auto [E, H] = fieldDipole(x, r, Iel, cos_theta, sin_theta, cos_phi, sin_phi);
+    
 
     // Print results
     cout << "E-field: (" << E[0] << ", " << E[1] << ", " << E[2] << ")" << endl;
     cout << "H-field: (" << H[0] << ", " << H[1] << ", " << H[2] << ")" << endl;
 
-    //rintf("sin_theta: %f\n", sin_theta(x));
+    //printf("sin_theta: %f\n", sin_theta(x));
     //printf("cos_phi: %f\n", cos_phi(x));
     //printf("sin_phi: %f\n", sin_phi(x));
     //printf("H_phi: %f\n", H_phi(x, Iel).real());
