@@ -3,7 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load the data
-data = pd.read_csv('..\\E_field_unit_sphere.csv')
+#data = pd.read_csv('D:/OneDrive - Danmarks Tekniske Universitet/Dokumenter/GitHub/bioscat3d/E_field_unit_sphere.csv')
+data = pd.read_csv('../bioscat3d/E_field_unit_sphere.csv')  # CORRECT
+#data = pd.read_csv('../E_field_unit_sphere.csv')  # from Plots, one up is bioscat3d (CORRECT)
+
+
 
 # Extract coordinates and magnitude
 x, y, z, E_mag = data['x'], data['y'], data['z'], data['E_mag']
