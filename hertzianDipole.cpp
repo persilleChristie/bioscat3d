@@ -39,35 +39,6 @@ inline void compute_angles(const Eigen::Vector3d& x, double r, double& cosTheta,
     }
 }
 
-/*
-inline double cos_theta(const Eigen::Vector3d& x) {
-    double r = x.norm();
-    return (r == 0) ? 0.0 : x[2] / r;
-}
-
-inline double sin_theta(const Eigen::Vector3d& x) {
-    double cosT = cos_theta(x);
-    cosT = std::clamp(cosT, -1.0, 1.0);
-    return sqrt(1 - cosT * cosT);
-    
-}
-
-
-// Compute cos(φ) and sin(φ)
-inline double cos_phi(const Eigen::Vector3d& x) {
-    double phi = atan2(x[1], x[0]);
-    double cos_phi = cos(phi);
-    return cos_phi;
-}
-
-// Compute cos(φ) and sin(φ)
-inline double sin_phi(const Eigen::Vector3d& x) {
-    double phi = atan2(x[1], x[0]);
-    double sin_phi = sin(phi);
-    return sin_phi;
-    
-}
-*/
 
 // =========================================
 //  Compute E-Field Components (Spherical)

@@ -10,13 +10,6 @@ const complex<double> j(0, 1);  // Imaginary unit
 // =========================================
 //  Constants Definition
 // =========================================
-/*
-omega = 1
-epsilon0 = 1
-n0 = 1
-mu0 = 1
-k0 = omega * np.sqrt(epsilon0 * mu0)
-*/
 
 const double omega = 1.0;
 const double epsilon0 = 1.0;
@@ -24,14 +17,6 @@ const double n0 = 1.0;
 const double mu0 = 1.0;
 const double k0 = omega * sqrt(epsilon0 * mu0);
 
-/*
-epsilon_air = epsilon0
-epsilon_substrate = 2
-n_air = n0
-n_substrate = 2
-k_air = n_air * k0
-k_substrate = n_substrate * k0
-*/
 
 const double epsilon_air = epsilon0;
 const double epsilon_substrate = 2.0;
@@ -41,26 +26,8 @@ const double k_air = n_air * k0;
 const double k_substrate = n_substrate * k0;
 
 // =========================================
-//  Cartesian Unit Vectors
-// =========================================
-/*
-xhat = np.array([1,0,0])
-yhat = np.array([0,1,0])
-zhat = np.array([0,0,1])
-*/
-
-const Eigen::Vector3d xhat(1.0, 0.0, 0.0);
-const Eigen::Vector3d yhat(0.0, 1.0, 0.0);
-const Eigen::Vector3d zhat(0.0, 0.0, 1.0);
-
-// =========================================
 //  Azimuthal Angle Computation
 // =========================================
-/*
-def azimutal_angle(k_inc):
-    cos_phi = k_inc[0]/np.sqrt(k_inc[0]**2 + k_inc[1]**2)
-    sin_phi = np.sqrt(1 - cos_phi**2)
-*/
 
 inline double cos_phi(const Eigen::Vector3d& k_inc) {
     double xy_norm = hypot(k_inc[0], k_inc[1]);
@@ -75,12 +42,6 @@ inline double sin_phi(const Eigen::Vector3d& k_inc) {
 // =========================================
 //  Rotation Matrix (Z-axis)
 // =========================================
-/*
-def rotate(k_inc, E_inc, cos_phi, sin_phi):
-    Rz = np.array([[cos_phi, -sin_phi, 0],
-                    [sin_phi, cos_phi, 0],
-                    [0, 0, 1]])
-*/
 
 Eigen::Matrix3d rotation_matrix_z(double cos_phi, double sin_phi) {
     return {
@@ -104,11 +65,6 @@ Eigen::Matrix3d rotation_matrix_z_inv(double cos_phi, double sin_phi) {
 // =========================================
 //  Polar Angle Computation
 // =========================================
-/*
-def polar_angle(k_rot):
-    cos_theta = k_rot[2] / np.sqrt(k_rot[0]**2 + k_rot[2]**2)
-    sin_theta = np.sqrt(1 - cos_theta**2)
-*/
 
 inline double cos_theta(const Eigen::Vector3d& k_rot) {
     return k_rot[2] / hypot(k_rot[0], k_rot[2]);
@@ -122,9 +78,6 @@ inline double sin_theta(const Eigen::Vector3d& k_rot) {
 // =========================================
 //  Fresnel Coefficients (TE and TM)
 // =========================================
-/*
-def fresnel_coeffs_TE(cos_theta_inc, sin_theta_inc, epsilon1 = epsilon_air, epsilon2 = epsilon_substrate):
-*/
 
 pair<double, double> fresnel_coeffs_TE(double cos_theta_inc, double sin_theta_inc, double epsilon1 = epsilon_air, double epsilon2 = epsilon_substrate) {
     double large_sqrt = sqrt(epsilon2 / epsilon1) * sqrt(1 - (epsilon1 / epsilon2) * sin_theta_inc * sin_theta_inc);
@@ -133,9 +86,6 @@ pair<double, double> fresnel_coeffs_TE(double cos_theta_inc, double sin_theta_in
     return {Gamma_r, Gamma_t};
 }
 
-/*
-def fresnel_coeffs_TM(cos_theta_inc, sin_theta_inc, epsilon1 = epsilon_air, epsilon2 = epsilon_substrate):
-*/
 
 pair<double, double> fresnel_coeffs_TM(double cos_theta_inc, double sin_theta_inc, double epsilon1 = epsilon_air, double epsilon2 = epsilon_substrate) {
     double large_sqrt = sqrt(epsilon1 / epsilon2) * sqrt(1 - (epsilon1 / epsilon2) * sin_theta_inc * sin_theta_inc);
@@ -161,9 +111,6 @@ tuple<double, double, double> polarization_decomposition(const Eigen::Vector3cd&
 // =========================================
 //  Reflection and Transmission Fields
 // =========================================
-/*
-def reflected_field_TE(Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1 = k_air):
-*/
 
 Eigen::Vector3cd reflected_field_TE(double Gamma_r, double cos_theta_inc, double sin_theta_inc, const Eigen::Vector3d& x,
                                     double E0, double k1 = k_air) {
@@ -177,9 +124,6 @@ Eigen::Vector3cd reflected_field_TM(double Gamma_r, double cos_theta_inc, double
     return E_ref;
 }
 
-/*
-def transmitted_field_TE(Gamma_t, sin_theta_inc, E0, k1 = k_air, k2 = k_substrate):
-*/
 
 Eigen::Vector3cd transmitted_field_TE(double Gamma_t, double sin_theta_inc, const Eigen::Vector3d& x, double E0, 
                                       double k1 = k_air, double k2 = k_substrate) {
@@ -204,34 +148,6 @@ Eigen::Vector3cd transmitted_field_TM(double Gamma_t, double sin_theta_inc, cons
 // =========================================
 //  Driver Function
 // =========================================
-/*
-def driver(k_inc, E_inc):
-    cos_phi, sin_phi = azimutal_angle(k_inc)
-
-    k_rot, E_rot = rotate(k_inc, E_inc, cos_phi, sin_phi)
-
-    cos_theta_inc, sin_theta_inc = polar_angle(k_rot)
-
-    Gamma_r_TE, Gamma_t_TE = fresnel_coeffs_TE(cos_theta_inc, sin_theta_inc)
-    Gamma_r_TM, Gamma_t_TM = fresnel_coeffs_TM(cos_theta_inc, sin_theta_inc)
-
-    E0, cos_beta, sin_beta = decomposition(E_rot)
-
-    E_ref_TE = reflected_field_TE(Gamma_r_TE, cos_theta_inc, sin_theta_inc, E0)
-    E_ref_TM = reflected_field_TM(Gamma_r_TM, cos_theta_inc, sin_theta_inc, E0)
-    E_ref_rot = lambda r : cos_beta(r) * E_ref_TE(r) + sin_beta(r) * E_ref_TM(r)
-
-    E_trans_TE = transmitted_field_TE(Gamma_t_TE, sin_theta_inc, E0)
-    E_trans_TM = transmitted_field_TM(Gamma_t_TM, sin_theta_inc, E0)
-    E_trans_rot = lambda r : cos_beta(r) * E_trans_TE(r) + sin_beta(r) * E_trans_TM(r)
-
-    E_ref = rotate_inverse(E_ref_rot, cos_phi, sin_phi)
-    E_trans = rotate_inverse(E_trans_rot, cos_phi, sin_phi)
-
-    E_tot = lambda r : (E_trans(r)) * (r[2] > 0) + (E_ref(r) + E_inc(r)) * (r[2] < 0)
-
-    return E_tot
-*/
 
 Eigen::Vector3cd driver(const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc, const Eigen::Vector3d& x) {
     auto cosP = cos_phi(k_inc);
