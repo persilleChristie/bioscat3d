@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <complex>
 #include <Eigen/Dense>
@@ -182,14 +183,37 @@ Eigen::Vector3cd driver(const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_
 // =========================================
 //  Main Function
 // =========================================
+
+// Spherical to Cartesian conversion
+Eigen::Vector3d spherical_to_cartesian(double theta, double phi) {
+    double x = sin(theta) * cos(phi);
+    double y = sin(theta) * sin(phi);
+    double z = cos(theta);
+    return Eigen::Vector3d(x, y, z);
+}
+
 int main() {
     Eigen::Vector3d k_inc(1.0, 0.0, 2.0);
     Eigen::Vector3cd E_inc(2.0, -1.0, -1.0);
-    Eigen::Vector3d x(2.0, 2.0, 2.0);
 
-    auto E_tot = driver(k_inc, E_inc, x);
+    const int theta_steps = 100;
+    const int phi_steps = 100;
 
-    cout << "E_tot: (" << E_tot[0] << ", " << E_tot[1] << ", " << E_tot[2] << ")" << endl;
+    // Output file
+    ofstream outFile("E_field_unit_sphere.csv");
+    outFile << "x,y,z,E_mag\n";
 
-    return 0;
+    for (int i = 0; i <= theta_steps; ++i) {
+        double theta = M_PI * i / theta_steps; // [0, pi]
+        for (int j = 0; j <= phi_steps; ++j) {
+            double phi = 2 * M_PI * j / phi_steps; // [0, 2*pi]
+
+            Eigen::Vector3d x = spherical_to_cartesian(theta, phi); // unit sphere
+            Eigen::Vector3cd E_tot = driver(k_inc, E_inc, x);
+
+            double E_mag = E_tot.norm();
+
+            outFile << x[0] << "," << x[1] << "," << x[2] << "," << E_mag << "\n";
+        }
+    }
 }

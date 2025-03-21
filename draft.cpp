@@ -106,7 +106,7 @@ pair<double, double> polar_angle(const Vector3d& k_rot) {
 }
 
 // =========================================================
-//  Compute Fresnel Coefficients
+//  Compute Fresnel Coefficients for TE & TM Modes
 // =========================================================
 /*
 def fresnel_coeffs_TE(cos_theta_inc, sin_theta_inc, epsilon1 = epsilon_air, epsilon2 = epsilon_substrate):
@@ -122,8 +122,22 @@ pair<complex<double>, complex<double>> fresnel_coeffs_TE(double cos_theta_inc, d
     return {Gamma_r, Gamma_t};
 }
 
+/*
+def fresnel_coeffs_TM(cos_theta_inc, sin_theta_inc, epsilon1 = epsilon_air, epsilon2 = epsilon_substrate):
+    large_sqrt = np.sqrt(epsilon1/epsilon2) * np.sqrt(1 - (epsilon1/epsilon2)*sin_theta_inc**2)
+    Gamma_r = (-cos_theta_inc + large_sqrt) / (cos_theta_inc + large_sqrt)
+    Gamma_t = (2 * np.sqrt(epsilon1/epsilon2) * cos_theta_inc) / (cos_theta_inc + large_sqrt)
+    return Gamma_r, Gamma_t
+*/
+pair<complex<double>, complex<double>> fresnel_coeffs_TM(double cos_theta_inc, double sin_theta_inc, double epsilon1 = epsilon_air, double epsilon2 = epsilon_substrate) {
+    complex<double> large_sqrt = sqrt(epsilon1 / epsilon2) * sqrt(1.0 - (epsilon1 / epsilon2) * pow(sin_theta_inc, 2));
+    complex<double> Gamma_r = (-cos_theta_inc + large_sqrt) / (cos_theta_inc + large_sqrt);
+    complex<double> Gamma_t = (2.0 * sqrt(epsilon1 / epsilon2) * cos_theta_inc) / (cos_theta_inc + large_sqrt);
+    return {Gamma_r, Gamma_t};
+}
+
 // =========================================================
-//  Compute Reflected Field TE
+//  Original Python Code (Outcommented)
 // =========================================================
 /*
 def reflected_field_TE(Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1 = k_air):
@@ -131,11 +145,71 @@ def reflected_field_TE(Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1 = k_air):
                         * np.exp(- j * k1 * (r[0] * sin_theta_inc - r[2] * cos_theta_inc)))
     return E_ref
 */
-auto reflected_field_TE(complex<double> Gamma_r, double cos_theta_inc, double sin_theta_inc, function<double(Vector3d)> E0, double k1 = k_air) {
-    return [Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1](const Vector3d& r) {
-        return yhat * real(Gamma_r * E0(r) * exp(-j * k1 * (r[0] * sin_theta_inc - r[2] * cos_theta_inc)));
-    };
+// C++ Version:
+auto reflected_field_TE(complex<double> Gamma_r, double cos_theta_inc, double sin_theta_inc, 
+    function<double(Vector3d)> E0, double k1 = k_air) {
+return [Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1](const Vector3d& r) {
+return yhat * real(Gamma_r * E0(r) * exp(-j * k1 * (r[0] * sin_theta_inc - r[2] * cos_theta_inc)));
+};
 }
+
+/*
+def reflected_field_TM(Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1 = k_air):
+E_ref = lambda r : ((xhat * cos_theta_inc + zhat * sin_theta_inc) * Gamma_r * E0(r) 
+    * np.exp(- j * k1 * (r[0] * sin_theta_inc - r[2] * cos_theta_inc)))
+return E_ref
+*/
+// C++ Version:
+auto reflected_field_TM(complex<double> Gamma_r, double cos_theta_inc, double sin_theta_inc, 
+    function<double(Vector3d)> E0, double k1 = k_air) {
+return [Gamma_r, cos_theta_inc, sin_theta_inc, E0, k1](const Vector3d& r) {
+return (xhat * cos_theta_inc + zhat * sin_theta_inc) * 
+real(Gamma_r * E0(r) * exp(-j * k1 * (r[0] * sin_theta_inc - r[2] * cos_theta_inc)));
+};
+}
+
+/*
+def transmitted_field_TE(Gamma_t, sin_theta_inc, E0, k1 = k_air, k2 = k_substrate):
+sin_theta_trans = k1/k2 * sin_theta_inc
+cos_theta_trans = np.sqrt(1 - sin_theta_trans**2)
+
+E_trans = lambda r : (yhat * Gamma_t * E0(r) 
+    * np.exp(- j * k2 * (r[0] * sin_theta_trans + r[2] * cos_theta_trans)))
+return E_trans
+*/
+// C++ Version:
+auto transmitted_field_TE(complex<double> Gamma_t, double sin_theta_inc, function<double(Vector3d)> E0, 
+      double k1 = k_air, double k2 = k_substrate) {
+double sin_theta_trans = (k1 / k2) * sin_theta_inc;
+double cos_theta_trans = sqrt(1 - sin_theta_trans * sin_theta_trans);
+
+return [Gamma_t, sin_theta_trans, cos_theta_trans, E0, k2](const Vector3d& r) {
+return yhat * real(Gamma_t * E0(r) * exp(-j * k2 * (r[0] * sin_theta_trans + r[2] * cos_theta_trans)));
+};
+}
+
+/*
+def transmitted_field_TM(Gamma_t, sin_theta_inc, E0, k1 = k_air, k2 = k_substrate):
+sin_theta_trans = k1/k2 * sin_theta_inc
+cos_theta_trans = np.sqrt(1 - sin_theta_trans**2)
+
+E_trans = lambda r : ((xhat * cos_theta_trans - zhat * sin_theta_trans) * Gamma_t * E0(r)
+    * np.exp(- j * k2 * (r[0] * sin_theta_trans + r[2] * cos_theta_trans)))
+return E_trans
+*/
+// C++ Version:
+auto transmitted_field_TM(complex<double> Gamma_t, double sin_theta_inc, function<double(Vector3d)> E0, 
+      double k1 = k_air, double k2 = k_substrate) {
+double sin_theta_trans = (k1 / k2) * sin_theta_inc;
+double cos_theta_trans = sqrt(1 - sin_theta_trans * sin_theta_trans);
+
+return [Gamma_t, sin_theta_trans, cos_theta_trans, E0, k2](const Vector3d& r) {
+return (xhat * cos_theta_trans - zhat * sin_theta_trans) * 
+real(Gamma_t * E0(r) * exp(-j * k2 * (r[0] * sin_theta_trans + r[2] * cos_theta_trans)));
+};
+}
+
+
 
 // =========================================================
 //  Main Function
@@ -151,13 +225,35 @@ int main() {
     auto [cos_theta_inc, sin_theta_inc] = polar_angle(k_rot);
 
     auto [Gamma_r_TE, Gamma_t_TE] = fresnel_coeffs_TE(cos_theta_inc, sin_theta_inc);
-    
-    auto E_ref_TE = reflected_field_TE(Gamma_r_TE, cos_theta_inc, sin_theta_inc, [](const Vector3d& r) { return 1.0; });
+    auto [Gamma_r_TM, Gamma_t_TM] = fresnel_coeffs_TM(cos_theta_inc, sin_theta_inc);
 
-    Vector3d r(2, 2, 2);
-    Vector3d E_field = E_ref_TE(r);
+    cout << "TE Reflection Coefficient: " << Gamma_r_TE << endl;
+    cout << "TE Transmission Coefficient: " << Gamma_t_TE << endl;
+    cout << "TM Reflection Coefficient: " << Gamma_r_TM << endl;
+    cout << "TM Transmission Coefficient: " << Gamma_t_TM << endl;
 
-    cout << "Reflected E-field: " << E_field.transpose() << endl;
+    Vector3d r(2, 2, 2);  // Test position
+    complex<double> Gamma_r_TE(0.5, 0.1);
+    complex<double> Gamma_t_TE(0.8, 0.05);
+    complex<double> Gamma_r_TM(0.4, 0.2);
+    complex<double> Gamma_t_TM(0.7, 0.03);
     
+    auto E0 = [](const Vector3d& r) { return 1.0; };  // E0 function
+
+    auto E_ref_TE = reflected_field_TE(Gamma_r_TE, 0.5, 0.6, E0);
+    auto E_ref_TM = reflected_field_TM(Gamma_r_TM, 0.5, 0.6, E0);
+    auto E_trans_TE = transmitted_field_TE(Gamma_t_TE, 0.5, E0);
+    auto E_trans_TM = transmitted_field_TM(Gamma_t_TM, 0.5, E0);
+
+    Vector3d E_TE = E_ref_TE(r);
+    Vector3d E_TM = E_ref_TM(r);
+    Vector3d E_TTE = E_trans_TE(r);
+    Vector3d E_TTM = E_trans_TM(r);
+
+    cout << "Reflected TE E-field: " << E_TE.transpose() << endl;
+    cout << "Reflected TM E-field: " << E_TM.transpose() << endl;
+    cout << "Transmitted TE E-field: " << E_TTE.transpose() << endl;
+    cout << "Transmitted TM E-field: " << E_TTM.transpose() << endl;
+
     return 0;
 }
