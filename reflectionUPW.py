@@ -80,7 +80,7 @@ def fresnel_coeffs_TM(cos_theta_inc, sin_theta_inc, epsilon1 = epsilon_air, epsi
 def decomposition(E_rot): 
     E0 = lambda r : np.linalg.norm(E_rot(r))
 
-    cos_beta = lambda r : E_rot(r)[1] / E0(r)
+    cos_beta = lambda r : np.real(E_rot(r)[1]) / E0(r)
     sin_beta = lambda r : np.sqrt(1 - cos_beta(r)**2)
 
     return E0, cos_beta, sin_beta 
@@ -154,4 +154,4 @@ R = [np.random.rand(3) for _ in range(10)]
 
 E_tot = driver(k_inc, E_inc)
 
-print([E_tot(R[i]) for i in range(10)])
+print(E_tot(r) )
