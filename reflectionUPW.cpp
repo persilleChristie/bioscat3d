@@ -3,6 +3,7 @@
 #include <cmath>
 #include <complex>
 #include <Eigen/Dense>
+#include "eIncidentNew.h"
 
 using namespace std;
 
@@ -150,7 +151,7 @@ Eigen::Vector3cd transmitted_field_TM(double Gamma_t, double sin_theta_inc, cons
 //  Driver Function
 // =========================================
 
-Eigen::Vector3cd driver(const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc, const Eigen::Vector3d& x) {
+Eigen::Vector3cd eIncidentNew(const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc, const Eigen::Vector3d& x) {
     auto cosP = cos_phi(k_inc);
     auto sinP = sin_phi(k_inc);
 
@@ -209,7 +210,7 @@ int main() {
             double phi = 2 * M_PI * j / phi_steps; // [0, 2*pi]
 
             Eigen::Vector3d x = spherical_to_cartesian(theta, phi); // unit sphere
-            Eigen::Vector3cd E_tot = driver(k_inc, E_inc, x);
+            Eigen::Vector3cd E_tot = eIncidentNew(k_inc, E_inc, x);
 
             double E_mag = E_tot.norm();
 
