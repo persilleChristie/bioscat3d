@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <Eigen/Dense>
+#include "moveDipoleField.h"
 
 //g++ moveDipole.cpp -o mD.exe -I"D:/vcpkg/installed/x64-windows/include/eigen3"
 
@@ -119,8 +120,8 @@ Eigen::Vector3d translate_vector(const Eigen::Vector3d& v, const Eigen::Vector3d
 pair<Eigen::Vector3d, Eigen::Vector3d> moveDipoleField(
     const Eigen::Vector3d& xPrime,
     const Eigen::Vector3d& rPrime,
-    const Eigen::Vector3d& E,
-    const Eigen::Vector3d& H
+    const Eigen::Vector3cd& E,
+    const Eigen::Vector3cd& H
 ) {
     // Compute rotation matrices
     auto Ry = rotation_matrix_y(rPrime);
@@ -144,8 +145,8 @@ int main() {
     // Define test inputs
     Eigen::Vector3d xPrime(1.0, 1.0, 1.0);
     Eigen::Vector3d rPrime(0.0, 1.0, 1.0);
-    Eigen::Vector3d E(2.0, -1.0, 3.0);
-    Eigen::Vector3d H(1.0, 2.0, -1.0);
+    Eigen::Vector3cd E(2.0, -1.0, 3.0);
+    Eigen::Vector3cd H(1.0, 2.0, -1.0);
 
     // Compute moved dipole fields
     auto [E_new, H_new] = moveDipoleField(xPrime, rPrime, E, H);

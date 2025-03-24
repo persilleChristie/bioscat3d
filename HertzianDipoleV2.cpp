@@ -2,6 +2,8 @@
 #include <cmath>
 #include <complex>
 #include <Eigen/Dense>
+#include "fieldDipole.h"
+#include "computeAngles.h"
 
 using namespace std;
 
@@ -12,7 +14,7 @@ const double k0 = 1.0;
 // =========================================
 //  Compute Angular Components (Pass by Reference)
 // =========================================
-inline void compute_angles(const Eigen::Vector3d& x, double r, 
+void computeAngles(const Eigen::Vector3d& x, double r, 
                            double& cosTheta, double& sinTheta, 
                            double& cosPhi, double& sinPhi) {
     if (r == 0) {
@@ -117,7 +119,7 @@ int main() {
     double r = x.norm();
     double cos_theta = 0.0, sin_theta = 0.0, cos_phi = 0.0, sin_phi = 0.0;
     
-    compute_angles(x, r, cos_theta, sin_theta, cos_phi, sin_phi);
+    computeAngles(x, r, cos_theta, sin_theta, cos_phi, sin_phi);
     
     // Compute exp(-j * k0 * r) once
     complex<double> expK0r = std::polar(1.0, -k0 * r);
