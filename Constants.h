@@ -29,6 +29,7 @@ struct Constants {
         //printf("Constants initialized!\n");
     }
 
+    /*
     void newWavelength(double lambda) {
         lambda0 = lambda;
         // Computed constants
@@ -36,9 +37,10 @@ struct Constants {
         k1          = k0*n1/n0;             // Wave number in nanowire/nanostructure
         //printf("Constants initialized with new wavelength!\n");
     }
+        */
 
 
 };
 
-}
+//}
 #endif

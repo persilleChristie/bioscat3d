@@ -7,6 +7,7 @@
 #include "hertzianDipoleField.h"
 #include "fieldIncidentNew.h"
 #include "computeAngles.h"
+#include "linearSystem.h"
 
 using namespace std;
 
@@ -21,12 +22,13 @@ pair<Eigen::MatrixXcd, Eigen::VectorXcd> linearSystem(const Eigen::MatrixX3d& x_
                                 const double Iel, const double k0, const double Gamma_r,
                                 const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc){
     
-    Eigen::MatrixXcd A;
-    Eigen::VectorXcd b;
 
     int M = static_cast<int>(x_mu.size());
     int Nprime = static_cast<int>(x_nu_prime.size());
     int N2prime = static_cast<int>(x_nu_2prime.size());
+
+    Eigen::MatrixXcd A(4*M, 2*Nprime + 2*N2prime);
+    Eigen::VectorXcd b(4*M);
 
     for (int mu = 0; mu < M; mu++){
 
