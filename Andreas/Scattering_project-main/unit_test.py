@@ -166,4 +166,4 @@ columns = ['px', 'py', 'pz', 'nx', 'ny', 'nz', 't1x', 't1y', 't1z', 't2x', 't2y'
 df = pd.DataFrame(data, columns=columns)
 
 # Save to CSV
-df.to_csv("sphere_data.csv", index=False)
+df.to_csv("sphere_data_andreas_sphere.csv", index=False)
