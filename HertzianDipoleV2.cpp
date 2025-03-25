@@ -4,12 +4,16 @@
 #include <Eigen/Dense>
 #include "fieldDipole.h"
 #include "computeAngles.h"
+#include "Constants.h"
 
 using namespace std;
 
+
+struct Constants constants;
+
 const complex<double> j(0, 1);  // Imaginary unit
-const double eta0 = 1.0;
-const double k0 = 1.0;
+const double eta0 = constants.eta0;
+const double k0 = constants.k0;
 
 // =========================================
 //  Compute Angular Components (Pass by Reference)
@@ -47,10 +51,10 @@ void compute_E_fields(double r, double Iel, double cos_theta, double sin_theta,
         return;
     }
 
-    E_r_out = eta0 * Iel * cos_theta / (2.0 * M_PI * r * r) 
+    E_r_out = eta0 * Iel * cos_theta / (2.0 * constants.pi * r * r) 
               * (1.0 + 1.0 / (j * k0 * r)) * expK0r;
     
-    E_theta_out = (j * eta0 * Iel * sin_theta / (4.0 * M_PI * r)) 
+    E_theta_out = (j * eta0 * Iel * sin_theta / (4.0 * constants.pi * r)) 
                   * (1.0 + 1.0 / (j * k0 * r) - 1.0 / (k0 * r * r)) * expK0r;
 }
 
@@ -78,7 +82,7 @@ void compute_H_fields(double r, double Iel, double sin_theta,
         return;
     }
 
-    H_phi_out = j * k0 * Iel * sin_theta / (4.0 * M_PI * r) 
+    H_phi_out = j * k0 * Iel * sin_theta / (4.0 * constants.pi * r) 
                 * (1.0 + 1.0 / (j * k0 * r)) * expK0r;
 }
 

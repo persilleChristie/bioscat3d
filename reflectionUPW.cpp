@@ -3,7 +3,8 @@
 #include <cmath>
 #include <complex>
 #include <Eigen/Dense>
-#include "eIncidentNew.h"
+#include "fieldIncidentNew.h"
+#include "Constants.h"
 
 using namespace std;
 
@@ -13,12 +14,12 @@ const complex<double> j(0, 1);  // Imaginary unit
 //  Constants Definition
 // =========================================
 
+/*
 const double omega = 1.0;
 const double epsilon0 = 1.0;
 const double n0 = 1.0;
 const double mu0 = 1.0;
 const double k0 = omega * sqrt(epsilon0 * mu0);
-
 
 const double epsilon_air = epsilon0;
 const double epsilon_substrate = 2.0;
@@ -26,6 +27,27 @@ const double n_air = n0;
 const double n_substrate = 2.0;
 const double k_air = n_air * k0;
 const double k_substrate = n_substrate * k0;
+
+const double eta_air = sqrt(omega/epsilon0);
+const double eta_substrate = sqrt(omega/epsilon_substrate);
+*/
+struct Constants constants;
+
+const double omega = 1.0;
+const double epsilon0 = constants.epsilon0;
+const double n0 = constants.n0;
+const double mu0 = constants.mu0;
+const double k0 = constants.k0;
+
+const double epsilon_air = epsilon0;
+const double epsilon_substrate = 2.0; // ?????????????
+const double n_air = n0;
+const double n_substrate = constants.n1;
+const double k_air = k0;
+const double k_substrate = constants.k1;
+
+const double eta_air = constants.eta0; //sqrt(omega/epsilon0);
+const double eta_substrate = sqrt(mu0/epsilon_substrate);
 
 // =========================================
 //  Azimuthal Angle Computation
@@ -114,44 +136,57 @@ tuple<double, double, double> polarization_decomposition(const Eigen::Vector3cd&
 //  Reflection and Transmission Fields
 // =========================================
 
-Eigen::Vector3cd reflected_field_TE(double Gamma_r, double cos_theta_inc, double sin_theta_inc, const Eigen::Vector3d& x,
-                                    double E0, double k1 = k_air) {
-    return Eigen::Vector3cd(0.0, Gamma_r * E0 * exp(-j * k1 * (sin_theta_inc * x[0] - cos_theta_inc * x[2])), 0.0);
+pair<Eigen::Vector3cd, Eigen::Vector3cd> reflected_field_TE(double Gamma_r, double cos_theta_inc, double sin_theta_inc, const Eigen::Vector3d& x,
+                                    double E0, double k1 = k_air, double eta0 = eta_air) {
+    complex<double> wave = Gamma_r * E0 * exp(-j * k1 * (sin_theta_inc * x[0] - cos_theta_inc * x[2]));
+    
+    Eigen::Vector3cd E(0.0, wave, 0.0);
+    Eigen::Vector3cd H(cos_theta_inc * wave / eta0, 0.0, sin_theta_inc * wave / eta0);
+
+    return {E, H};
 }
 
-Eigen::Vector3cd reflected_field_TM(double Gamma_r, double cos_theta_inc, double sin_theta_inc, const Eigen::Vector3d& x, 
-                                    double E0, double k1 = k_air) {
+pair<Eigen::Vector3cd, Eigen::Vector3cd> reflected_field_TM(double Gamma_r, double cos_theta_inc, double sin_theta_inc, const Eigen::Vector3d& x, 
+                                    double E0, double k1 = k_air, double eta0 = eta_air) {
     complex<double> wave = E0 * Gamma_r * exp(-j * k1 * (x[0] * sin_theta_inc - x[2] * cos_theta_inc));
-    Eigen::Vector3cd E_ref (cos_theta_inc * wave, 0.0, sin_theta_inc * wave);
-    return E_ref;
+    
+    Eigen::Vector3cd E (cos_theta_inc * wave, 0.0, sin_theta_inc * wave);
+    Eigen::Vector3cd H (0.0, - wave/eta0, 0);
+    return {E, H};
 }
 
 
-Eigen::Vector3cd transmitted_field_TE(double Gamma_t, double sin_theta_inc, const Eigen::Vector3d& x, double E0, 
-                                      double k1 = k_air, double k2 = k_substrate) {
+pair<Eigen::Vector3cd, Eigen::Vector3cd> transmitted_field_TE(double Gamma_t, double sin_theta_inc, const Eigen::Vector3d& x, double E0, 
+                                      double k1 = k_air, double k2 = k_substrate, double eta1 = eta_substrate) {
     double sin_theta_trans = k1 / k2 * sin_theta_inc;
     double cos_theta_trans = sqrt(1 - sin_theta_trans * sin_theta_trans);
+
+    complex<double> wave = Gamma_t * E0 * exp(-j * k2 * (sin_theta_trans * x[0] + cos_theta_trans * x[2]));
+
+    Eigen::Vector3cd E(0.0, wave , 0.0);
+    Eigen::Vector3cd H(-cos_theta_trans * wave / eta1, 0.0 , sin_theta_trans * wave / eta1);
     
-    return {Eigen::Vector3cd(0.0, Gamma_t * E0 * exp(-j * k2 * (sin_theta_trans * x[0] + cos_theta_trans * x[2])), 0.0)
-    };
+    return {E, H};
 }
 
-Eigen::Vector3cd transmitted_field_TM(double Gamma_t, double sin_theta_inc, const Eigen::Vector3d& x, double E0, 
-                                      double k1 = k_air, double k2 = k_substrate) {
+pair<Eigen::Vector3cd, Eigen::Vector3cd> transmitted_field_TM(double Gamma_t, double sin_theta_inc, const Eigen::Vector3d& x, double E0, 
+                                      double k1 = k_air, double k2 = k_substrate, double eta1 = eta_substrate) {
     double sin_theta_trans = k1 / k2 * sin_theta_inc;
     double cos_theta_trans = sqrt(1 - sin_theta_trans * sin_theta_trans);
 
     complex<double> wave = E0 * Gamma_t * exp(-j * k2 * (x[0] * sin_theta_trans + x[2] * cos_theta_trans));
 
-    return {Eigen::Vector3cd(wave * cos_theta_trans, 0.0, - wave * sin_theta_trans)
-    };
+    Eigen::Vector3cd E (wave * cos_theta_trans, 0.0, - wave * sin_theta_trans);
+    Eigen::Vector3cd H (0.0, wave / eta1, 0.0);
+
+    return {E, H};
 }
 
 // =========================================
 //  Driver Function
 // =========================================
 
-Eigen::Vector3cd eIncidentNew(const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc, const Eigen::Vector3d& x) {
+pair<Eigen::Vector3cd, Eigen::Vector3cd> fieldIncidentNew(const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc, const Eigen::Vector3d& x) {
     auto cosP = cos_phi(k_inc);
     auto sinP = sin_phi(k_inc);
 
@@ -168,17 +203,23 @@ Eigen::Vector3cd eIncidentNew(const Eigen::Vector3d& k_inc, const Eigen::Vector3
     auto [Gamma_r_TE, Gamma_t_TE] = fresnel_coeffs_TE(cos_theta_inc, sin_theta_inc);
     auto [Gamma_r_TM, Gamma_t_TM] = fresnel_coeffs_TM(cos_theta_inc, sin_theta_inc);
 
-    auto E_ref_TE = reflected_field_TE(Gamma_r_TE, cos_theta_inc, sin_theta_inc, x, E0);
-    auto E_ref_TM = reflected_field_TM(Gamma_r_TM, cos_theta_inc, sin_theta_inc, x, E0);
-    auto E_trans_TE = transmitted_field_TE(Gamma_t_TE, sin_theta_inc, x, E0);
-    auto E_trans_TM = transmitted_field_TM(Gamma_t_TM, sin_theta_inc, x, E0);
+    auto [E_ref_TE, H_ref_TE] = reflected_field_TE(Gamma_r_TE, cos_theta_inc, sin_theta_inc, x, E0);
+    auto [E_ref_TM, H_ref_TM] = reflected_field_TM(Gamma_r_TM, cos_theta_inc, sin_theta_inc, x, E0);
+    auto [E_trans_TE, H_trans_TE] = transmitted_field_TE(Gamma_t_TE, sin_theta_inc, x, E0);
+    auto [E_trans_TM, H_trans_TM] = transmitted_field_TM(Gamma_t_TM, sin_theta_inc, x, E0);
 
     auto Rz_inv = rotation_matrix_z_inv(cosP, sinP);
 
     Eigen::Vector3cd E_tot_1 = E_inc + Rz_inv * (cos_beta * E_ref_TE + sin_beta * E_ref_TM);
     Eigen::Vector3cd E_tot_2 = Rz_inv * (cos_beta * E_trans_TE + sin_beta * E_trans_TM);
 
-    return (x[2] > 0) ? E_tot_2 : E_tot_1;
+    Eigen::Vector3cd H_tot_1 = E_inc + Rz_inv * (cos_beta * H_ref_TE + sin_beta * H_ref_TM);
+    Eigen::Vector3cd H_tot_2 = Rz_inv * (cos_beta * H_trans_TE + sin_beta * H_trans_TM);
+
+    Eigen::Vector3cd E_tot = (x[2] < 0) ? E_tot_2 : E_tot_1;
+    Eigen::Vector3cd H_tot = (x[2] < 0) ? H_tot_2 : H_tot_1;
+
+    return {E_tot, H_tot}; 
 }
 
 // =========================================
@@ -205,16 +246,16 @@ int main() {
     outFile << "x,y,z,E_mag\n";
 
     for (int i = 0; i <= theta_steps; ++i) {
-        double theta = M_PI * i / theta_steps; // [0, pi]
+        double theta = constants.pi * i / theta_steps; // [0, pi]
         for (int j = 0; j <= phi_steps; ++j) {
-            double phi = 2 * M_PI * j / phi_steps; // [0, 2*pi]
+            double phi = 2 * constants.pi * j / phi_steps; // [0, 2*pi]
 
             Eigen::Vector3d x = spherical_to_cartesian(theta, phi); // unit sphere
-            Eigen::Vector3cd E_tot = eIncidentNew(k_inc, E_inc, x);
+            //auto [E_tot, H_tot] = fieldIncidentNew(k_inc, E_inc, x);
 
-            double E_mag = E_tot.norm();
+            //double E_mag = E_tot.norm();
 
-            outFile << x[0] << "," << x[1] << "," << x[2] << "," << E_mag << "\n";
+            //outFile << x[0] << "," << x[1] << "," << x[2] << "," << E_mag << "\n";
         }
     }
 }
