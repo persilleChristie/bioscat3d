@@ -13,6 +13,7 @@ using namespace Eigen;
 
 struct Constants constants;
 
+/*
 tuple <MatrixXd, MatrixXd, MatrixXd, MatrixXd> sphere(const int num_points, const double radius, const Vector3d& center){
     double x0 = center(0), y0 = center(1), z0 = center(2);
 
@@ -30,42 +31,43 @@ tuple <MatrixXd, MatrixXd, MatrixXd, MatrixXd> sphere(const int num_points, cons
     MatrixXd z = (z0 + radius * theta.array().cos()).matrix();
     
     MatrixXd points(num_points * num_points, 3);
-    points << x.reshaped(num_points * num_points, 1),
-              y.reshaped(num_points * num_points, 1),
-              z.reshaped(num_points * num_points, 1);
+    points << x.reshaped(1, num_points * num_points).transpose(),
+          y.reshaped(1, num_points * num_points).transpose(),
+          z.reshaped(1, num_points * num_points).transpose();
     
-    MatrixXd normals = points.array().rowwise() / points.rowwise().norm().array();
+    MatrixXd normals = points.array().colwise() / points.colwise().norm().array();
     
     MatrixXd tau1(num_points * num_points, 3);
-    tau1 << radius * theta.array().cos().reshaped(num_points * num_points, 1) * phi.array().cos().reshaped(num_points * num_points, 1),
-            radius * theta.array().cos().reshaped(num_points * num_points, 1) * phi.array().sin().reshaped(num_points * num_points, 1),
-            -radius * theta.array().sin().reshaped(num_points * num_points, 1);
+    tau1 << (radius * theta.array().cos() * phi.array().cos()).reshaped(1, num_points * num_points).transpose(),
+        (radius * theta.array().cos() * phi.array().sin()).reshaped(1, num_points * num_points).transpose(),
+        (-radius * theta.array().sin()).reshaped(1, num_points * num_points).transpose();
     
-    tau1 = (tau1.array().rowwise() / tau1.rowwise().norm().array());
+    tau1 = (tau1.array().colwise() / tau1.colwise().norm().array());
     
     MatrixXd tau2(num_points * num_points, 3);
-    tau2 << -radius * theta.array().sin().reshaped(num_points * num_points, 1) * phi.array().sin().reshaped(num_points * num_points, 1),
-            radius * theta.array().sin().reshaped(num_points * num_points, 1) * phi.array().cos().reshaped(num_points * num_points, 1),
-            MatrixXd::Zero(num_points * num_points, 1);
+    tau2 << (-radius * theta.array().sin() * phi.array().sin()).reshaped(1, num_points * num_points).transpose(),
+        (radius * theta.array().sin() * phi.array().cos()).reshaped(1, num_points * num_points).transpose(),
+        MatrixXd::Zero(num_points * num_points, 1);
     
-    tau2 = (tau2.array().rowwise() / tau2.rowwise().norm().array());
+    tau2 = (tau2.array().colwise() / tau2.colwise().norm().array());
 
     return {points, normals, tau1, tau2};
 }
+*/
 
 int main(){
 
     // Print sphere data
     Vector3d center (0.0, 0.0, 0.0);
-    auto [points, normals, tau1, tau2] = sphere(10, 1, center);
+    // auto [points, normals, tau1, tau2] = sphere(10, 1, center);
 
-    MatrixXd dataMatrix(10*10, 3*4);
+    MatrixXd m = MatrixXd::Random(3,3);
 
-    dataMatrix << points, normals, tau1, tau2;
+    //dataMatrix << points, normals, tau1, tau2;
 
-    list<string> colnames = {"px", "py", "pz", "nx", "ny", "nz", "t1x", "t2x","t2y", "t2z"};
+    list<string> colnames = {"t1", "t2", "t3", "t4"};//{"px", "py", "pz", "nx", "ny", "nz", "t1x", "t2x","t2y", "t2z"};
 
-    matrixToCSVfile("testSphere", colnames, dataMatrix);
+    matrixToCSVfile("test", m);
 
     return 0;
 }

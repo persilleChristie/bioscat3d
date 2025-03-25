@@ -16,13 +16,14 @@ const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, Eigen::DontAlignC
 // writing functions taking Eigen types as parameters, 
 // see https://eigen.tuxfamily.org/dox/TopicFunctionTakingEigenTypes.html
 template <typename Derived>
-void matrixToCSVfile(string name, std::list<string> column_names, const Eigen::MatrixBase<Derived>& matrix)
+void matrixToCSVfile(string name, const Eigen::MatrixBase<Derived>& matrix) // std::list<string> column_names,
 {
     ofstream file(name.c_str());
+    /*
     for (auto name : column_names){
         file << name << ",";
     }
-    file << '\n';
+    file << '\n';*/
     file << matrix.format(CSVFormat);
     // file.close() is not necessary, 
     // desctructur closes file, see https://en.cppreference.com/w/cpp/io/basic_ofstream
