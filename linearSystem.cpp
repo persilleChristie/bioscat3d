@@ -17,7 +17,8 @@ using namespace std;
 pair<Eigen::MatrixXcd, Eigen::VectorXcd> linearSystem(const Eigen::MatrixX3d& x_mu, const Eigen::MatrixX3d& x_nu_prime, 
                                 const Eigen::MatrixX3d& x_nu_prime_tilde, const Eigen::MatrixX3d& x_nu_2prime, 
                                 const Eigen::MatrixX3d& tau1_mat, const Eigen::MatrixX3d& tau2_mat, 
-                                const Eigen::MatrixX3d& dipole1_int, const Eigen::MatrixX3d& dipole2_int, 
+                                const Eigen::MatrixX3d& dipole1_int, const Eigen::MatrixX3d& dipole2_int,
+                                const Eigen::MatrixX3d& dipole1_int_tilde, const Eigen::MatrixX3d& dipole2_int_tilde,  
                                 const Eigen::MatrixX3d& dipole1_ext, const Eigen::MatrixX3d& dipole2_ext, 
                                 const double Iel, const double k0, const double Gamma_r,
                                 const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc){
@@ -59,17 +60,20 @@ pair<Eigen::MatrixXcd, Eigen::VectorXcd> linearSystem(const Eigen::MatrixX3d& x_
 
             Eigen::Vector3d dipole1 = dipole1_int.row(nu);
             Eigen::Vector3d dipole2 = dipole2_int.row(nu);
+
+            Eigen::Vector3d dipole1_tilde = dipole1_int_tilde.row(nu);
+            Eigen::Vector3d dipole2_tilde = dipole2_int_tilde.row(nu);
             
             /////////////////////////
 
             // FIELDS NEEDED
             // Dipole 1
             auto [E1_nuprime, H1_nuprime] = hertzianDipoleField(x_mu_it, Iel, x_nu_it, dipole1, k0);
-            auto [E1_nuprime_tilde, H1_nuprime_tilde] = hertzianDipoleField(x_mu_it, Iel, x_nu_tilde_it, dipole1, k0);
+            auto [E1_nuprime_tilde, H1_nuprime_tilde] = hertzianDipoleField(x_mu_it, Iel, x_nu_tilde_it, dipole1_tilde, k0);
 
             // Dipole 2
             auto [E2_nuprime, H2_nuprime] = hertzianDipoleField(x_mu_it, Iel, x_nu_it, dipole2, k0);
-            auto [E2_nuprime_tilde, H2_nuprime_tilde] = hertzianDipoleField(x_mu_it, Iel, x_nu_tilde_it, dipole2, k0);
+            auto [E2_nuprime_tilde, H2_nuprime_tilde] = hertzianDipoleField(x_mu_it, Iel, x_nu_tilde_it, dipole2_tilde, k0);
 
             /////////////////////////
 

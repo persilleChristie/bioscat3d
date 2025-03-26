@@ -11,6 +11,6 @@ using namespace std;
 const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "\n");
 
 template <typename Derived>
-void matrixToCSVfile(string name, const Eigen::MatrixBase<Derived>& matrix); // std::list<string> column_names,
+void matrixToCSVfile(string name, std::list<string> column_names, const Eigen::MatrixBase<Derived>& matrix); // 
 
 #endif

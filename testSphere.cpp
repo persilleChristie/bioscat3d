@@ -65,9 +65,9 @@ int main(){
 
     //dataMatrix << points, normals, tau1, tau2;
 
-    list<string> colnames = {"t1", "t2", "t3", "t4"};//{"px", "py", "pz", "nx", "ny", "nz", "t1x", "t2x","t2y", "t2z"};
+    list<string> colnames = {"t1", "t2", "t3"};//{"px", "py", "pz", "nx", "ny", "nz", "t1x", "t2x","t2y", "t2z"};
 
-    matrixToCSVfile("test", m);
+    matrixToCSVfile("test", colnames, m);
 
     return 0;
 }
