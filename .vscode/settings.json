@@ -81,6 +81,7 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "core": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "fstream": "cpp"
     }
 }
