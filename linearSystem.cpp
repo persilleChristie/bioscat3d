@@ -43,10 +43,10 @@ pair<Eigen::MatrixXcd, Eigen::VectorXcd> linearSystem(const Eigen::MatrixX3d& x_
 
         auto [E_incnew, H_incnew] = fieldIncidentNew(k_inc, E_inc, x_mu_it);
 
-        b[mu] = - E_incnew.dot(tau1);
-        b[mu + M] = - E_incnew.dot(tau2);
-        b[mu + 2*M] = - H_incnew.dot(tau1);
-        b[mu + 3*M] = - H_incnew.dot(tau2);
+        b(mu) = - E_incnew.dot(tau1);
+        b(mu + M) = - E_incnew.dot(tau2);
+        b(mu + 2*M) = - H_incnew.dot(tau1);
+        b(mu + 3*M) = - H_incnew.dot(tau2);
 
         /////////////////////////
 
@@ -79,29 +79,29 @@ pair<Eigen::MatrixXcd, Eigen::VectorXcd> linearSystem(const Eigen::MatrixX3d& x_
 
             // Electric fields
             // A(1,1) 
-            A[mu, nu] = E1_nuprime.dot(tau1) + Gamma_r * E1_nuprime_tilde.dot(tau1);
+            A(mu, nu) = E1_nuprime.dot(tau1) + Gamma_r * E1_nuprime_tilde.dot(tau1);
             
             // A(1,2)
-            A[mu, nu + Nprime] = E2_nuprime.dot(tau1) + Gamma_r * E2_nuprime_tilde.dot(tau1);
+            A(mu, nu + Nprime) = E2_nuprime.dot(tau1) + Gamma_r * E2_nuprime_tilde.dot(tau1);
 
             // A(2,1)
-            A[mu + M, nu] = E1_nuprime.dot(tau2) + Gamma_r * E1_nuprime_tilde.dot(tau2);
+            A(mu + M, nu) = E1_nuprime.dot(tau2) + Gamma_r * E1_nuprime_tilde.dot(tau2);
             
             // A(2,2)
-            A[mu + M, nu + Nprime] = E2_nuprime.dot(tau2) + Gamma_r * E2_nuprime_tilde.dot(tau2);
+            A(mu + M, nu + Nprime) = E2_nuprime.dot(tau2) + Gamma_r * E2_nuprime_tilde.dot(tau2);
 
             // Magnetic fields
             // A(3,1)
-            A[mu + 2*M, nu] = H1_nuprime.dot(tau1) + Gamma_r * H1_nuprime_tilde.dot(tau1);
+            A(mu + 2*M, nu) = H1_nuprime.dot(tau1) + Gamma_r * H1_nuprime_tilde.dot(tau1);
             
             // A(3,2)
-            A[mu + 2*M, nu + Nprime] = H2_nuprime.dot(tau1) + Gamma_r * H2_nuprime_tilde.dot(tau1);
+            A(mu + 2*M, nu + Nprime) = H2_nuprime.dot(tau1) + Gamma_r * H2_nuprime_tilde.dot(tau1);
 
             // A(4,1)
-            A[mu + 3*M, nu] = H1_nuprime.dot(tau2) + Gamma_r * H1_nuprime_tilde.dot(tau2);
+            A(mu + 3*M, nu) = H1_nuprime.dot(tau2) + Gamma_r * H1_nuprime_tilde.dot(tau2);
             
             // A(4,2)
-            A[mu + 3*M, nu + Nprime] = H2_nuprime.dot(tau2) + Gamma_r * H2_nuprime_tilde.dot(tau2);
+            A(mu + 3*M, nu + Nprime) = H2_nuprime.dot(tau2) + Gamma_r * H2_nuprime_tilde.dot(tau2);
         }
 
         for (int nu = 0; nu < N2prime; nu++){
@@ -125,29 +125,29 @@ pair<Eigen::MatrixXcd, Eigen::VectorXcd> linearSystem(const Eigen::MatrixX3d& x_
 
             // Electric fields
             // A(1,3) 
-            A[mu, nu + 2*Nprime] = E1_nuprime.dot(tau1);
+            A(mu, nu + 2*Nprime) = E1_nuprime.dot(tau1);
             
             // A(1,4)
-            A[mu, nu + 2*Nprime + N2prime] = E2_nuprime.dot(tau1);
+            A(mu, nu + 2*Nprime + N2prime) = E2_nuprime.dot(tau1);
 
             // A(2,3)
-            A[mu + M, nu + 2*Nprime] = E1_nuprime.dot(tau2);
+            A(mu + M, nu + 2*Nprime) = E1_nuprime.dot(tau2);
             
             // A(2,4)
-            A[mu + M, nu + 2*Nprime + N2prime]  = E2_nuprime.dot(tau2);
+            A(mu + M, nu + 2*Nprime + N2prime)  = E2_nuprime.dot(tau2);
 
             // Magnetic fields
             // A(3,3)
-            A[mu + 2*M, nu + 2*Nprime] = H1_nuprime.dot(tau1);
+            A(mu + 2*M, nu + 2*Nprime) = H1_nuprime.dot(tau1);
             
             // A(3,4)
-            A[mu + 2*M, nu + 2*Nprime + N2prime] = H2_nuprime.dot(tau1);
+            A(mu + 2*M, nu + 2*Nprime + N2prime) = H2_nuprime.dot(tau1);
 
             // A(4,3)
-            A[mu + 3*M, nu + 2*Nprime] = H1_nuprime.dot(tau2);
+            A(mu + 3*M, nu + 2*Nprime) = H1_nuprime.dot(tau2);
             
             // A(4,4)
-            A[mu + 3*M, nu + 2*Nprime + N2prime] = H2_nuprime.dot(tau2);
+            A(mu + 3*M, nu + 2*Nprime + N2prime) = H2_nuprime.dot(tau2);
         }
     }
 

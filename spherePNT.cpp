@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include "spherePNT.h"
 
 using namespace Eigen;
 using namespace std;
