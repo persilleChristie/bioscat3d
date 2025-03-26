@@ -91,7 +91,7 @@ Eigen::Matrix3d rotation_matrix_z_inv(double cos_phi, double sin_phi) {
 // =========================================
 
 inline double cos_theta(const Eigen::Vector3d& k_rot) {
-    return k_rot[2] / hypot(k_rot[0], k_rot[2]);
+    return - k_rot[2] / hypot(k_rot[0], k_rot[2]);
 }
 
 inline double sin_theta(const Eigen::Vector3d& k_rot) {
@@ -138,19 +138,19 @@ tuple<double, double, double> polarization_decomposition(const Eigen::Vector3cd&
 
 pair<Eigen::Vector3cd, Eigen::Vector3cd> reflected_field_TE(double Gamma_r, double cos_theta_inc, double sin_theta_inc, const Eigen::Vector3d& x,
                                     double E0, double k1 = k_air, double eta0 = eta_air) {
-    complex<double> wave = Gamma_r * E0 * exp(-j * k1 * (sin_theta_inc * x[0] - cos_theta_inc * x[2]));
+    complex<double> wave = Gamma_r * E0 * exp(-j * k1 * (sin_theta_inc * x[0] + cos_theta_inc * x[2]));
     
     Eigen::Vector3cd E(0.0, wave, 0.0);
-    Eigen::Vector3cd H(cos_theta_inc * wave / eta0, 0.0, sin_theta_inc * wave / eta0);
+    Eigen::Vector3cd H(cos_theta_inc * wave / eta0, 0.0, -sin_theta_inc * wave / eta0);
 
     return {E, H};
 }
 
 pair<Eigen::Vector3cd, Eigen::Vector3cd> reflected_field_TM(double Gamma_r, double cos_theta_inc, double sin_theta_inc, const Eigen::Vector3d& x, 
                                     double E0, double k1 = k_air, double eta0 = eta_air) {
-    complex<double> wave = E0 * Gamma_r * exp(-j * k1 * (x[0] * sin_theta_inc - x[2] * cos_theta_inc));
+    complex<double> wave = E0 * Gamma_r * exp(-j * k1 * (x[0] * sin_theta_inc + x[2] * cos_theta_inc));
     
-    Eigen::Vector3cd E (cos_theta_inc * wave, 0.0, sin_theta_inc * wave);
+    Eigen::Vector3cd E (cos_theta_inc * wave, 0.0, -sin_theta_inc * wave);
     Eigen::Vector3cd H (0.0, - wave/eta0, 0);
     return {E, H};
 }
@@ -161,10 +161,10 @@ pair<Eigen::Vector3cd, Eigen::Vector3cd> transmitted_field_TE(double Gamma_t, do
     double sin_theta_trans = k1 / k2 * sin_theta_inc;
     double cos_theta_trans = sqrt(1 - sin_theta_trans * sin_theta_trans);
 
-    complex<double> wave = Gamma_t * E0 * exp(-j * k2 * (sin_theta_trans * x[0] + cos_theta_trans * x[2]));
+    complex<double> wave = Gamma_t * E0 * exp(-j * k2 * (sin_theta_trans * x[0] - cos_theta_trans * x[2]));
 
     Eigen::Vector3cd E(0.0, wave , 0.0);
-    Eigen::Vector3cd H(-cos_theta_trans * wave / eta1, 0.0 , sin_theta_trans * wave / eta1);
+    Eigen::Vector3cd H(- cos_theta_trans * wave / eta1, 0.0 , -sin_theta_trans * wave / eta1);
     
     return {E, H};
 }
@@ -174,9 +174,9 @@ pair<Eigen::Vector3cd, Eigen::Vector3cd> transmitted_field_TM(double Gamma_t, do
     double sin_theta_trans = k1 / k2 * sin_theta_inc;
     double cos_theta_trans = sqrt(1 - sin_theta_trans * sin_theta_trans);
 
-    complex<double> wave = E0 * Gamma_t * exp(-j * k2 * (x[0] * sin_theta_trans + x[2] * cos_theta_trans));
+    complex<double> wave = E0 * Gamma_t * exp(-j * k2 * (x[0] * sin_theta_trans - x[2] * cos_theta_trans));
 
-    Eigen::Vector3cd E (wave * cos_theta_trans, 0.0, - wave * sin_theta_trans);
+    Eigen::Vector3cd E (wave * cos_theta_trans, 0.0, wave * sin_theta_trans);
     Eigen::Vector3cd H (0.0, wave / eta1, 0.0);
 
     return {E, H};
