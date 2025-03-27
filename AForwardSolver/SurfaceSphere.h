@@ -6,7 +6,7 @@
 
 class SphereSurface : public Surface {
 public:
-    SphereSurface(double radius, const Eigen::Vector3d& center, int resolution);
+    SurfaceSphere(double radius, const Eigen::Vector3d& center, int resolution);
 
     const Eigen::MatrixXd& getPoints() const override;
     const Eigen::MatrixXd& getNormals() const override;

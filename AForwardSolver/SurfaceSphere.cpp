@@ -1,9 +1,9 @@
-#include "SphereSurface.h"
+#include "SurfaceSphere.h"
 #include "Constants.h"
 
 using namespace Eigen;
 
-SphereSurface::SphereSurface(double r, const Eigen::Vector3d& c, int res)
+SphereSurface::SurfaceSphere(double r, const Eigen::Vector3d& c, int res)
     : radius(r), center(c), resolution(res) {
     generateSurface();
 }

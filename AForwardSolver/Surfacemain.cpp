@@ -1,7 +1,7 @@
 #include <iostream>
 #include <Eigen/Dense>
 
-#include "SphereSurface.h"
+#include "SurfaceSphere.h"
 #include "Constants.h"
 
 int main() {
@@ -11,7 +11,7 @@ int main() {
     int resolution = 10;
 
     // Create a SphereSurface
-    SurfaceSphere surface(radius, center, resolution);
+    SphereSurface surface(radius, center, resolution);
 
     // Output some info
     const auto& points = surface.getPoints();

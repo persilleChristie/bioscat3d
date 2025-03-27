@@ -9,11 +9,13 @@
 
 class SystemAssembler {
 public:
-    // Assemble system matrix A using a surface and collection of field sources
+    // Assemble system matrix A and RHS vector b using a surface and field sources
     static void assemble(
         Eigen::MatrixXd& A,
+        Eigen::VectorXd& b,
         const Surface& surface,
-        const std::vector<std::shared_ptr<FieldCalculator>>& sources
+        const std::vector<std::shared_ptr<FieldCalculator>>& sources,
+        const std::shared_ptr<FieldCalculator>& incidentField
     );
 };
 

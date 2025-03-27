@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 
 
-//g++ hertzianDipole.cpp -o hD.exe -I"D:/vcpkg/installed/x64-windows/include/eigen3"
+//g++ hertzianDipole.cpp -o hD.exe -I"D:/vcpkg/installed/x64-windows/include/eigen3" //
 
 using namespace std;
 
