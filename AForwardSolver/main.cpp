@@ -9,7 +9,7 @@ int main() {
     using namespace Eigen;
 
     // Define parameters
-    int num_points = 5;
+    int num_points = 10;
     double radius = 1.0;
     Vector3d center(0.0, 0.0, 1.0);
     double k0 = 2 * constants.pi;
