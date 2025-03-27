@@ -469,7 +469,7 @@ pair<Eigen::MatrixXcd, Eigen::VectorXcd> linearSystem(const Eigen::MatrixX3d& x_
     const Eigen::MatrixX3d& dipole1_int_tilde, const Eigen::MatrixX3d& dipole2_int_tilde,  
     const Eigen::MatrixX3d& dipole1_ext, const Eigen::MatrixX3d& dipole2_ext, 
     const double Iel, const double k0, const double Gamma_r,
-    const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc){
+    const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc, const Eigen::Vector3cd& H_inc){
 
 
 int M = x_mu.rows();
@@ -492,10 +492,10 @@ Eigen::Vector3d tau2 = tau2_mat.row(mu);
 
 auto [E_incnew, H_incnew] = fieldIncidentNew(k_inc, E_inc, x_mu_it);
 
-b(mu) = - E_incnew.dot(tau1);
-b(mu + M) = - E_incnew.dot(tau2);
-b(mu + 2*M) = - H_incnew.dot(tau1);
-b(mu + 3*M) = - H_incnew.dot(tau2);
+b(mu) = - E_inc.dot(tau1);
+b(mu + M) = - E_inc.dot(tau2);
+b(mu + 2*M) = - H_inc.dot(tau1);
+b(mu + 3*M) = - H_inc.dot(tau2);
 
 /////////////////////////
 
@@ -528,29 +528,29 @@ auto [E2_nuprime_tilde, H2_nuprime_tilde] = hertzianDipoleField(x_mu_it, Iel, x_
 
 // Electric fields
 // A(1,1) 
-A(mu, nu) = E1_nuprime.dot(tau1) + Gamma_r * E1_nuprime_tilde.dot(tau1);
+A(mu, nu) = E1_nuprime.dot(tau1) ;
 
 // A(1,2)
-A(mu, nu + Nprime) = E2_nuprime.dot(tau1) + Gamma_r * E2_nuprime_tilde.dot(tau1);
+A(mu, nu + Nprime) = E2_nuprime.dot(tau1) ;
 
 // A(2,1)
-A(mu + M, nu) = E1_nuprime.dot(tau2) + Gamma_r * E1_nuprime_tilde.dot(tau2);
+A(mu + M, nu) = E1_nuprime.dot(tau2) ;
 
 // A(2,2)
-A(mu + M, nu + Nprime) = E2_nuprime.dot(tau2) + Gamma_r * E2_nuprime_tilde.dot(tau2);
+A(mu + M, nu + Nprime) = E2_nuprime.dot(tau2) ;
 
 // Magnetic fields
 // A(3,1)
-A(mu + 2*M, nu) = H1_nuprime.dot(tau1) + Gamma_r * H1_nuprime_tilde.dot(tau1);
+A(mu + 2*M, nu) = H1_nuprime.dot(tau1);
 
 // A(3,2)
-A(mu + 2*M, nu + Nprime) = H2_nuprime.dot(tau1) + Gamma_r * H2_nuprime_tilde.dot(tau1);
+A(mu + 2*M, nu + Nprime) = H2_nuprime.dot(tau1) ;
 
 // A(4,1)
-A(mu + 3*M, nu) = H1_nuprime.dot(tau2) + Gamma_r * H1_nuprime_tilde.dot(tau2);
+A(mu + 3*M, nu) = H1_nuprime.dot(tau2);
 
 // A(4,2)
-A(mu + 3*M, nu + Nprime) = H2_nuprime.dot(tau2) + Gamma_r * H2_nuprime_tilde.dot(tau2);
+A(mu + 3*M, nu + Nprime) = H2_nuprime.dot(tau2);
 }
 
 for (int nu = 0; nu < N2prime; nu++){
@@ -715,6 +715,8 @@ int main() {
     Vector3d k_inc(0.0, 0.0, 1.0);
     Vector3cd E_inc;
     E_inc << 1.0, 0.0, 0.0;
+    Vector3cd H_inc;
+    H_inc << 0.0, 1.0, 0.0;
 
     // Call the linear system
     auto [A, b] = linearSystem(points_mu, points_nu_prime, points_nu_prime_tilde,
@@ -722,7 +724,7 @@ int main() {
                                dipole1_int, dipole2_int,
                                dipole1_int_tilde, dipole2_int_tilde,
                                dipole1_ext, dipole2_ext,
-                               Iel, k0, Gamma_r, k_inc, E_inc);
+                               Iel, k0, Gamma_r, k_inc, E_inc, H_inc);
 
     std::cout << "Linear system A has size: " << A.rows() << " x " << A.cols() << std::endl;
     std::cout << "Right-hand side b has size: " << b.size() << std::endl;
@@ -733,9 +735,9 @@ int main() {
     
 
     // At the end of main()
-    saveMatrixCSV("matrix_A.csv", A);
-    saveVectorCSV("vector_b.csv", b);
-    saveVectorCSV("solution_y.csv", y);
+    saveMatrixCSV("matrix_A_simple.csv", A);
+    saveVectorCSV("vector_b_simple.csv", b);
+    saveVectorCSV("solution_y_simple.csv", y);
 
 
     return 0;
