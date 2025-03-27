@@ -4,7 +4,7 @@
 #include "Surface.h"
 #include <Eigen/Dense>
 
-class SphereSurface : public Surface {
+class SurfaceSphere : public Surface {
 public:
     SurfaceSphere(double radius, const Eigen::Vector3d& center, int resolution);
 
