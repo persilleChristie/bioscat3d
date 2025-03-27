@@ -15,7 +15,7 @@ public:
 
 private:
     Eigen::Vector3d position;  // Dipole center
-    Eigen::Vector3d moment;    // Dipole vector (direction × magnitude)
+    Eigen::Vector3d moment;    // Dipole vector (direction × magnitude)  
 };
 
 #endif // DIPOLE_H

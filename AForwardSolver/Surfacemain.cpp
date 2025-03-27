@@ -3,7 +3,7 @@
 #include "SurfaceSphere.h"
 #include "Constants.h"
 
-int main() {
+int mainSurface() {
     double radius = 1.0;
     Eigen::Vector3d center(0.0, 0.0, 1.0);
     int resolution = 10;

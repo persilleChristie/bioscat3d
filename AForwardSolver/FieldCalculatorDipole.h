@@ -16,11 +16,7 @@ public:
     ) const override;
 
 private:
-    Dipole dip;
-
-    static constexpr double mu0 = 4 * M_PI * 1e-7;
-    static constexpr double epsilon0 = 8.854187817e-12;
-    static constexpr double c0 = 1.0 / std::sqrt(mu0 * epsilon0);
+    Dipole dip; 
 };
 
 #endif // FIELDCALCULATORDIPOLE_H

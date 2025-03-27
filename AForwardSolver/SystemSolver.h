@@ -2,11 +2,10 @@
 #define SYSTEMSOLVER_H
 
 #include <Eigen/Dense>
-#include <vector>
 
 class SystemSolver {
 public:
-    static Eigen::VectorXd solve(const Eigen::MatrixXd& A, const Eigen::VectorXd& b);
+    static Eigen::VectorXcd solve(const Eigen::MatrixXcd& A, const Eigen::VectorXcd& b);
 };
 
 #endif // SYSTEMSOLVER_H

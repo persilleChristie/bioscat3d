@@ -4,9 +4,9 @@
 #include "FieldCalculator.h"
 #include <Eigen/Dense>
 
-class UPWFieldCalculator : public FieldCalculator {
+class FieldCalculatorUPW : public FieldCalculator {
 public:
-    UPWFieldCalculator(const Eigen::Vector3d& waveVector,
+    FieldCalculatorUPW(const Eigen::Vector3d& waveVector,
                        const Eigen::Vector3d& polarization);
 
     void computeFields(

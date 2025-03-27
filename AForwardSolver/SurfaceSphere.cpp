@@ -3,19 +3,19 @@
 
 using namespace Eigen;
 
-SphereSurface::SphereSurface(double r, const Eigen::Vector3d& c, int res)
+SurfaceSphere::SurfaceSphere(double r, const Eigen::Vector3d& c, int res)
     : radius(r), center(c), resolution(res) {
     generateSurface();
 }
 
 
-const Eigen::MatrixXd& SphereSurface::getPoints() const  { return points;  }
-const Eigen::MatrixXd& SphereSurface::getNormals() const { return normals; }
-const Eigen::MatrixXd& SphereSurface::getTau1() const    { return tau1;    }
-const Eigen::MatrixXd& SphereSurface::getTau2() const    { return tau2;    }
+const Eigen::MatrixXd& SurfaceSphere::getPoints() const  { return points;  }
+const Eigen::MatrixXd& SurfaceSphere::getNormals() const { return normals; }
+const Eigen::MatrixXd& SurfaceSphere::getTau1() const    { return tau1;    }
+const Eigen::MatrixXd& SurfaceSphere::getTau2() const    { return tau2;    }
 
-std::unique_ptr<Surface> SphereSurface::mirrored(const Vector3d& normal) const {
-    auto mirroredSurface = std::make_unique<SphereSurface>(*this);
+std::unique_ptr<Surface> SurfaceSphere::mirrored(const Vector3d& normal) const {
+    auto mirroredSurface = std::make_unique<SurfaceSphere>(*this);
     mirroredSurface->points.col(2) *= -1;
     mirroredSurface->normals.col(2) *= -1;
     mirroredSurface->tau1.col(2) *= -1;
@@ -23,7 +23,7 @@ std::unique_ptr<Surface> SphereSurface::mirrored(const Vector3d& normal) const {
     return mirroredSurface;
 }
 
-void SphereSurface::generateSurface() {
+void SurfaceSphere::generateSurface() {
     Constants constants;
     int N = resolution;
 

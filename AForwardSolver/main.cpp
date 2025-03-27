@@ -1,51 +1,34 @@
-#include "SystemSolver.h"
-#include "SystemAssembler.h"
-#include "FieldCalculatorUPW.h"
-#include "FieldCalculatorDipole.h"
-#include "SurfaceSphere.h"
+#include "LinearSystemSolver.h"
+#include "UtilsExport.h"
+#include "Constants.h"
+#include <iostream>
 
-SystemSolver::Result SystemSolver::solve(
-    const SurfaceSphere& sphere_mu,
-    const SurfaceSphere& sphere_nu_prime,
-    const SurfaceSphere& sphere_nu_prime_tilde,
-    const SurfaceSphere& sphere_nu_2prime,
-    const std::complex<double>& Gamma_r,
-    const Eigen::Vector3d& k_inc,
-    const Eigen::Vector3cd& E_inc,
-    double k0,
-    double Iel
-) {
+Constants constants;
+
+int main() {
     using namespace Eigen;
 
-    std::vector<FieldPtr> sources;
+    // Define parameters
+    int num_points = 5;
+    double radius = 1.0;
+    Vector3d center(0.0, 0.0, 1.0);
+    double k0 = 2 * constants.pi;
+    double Gamma_r = 1.0;
+    Vector3d k_inc(0.0, 0.0, -1.0);
+    Vector3d polarization(1.0, 0.0, 0.0);
 
-    // Build dipoles from tangent vectors
-    auto addDipoles = [&](const SurfaceSphere& surface) {
-        const MatrixXd& points = surface.getPoints();
-        const MatrixXd& tau1 = surface.getTau1();
-        const MatrixXd& tau2 = surface.getTau2();
+    // Solve the system
+    auto result = LinearSystemSolver::solveSystem(radius, center, num_points, k0, Gamma_r, k_inc, polarization);
 
-        for (int i = 0; i < points.rows(); ++i) {
-            sources.push_back(std::make_shared<FieldCalculatorDipole>(Dipole(points.row(i), tau1.row(i))));
-            sources.push_back(std::make_shared<FieldCalculatorDipole>(Dipole(points.row(i), tau2.row(i))));
-        }
-    };
+    // Output sizes
+    std::cout << "Linear system A has size: " << result.A.rows() << " x " << result.A.cols() << std::endl;
+    std::cout << "Right-hand side b has size: " << result.b.size() << std::endl;
+    std::cout << "Solution x has size: " << result.x.size() << std::endl;
 
-    addDipoles(sphere_nu_prime);
-    addDipoles(sphere_nu_prime_tilde);
-    addDipoles(sphere_nu_2prime);
+    // Save to files
+    saveMatrixCSV("matrix_A_simple.csv", result.A);
+    saveVectorCSV("vector_b_simple.csv", result.b);
+    saveVectorCSV("solution_y_simple.csv", result.x);
 
-    // Define incident field
-    Vector3d polarization = E_inc.real();
-    auto incidentField = std::make_shared<FieldCalculatorUPW>(k_inc, polarization);
-
-    // Assemble A and b
-    MatrixXd A;
-    VectorXd b;
-    SystemAssembler::assemble(A, b, sphere_mu, sources, incidentField);
-
-    // Solve system
-    VectorXd x = SystemSolver::solve(A, b);
-
-    return { A, b, x };
+    return 0;
 }

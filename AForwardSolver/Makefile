@@ -1,31 +1,34 @@
-# Makefile for EM Scattering Simulation
-
+# Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++17 -O2 -Wall -I./ -I/usr/include/eigen3
+CXXFLAGS = -std=c++17 -Wall -O2
 
-SRCS = \
-    main.cpp \
-    SystemSolver.cpp \
-    SystemAssembler.cpp \
-    FieldCalculatorDipole.cpp \
-    FieldCalculatorUPW.cpp \
-    SurfaceSphere.cpp \
-    Dipole.cpp
+# Only look for .cpp files in the current directory
+SOURCES = main.cpp \
+          Dipole.cpp \
+          FieldCalculatorDipole.cpp \
+          FieldCalculatorUPW.cpp \
+          SurfaceSphere.cpp \
+          SystemAssembler.cpp \
+          SystemSolver.cpp \
+          LinearSystemSolver.cpp
+# Remove Surfacemain.cpp from this list
+OBJECTS := $(SOURCES:.cpp=.o)
 
-OBJS = $(SRCS:.cpp=.o)
 
-EXEC = EMScatteringSim
 
-all: $(EXEC)
 
-$(EXEC): $(OBJS)
-	$(CXX) $(OBJS) -o $(EXEC)
+# Output binary
+TARGET = scatterSim
+
+# Build target
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-run: $(EXEC)
-	./$(EXEC)
-
+# Clean up
 clean:
-	rm -f $(OBJS) $(EXEC)
+	rm -f $(TARGET) *.o FilesCSV/*.csv

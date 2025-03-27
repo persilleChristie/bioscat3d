@@ -48,5 +48,6 @@ struct Constants {
 
 };
 
-//}
+extern Constants constants;
+
 #endif

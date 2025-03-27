@@ -1,8 +1,8 @@
 #include "SystemAssembler.h"
 
 void SystemAssembler::assemble(
-    Eigen::MatrixXd& A,
-    Eigen::VectorXd& b,
+    Eigen::MatrixXcd& A,
+    Eigen::VectorXcd& b,
     const Surface& surface,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources,
     const std::shared_ptr<FieldCalculator>& incidentField
