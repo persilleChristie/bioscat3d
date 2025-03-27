@@ -7,7 +7,6 @@ SRCS = \
     main.cpp \
     SystemSolver.cpp \
     SystemAssembler.cpp \
-    LinearSystemSolver.cpp \
     FieldCalculatorDipole.cpp \
     FieldCalculatorUPW.cpp \
     SurfaceSphere.cpp \

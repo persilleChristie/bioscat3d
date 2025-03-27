@@ -1,19 +1,15 @@
 #include <iostream>
 #include <Eigen/Dense>
-
 #include "SurfaceSphere.h"
 #include "Constants.h"
 
 int main() {
-    // Define parameters
     double radius = 1.0;
     Eigen::Vector3d center(0.0, 0.0, 1.0);
     int resolution = 10;
 
-    // Create a SphereSurface
-    SphereSurface surface(radius, center, resolution);
+    SurfaceSphere surface(radius, center, resolution); // ✅ Fixed
 
-    // Output some info
     const auto& points = surface.getPoints();
     const auto& normals = surface.getNormals();
     const auto& tau1 = surface.getTau1();
@@ -25,7 +21,6 @@ int main() {
     std::cout << "Tau1 at first point: " << tau1.row(0) << "\n";
     std::cout << "Tau2 at first point: " << tau2.row(0) << "\n";
 
-    // Mirror test
     auto mirrored = surface.mirrored(Eigen::Vector3d(0, 0, 1));
     std::cout << "Mirrored first point: " << mirrored->getPoints().row(0) << "\n";
 

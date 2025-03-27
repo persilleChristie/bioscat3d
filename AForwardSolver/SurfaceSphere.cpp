@@ -3,10 +3,11 @@
 
 using namespace Eigen;
 
-SphereSurface::SurfaceSphere(double r, const Eigen::Vector3d& c, int res)
+SphereSurface::SphereSurface(double r, const Eigen::Vector3d& c, int res)
     : radius(r), center(c), resolution(res) {
     generateSurface();
 }
+
 
 const Eigen::MatrixXd& SphereSurface::getPoints() const  { return points;  }
 const Eigen::MatrixXd& SphereSurface::getNormals() const { return normals; }

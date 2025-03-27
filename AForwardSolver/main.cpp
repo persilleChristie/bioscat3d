@@ -1,11 +1,14 @@
-#include "LinearSystemSolver.h"
 #include "SystemSolver.h"
+#include "SystemAssembler.h"
+#include "FieldCalculatorUPW.h"
+#include "FieldCalculatorDipole.h"
+#include "SurfaceSphere.h"
 
-LinearSystemSolver::Result LinearSystemSolver::solveSystem(
-    const SphereSurface& sphere_mu,
-    const SphereSurface& sphere_nu_prime,
-    const SphereSurface& sphere_nu_prime_tilde,
-    const SphereSurface& sphere_nu_2prime,
+SystemSolver::Result SystemSolver::solve(
+    const SurfaceSphere& sphere_mu,
+    const SurfaceSphere& sphere_nu_prime,
+    const SurfaceSphere& sphere_nu_prime_tilde,
+    const SurfaceSphere& sphere_nu_2prime,
     const std::complex<double>& Gamma_r,
     const Eigen::Vector3d& k_inc,
     const Eigen::Vector3cd& E_inc,
@@ -17,7 +20,7 @@ LinearSystemSolver::Result LinearSystemSolver::solveSystem(
     std::vector<FieldPtr> sources;
 
     // Build dipoles from tangent vectors
-    auto addDipoles = [&](const SphereSurface& surface) {
+    auto addDipoles = [&](const SurfaceSphere& surface) {
         const MatrixXd& points = surface.getPoints();
         const MatrixXd& tau1 = surface.getTau1();
         const MatrixXd& tau2 = surface.getTau2();

@@ -6,6 +6,8 @@
 using namespace Eigen;
 using namespace std;
 
+struct Constants constants;
+
 static const complex<double> j(0.0, 1.0);
 
 FieldCalculatorDipole::FieldCalculatorDipole(const Dipole& dipole)
