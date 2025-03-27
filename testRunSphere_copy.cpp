@@ -712,7 +712,7 @@ int main() {
     double Iel = 1.0;
     double k0 = 2 * constants.pi; // Example wavenumber
     double Gamma_r = 1.0; // Reflection coefficient
-    Vector3d k_inc(0.0, 0.0, 1.0);
+    Vector3d k_inc(0.0, 0.0, -1.0);
     Vector3cd E_inc;
     E_inc << 1.0, 0.0, 0.0;
     Vector3cd H_inc;

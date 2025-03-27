@@ -362,13 +362,13 @@ pair<double, double> fresnel_coeffs_TM(double cos_theta_inc, double sin_theta_in
 // =========================================
 //  Decomposition of E polarization
 // =========================================
-tuple<double, double, double> polarization_decomposition(const Eigen::Vector3cd& E_rot){
+tuple<double, double> polarization_decomposition(const Eigen::Vector3cd& E_rot){
     double E0 = E_rot.norm();
 
     double cos_beta = E_rot[1].real()/E0;
     double sin_beta = sqrt(1 - cos_beta * cos_beta);
 
-    return {E0, cos_beta, sin_beta};
+    return {cos_beta, sin_beta};
 }
 
 
@@ -426,27 +426,31 @@ pair<Eigen::Vector3cd, Eigen::Vector3cd> transmitted_field_TM(double Gamma_t, do
 //  Driver Function
 // =========================================
 
-pair<Eigen::Vector3cd, Eigen::Vector3cd> fieldIncidentNew(const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc, const Eigen::Vector3d& x) {
+pair<Eigen::Vector3cd, Eigen::Vector3cd> fieldIncidentNew(const Eigen::Vector3d& k_inc, const Eigen::Vector3d& r, const double E0, const Eigen::Vector3d& x) {
     auto cosP = cos_phi(k_inc);
     auto sinP = sin_phi(k_inc);
 
     auto Rz = rotation_matrix_z(cosP, sinP);
 
+    Eigen::Vector3cd E_inc = r * E0 * polar(1.0, k_inc.dot(x));
+
     Eigen::Vector3d k_rot = Rz * k_inc;
+    Eigen::Vector3d x_rot = Rz * x;
+    Eigen::Vector3d x_plane (x_rot[0], 0.0, x_rot[2]);
     Eigen::Vector3cd E_rot = Rz * E_inc;
 
     double cos_theta_inc = cos_theta(k_rot);
     double sin_theta_inc = sin_theta(k_rot);
 
-    auto [E0, cos_beta, sin_beta] = polarization_decomposition(E_rot);
+    auto [cos_beta, sin_beta] = polarization_decomposition(E_rot);
 
     auto [Gamma_r_TE, Gamma_t_TE] = fresnel_coeffs_TE(cos_theta_inc, sin_theta_inc);
     auto [Gamma_r_TM, Gamma_t_TM] = fresnel_coeffs_TM(cos_theta_inc, sin_theta_inc);
 
-    auto [E_ref_TE, H_ref_TE] = reflected_field_TE(Gamma_r_TE, cos_theta_inc, sin_theta_inc, x, E0);
-    auto [E_ref_TM, H_ref_TM] = reflected_field_TM(Gamma_r_TM, cos_theta_inc, sin_theta_inc, x, E0);
-    auto [E_trans_TE, H_trans_TE] = transmitted_field_TE(Gamma_t_TE, sin_theta_inc, x, E0);
-    auto [E_trans_TM, H_trans_TM] = transmitted_field_TM(Gamma_t_TM, sin_theta_inc, x, E0);
+    auto [E_ref_TE, H_ref_TE] = reflected_field_TE(Gamma_r_TE, cos_theta_inc, sin_theta_inc, x_plane, E0);
+    auto [E_ref_TM, H_ref_TM] = reflected_field_TM(Gamma_r_TM, cos_theta_inc, sin_theta_inc, x_plane, E0);
+    auto [E_trans_TE, H_trans_TE] = transmitted_field_TE(Gamma_t_TE, sin_theta_inc, x_plane, E0);
+    auto [E_trans_TM, H_trans_TM] = transmitted_field_TM(Gamma_t_TM, sin_theta_inc, x_plane, E0);
 
     auto Rz_inv = rotation_matrix_z_inv(cosP, sinP);
 
@@ -469,7 +473,7 @@ pair<Eigen::MatrixXcd, Eigen::VectorXcd> linearSystem(const Eigen::MatrixX3d& x_
     const Eigen::MatrixX3d& dipole1_int_tilde, const Eigen::MatrixX3d& dipole2_int_tilde,  
     const Eigen::MatrixX3d& dipole1_ext, const Eigen::MatrixX3d& dipole2_ext, 
     const double Iel, const double k0, const double Gamma_r,
-    const Eigen::Vector3d& k_inc, const Eigen::Vector3cd& E_inc){
+    const Eigen::Vector3d& k_inc, const Eigen::Vector3d& r, const double E0){
 
 
 int M = x_mu.rows();
@@ -490,7 +494,7 @@ Eigen::Vector3d tau2 = tau2_mat.row(mu);
 
 // BUILDING RIGHT HAND SIDE
 
-auto [E_incnew, H_incnew] = fieldIncidentNew(k_inc, E_inc, x_mu_it);
+auto [E_incnew, H_incnew] = fieldIncidentNew(k_inc, r, E0, x_mu_it);
 
 b(mu) = - E_incnew.dot(tau1);
 b(mu + M) = - E_incnew.dot(tau2);
@@ -713,8 +717,9 @@ int main() {
     double k0 = 2 * constants.pi; // Example wavenumber
     double Gamma_r = 1.0; // Reflection coefficient
     Vector3d k_inc(0.0, 0.0, 1.0);
-    Vector3cd E_inc;
-    E_inc << 1.0, 0.0, 0.0;
+    Vector3d r;
+    r << 1.0, 0.0, 0.0;
+    double E0 = 1;
 
     // Call the linear system
     auto [A, b] = linearSystem(points_mu, points_nu_prime, points_nu_prime_tilde,
@@ -722,7 +727,7 @@ int main() {
                                dipole1_int, dipole2_int,
                                dipole1_int_tilde, dipole2_int_tilde,
                                dipole1_ext, dipole2_ext,
-                               Iel, k0, Gamma_r, k_inc, E_inc);
+                               Iel, k0, Gamma_r, k_inc, r, E0);
 
     std::cout << "Linear system A has size: " << A.rows() << " x " << A.cols() << std::endl;
     std::cout << "Right-hand side b has size: " << b.size() << std::endl;
