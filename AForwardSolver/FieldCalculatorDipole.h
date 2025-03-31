@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #ifndef FIELDCALCULATORDIPOLE_H
 #define FIELDCALCULATORDIPOLE_H
 
@@ -29,3 +30,27 @@ private:
 };
 
 #endif // FIELDCALCULATORDIPOLE_H
+=======
+#ifndef FIELDCALCULATORDIPOLE_H
+#define FIELDCALCULATORDIPOLE_H
+
+#include "FieldCalculator.h"
+#include "Dipole.h"
+#include <Eigen/Dense>
+
+class FieldCalculatorDipole : public FieldCalculator {
+public:
+    FieldCalculatorDipole(const Dipole& dipole);
+
+    void computeFields(
+        Eigen::MatrixXd& outE,
+        Eigen::MatrixXd& outH,
+        const Eigen::MatrixXd& evalPoints
+    ) const override;
+
+private:
+    Dipole dip; 
+};
+
+#endif // FIELDCALCULATORDIPOLE_H
+>>>>>>> a5573bfeda0575951aeed785824f8fe3a44f17d7
