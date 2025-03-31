@@ -7,7 +7,7 @@ using namespace Eigen;
 using namespace std;
 using namespace TransformUtils;
 
-FieldCalculatorDipole::FieldCalculatorDipole(const Dipole& dipole, double Iel, const Constants& constants)
+FieldCalculatorDipole::FieldCalculatorDipole(const Dipole& dipole, double Iel, const Constants& constants) // drop Iel and constants, add k0 
     : dipole_(dipole), Iel_(Iel), constants_(constants) {}
 
 std::pair<Vector3cd, Vector3cd> FieldCalculatorDipole::computeFieldAt(const Vector3d& x) const {
@@ -26,22 +26,18 @@ std::pair<Vector3cd, Vector3cd> FieldCalculatorDipole::computeFieldAt(const Vect
         return {Vector3cd::Zero(), Vector3cd::Zero()};
     }
 
-    // Compute local field components in spherical coordinates
-    computeAngles(x_local, r, cosTheta, sinTheta, cosPhi, sinPhi);
-
-    complex<double> j(0, 1);
-    complex<double> expK0r = exp(-j * constants_.k0 * r);
+    complex<double> expK0r = exp(-constants.j * constants_.k0 * r);
 
     complex<double> E_r = constants_.eta0 * Iel_ * cosTheta / (2.0 * constants_.pi * r * r)
-                        * (1.0 + 1.0 / (j * constants_.k0 * r)) * expK0r;
+                        * (1.0 + 1.0 / (constants.j * constants_.k0 * r)) * expK0r;
 
-    complex<double> E_theta = (j * constants_.eta0 * Iel_ * sinTheta / (4.0 * constants_.pi * r))
-                            * (1.0 + 1.0 / (j * constants_.k0 * r) - 1.0 / (constants_.k0 * r * r)) * expK0r;
+    complex<double> E_theta = (constants.j * constants_.eta0 * Iel_ * sinTheta / (4.0 * constants_.pi * r))
+                            * (1.0 + 1.0 / (constants.j * constants_.k0 * r) - 1.0 / (constants_.k0 * r * r)) * expK0r;
 
     Vector3cd E_local = computeECartesian(sinTheta, cosTheta, sinPhi, cosPhi, E_r, E_theta);
 
-    complex<double> H_phi = j * constants_.k0 * Iel_ * sinTheta / (4.0 * constants_.pi * r)
-                          * (1.0 + 1.0 / (j * constants_.k0 * r)) * expK0r;
+    complex<double> H_phi = constants.j * constants_.k0 * Iel_ * sinTheta / (4.0 * constants_.pi * r)
+                          * (1.0 + 1.0 / (constants.j * constants_.k0 * r)) * expK0r;
 
     Vector3cd H_local;
     H_local << -H_phi * sinPhi, H_phi * cosPhi, 0.0;
@@ -63,17 +59,4 @@ Vector3cd FieldCalculatorDipole::getEField(const Vector3d& x) const {
 
 Vector3cd FieldCalculatorDipole::getHField(const Vector3d& x) const {
     return computeFieldAt(x).second;
-}
-
-void FieldCalculatorDipole::computeFields(MatrixXd& outE_real, MatrixXd& outH_real, const MatrixXd& evalPoints) const {
-    int N = evalPoints.rows();
-    outE_real.resize(N, 3);
-    outH_real.resize(N, 3);
-
-    for (int i = 0; i < N; ++i) {
-        Vector3d x = evalPoints.row(i);
-        auto [E, H] = computeFieldAt(x);
-        outE_real.row(i) = E.real();
-        outH_real.row(i) = H.real();
-    }
 }
