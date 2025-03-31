@@ -229,8 +229,8 @@ Vector3cd E_rot = Ry_inv * Rz_inv * E;
 Vector3cd H_rot = Ry_inv * Rz_inv * H;
 
 // Translate the fields
-Vector3cd E_prime = E_rot - xPrime;
-Vector3cd H_prime = H_rot - xPrime;
+Vector3cd E_prime = E_rot; // - xPrime;
+Vector3cd H_prime = H_rot; // - xPrime;
 
 return {E_prime, H_prime};
 }
