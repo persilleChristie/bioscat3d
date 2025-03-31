@@ -1,6 +1,5 @@
 #include "FieldCalculatorDipole.h"
 #include "UtilsTransform.h"
-#include "UtilsFresnel.h"
 #include <complex>
 
 using namespace Eigen;
