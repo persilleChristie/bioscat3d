@@ -32,7 +32,7 @@ def compare_csv_files(file1, file2):
     # Compute absolute difference for each column
     differences = {}
     for col in df1.columns:
-        differences[col] = np.sum(np.abs(df1[col] - df2[col]))
+        differences[col] = np.mean(np.abs(df1[col] - df2[col])) #np.sum(np.abs(df1[col] - df2[col]))
 
     # Print differences
     print("\nTotal differences between A_simple.csv and PN_simple.csv:")
@@ -89,11 +89,13 @@ if True:
     omega=1
 
     # Random position (assuming within a range, e.g., -10 to 10)
-    position = np.random.uniform(-10, 10, size=3).tolist()
+    # position = np.random.uniform(-10, 10, size=3).tolist()
+    position = [0,0,0]
 
     # Random unit vector for direction
-    random_vector = np.random.uniform(-1, 1, size=3)
-    direction = (random_vector / np.linalg.norm(random_vector)).tolist()
+    # random_vector = np.random.uniform(-1, 1, size=3)
+    # direction = (random_vector / np.linalg.norm(random_vector)).tolist()
+    direction = [0,0,1]
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
     testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
