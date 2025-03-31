@@ -8,7 +8,7 @@ public:
     struct Result {
         Eigen::MatrixXcd A;
         Eigen::VectorXcd b;
-        Eigen::VectorXcd x;
+        Eigen::VectorXcd y;
     };
 
     static Result solveSystem(double radius,

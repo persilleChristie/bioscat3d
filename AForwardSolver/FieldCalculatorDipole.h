@@ -3,7 +3,7 @@
 #define FIELDCALCULATORDIPOLE_H
 
 #include "FieldCalculator.h"
-#include "Dipole.h"
+#include "UtilsDipole.h"
 #include "Constants.h"
 #include <Eigen/Dense>
 #include <complex>

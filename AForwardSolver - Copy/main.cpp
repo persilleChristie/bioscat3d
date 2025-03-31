@@ -18,17 +18,17 @@ int main() {
     Vector3d polarization(1.0, 0.0, 0.0);
 
     // Solve the system
-    auto result = LinearSystemSolver::solveSystem(radius, center, num_points, k0, Gamma_r, k_inc, polarization);
+    auto result = LinearSystemSolver::solveSystem(radius, center, num_points, k0, Gamma_r, k_inc, polarization); // take surface as input.
 
     // Output sizes
     std::cout << "Linear system A has size: " << result.A.rows() << " x " << result.A.cols() << std::endl;
     std::cout << "Right-hand side b has size: " << result.b.size() << std::endl;
-    std::cout << "Solution x has size: " << result.x.size() << std::endl;
+    std::cout << "Solution y has size: " << result.y.size() << std::endl;
 
     // Save to files
     Export::saveMatrixCSV("matrix_A_simple.csv", result.A);
     Export::saveVectorCSV("vector_b_simple.csv", result.b);
-    Export::saveVectorCSV("solution_y_simple.csv", result.x);
+    Export::saveVectorCSV("solution_y_simple.csv", result.y);
 
     return 0;
 }

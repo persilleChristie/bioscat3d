@@ -3,7 +3,7 @@
 #include "SurfaceSphere.h"
 #include "FieldCalculatorDipole.h"
 #include "FieldCalculatorUPW.h"
-#include "Dipole.h"
+#include "UtilsDipole.h"
 #include "Constants.h"
 #include "UtilsSolvers.h"
 #include <memory>
@@ -48,11 +48,11 @@ LinearSystemSolver::Result LinearSystemSolver::solveSystem(double radius,
     VectorXcd b;
     SystemAssembler::assembleSystem(A, b, sphere_mu, sources, incident);
 
-    VectorXcd x = UtilsSolvers::solveQR(A, b);
+    VectorXcd y = UtilsSolvers::solveQR(A, b);
 
     LinearSystemSolver::Result result;
     result.A = A;
     result.b = b;
-    result.x = x;
+    result.y = y;
     return result;
 }
