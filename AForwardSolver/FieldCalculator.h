@@ -5,14 +5,18 @@
 
 class FieldCalculator {
 public:
-    // Compute full E and H fields at given evaluation points
+    // Pointwise field access (needed by SystemAssembler)
+    virtual Eigen::Vector3cd getEField(const Eigen::Vector3d& x) const = 0;
+    virtual Eigen::Vector3cd getHField(const Eigen::Vector3d& x) const = 0;
+
+    // Batched field computation
     virtual void computeFields(
         Eigen::MatrixXd& outE,
         Eigen::MatrixXd& outH,
         const Eigen::MatrixXd& evalPoints
     ) const = 0;
 
-    // Compute tangential components of E and H given tau1 and tau2 directions
+    // Tangential components
     virtual void computeTangentialFields(
         Eigen::MatrixXd& outEt,
         Eigen::MatrixXd& outHt,

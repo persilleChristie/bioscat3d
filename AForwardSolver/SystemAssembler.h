@@ -1,5 +1,5 @@
-#ifndef SYSTEMASSEMBLER_H
-#define SYSTEMASSEMBLER_H
+#ifndef SYSTEM_ASSEMBLER_H
+#define SYSTEM_ASSEMBLER_H
 
 #include "Surface.h"
 #include "FieldCalculator.h"
@@ -9,14 +9,13 @@
 
 class SystemAssembler {
 public:
-    // Assemble system matrix A and RHS vector b using a surface and field sources
-    static void assemble(
+    static void assembleSystem(
         Eigen::MatrixXcd& A,
         Eigen::VectorXcd& b,
-        const Surface& surface,
+        const Surface& surface_mu,
         const std::vector<std::shared_ptr<FieldCalculator>>& sources,
-        const std::shared_ptr<FieldCalculator>& incidentField
+        const std::shared_ptr<FieldCalculator>& incident
     );
 };
 
-#endif // SYSTEMASSEMBLER_H
+#endif // SYSTEM_ASSEMBLER_H

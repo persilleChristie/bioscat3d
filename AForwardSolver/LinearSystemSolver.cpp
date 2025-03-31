@@ -1,11 +1,11 @@
 #include "LinearSystemSolver.h"
 #include "SystemAssembler.h"
-#include "SystemSolver.h"
 #include "SurfaceSphere.h"
 #include "FieldCalculatorDipole.h"
 #include "FieldCalculatorUPW.h"
 #include "Dipole.h"
 #include "Constants.h"
+#include "UtilsSolvers.h"
 #include <memory>
 
 using namespace Eigen;
@@ -17,10 +17,8 @@ LinearSystemSolver::Result LinearSystemSolver::solveSystem(double radius,
                                                            double Gamma_r,
                                                            const Eigen::Vector3d& k_inc,
                                                            const Eigen::Vector3d& polarization) {
-    
-
     Constants constants;
-    constants.k0 = k0; // Override k0 in constants if used elsewhere
+    constants.k0 = k0;
 
     SurfaceSphere sphere_mu(radius, center, resolution);
     SurfaceSphere sphere_nu_prime(0.8 * radius, center, resolution);
@@ -35,8 +33,8 @@ LinearSystemSolver::Result LinearSystemSolver::solveSystem(double radius,
         const MatrixXd& t1 = surface.getTau1();
         const MatrixXd& t2 = surface.getTau2();
         for (int i = 0; i < pts.rows(); ++i) {
-            sources.push_back(std::make_shared<FieldCalculatorDipole>(Dipole(pts.row(i), t1.row(i))));
-            sources.push_back(std::make_shared<FieldCalculatorDipole>(Dipole(pts.row(i), t2.row(i))));
+            sources.emplace_back(std::make_shared<FieldCalculatorDipole>(Dipole(pts.row(i), t1.row(i))));
+            sources.emplace_back(std::make_shared<FieldCalculatorDipole>(Dipole(pts.row(i), t2.row(i))));
         }
     };
 
@@ -44,13 +42,17 @@ LinearSystemSolver::Result LinearSystemSolver::solveSystem(double radius,
     addDipoles(*sphere_nu_prime_tilde);
     addDipoles(sphere_nu_2prime);
 
-    auto incident = std::make_shared<FieldCalculatorUPW>(k_inc, polarization);
+    std::shared_ptr<FieldCalculator> incident = std::make_shared<FieldCalculatorUPW>(k_inc, polarization);
 
     MatrixXcd A;
     VectorXcd b;
-    SystemAssembler::assemble(A, b, sphere_mu, sources, incident);
+    SystemAssembler::assembleSystem(A, b, sphere_mu, sources, incident);
 
-    Eigen::VectorXcd x = SystemSolver::solve(A, b);
+    VectorXcd x = UtilsSolvers::solveQR(A, b);
 
-    return { A, b, x };
+    LinearSystemSolver::Result result;
+    result.A = A;
+    result.b = b;
+    result.x = x;
+    return result;
 }

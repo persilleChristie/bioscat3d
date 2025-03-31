@@ -26,9 +26,9 @@ int main() {
     std::cout << "Solution x has size: " << result.x.size() << std::endl;
 
     // Save to files
-    saveMatrixCSV("matrix_A_simple.csv", result.A);
-    saveVectorCSV("vector_b_simple.csv", result.b);
-    saveVectorCSV("solution_y_simple.csv", result.x);
+    Export::saveMatrixCSV("matrix_A_simple.csv", result.A);
+    Export::saveVectorCSV("vector_b_simple.csv", result.b);
+    Export::saveVectorCSV("solution_y_simple.csv", result.x);
 
     return 0;
 }
