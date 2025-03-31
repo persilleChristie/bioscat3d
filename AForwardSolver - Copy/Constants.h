@@ -18,6 +18,7 @@ struct Constants {
     static constexpr double n0       = 1.0;              // Refractive index of air
     static constexpr double epsilon0 = 8.8541878188e-12; // Permittivity of free space
     static constexpr double mu0      = 1.25663706127e-6; // Permeability of free space
+    static constexpr double omega = 1;
 
     // Chosen constants (I have used the same constants as Mirza for some of them)
     static constexpr double lambda0 = 325e-9;    // Default value of wavelength in free space

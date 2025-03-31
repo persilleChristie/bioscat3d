@@ -12,10 +12,9 @@ pair<Vector3cd, Vector3cd> computeUPWField(const Vector3d& x, const Vector3d& k,
     complex<double> phase = exp(-j * k.dot(x));
     Vector3cd E = E0 * phase;
 
-    double omega = 1; // constants.omega; ?????????????????????????????????????????????
-    double mu0 = constants.mu0;
+     
 
-    Vector3cd H = (k.cross(E0)) / (omega * mu0) * phase;
+    Vector3cd H = (k.cross(E0)) / (constants.omega * constants.mu0) * phase;
 
     return {E, H};
 }
