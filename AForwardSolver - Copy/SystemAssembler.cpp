@@ -1,12 +1,14 @@
 #include "SystemAssembler.h"
 #include "UtilsSolvers.h"
 #include "FieldCalculator.h"
+#include "FieldCalculatorDipole.h"
+#include "FieldCalculatorUPW.h"
 #include <iostream>
 
 using namespace Eigen;
 
 void SystemAssembler::assembleSystem(
-    Eigen::MatrixXcd& A,
+    Eigen::MatrixX3cd& A,
     Eigen::VectorXcd& b,
     const Surface& surface,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources,
