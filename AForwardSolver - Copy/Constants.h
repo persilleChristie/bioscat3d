@@ -17,8 +17,10 @@ struct Constants {
     static constexpr double eta0     = 377.0;            // 377 Ohm, impedance of free space
     static constexpr double n0       = 1.0;              // Refractive index of air
     static constexpr double epsilon0 = 8.8541878188e-12; // Permittivity of free space
+    static constexpr double epsilon1 = 1; // Substrate epsilon value???? 
     static constexpr double mu0      = 1.25663706127e-6; // Permeability of free space
     static constexpr double omega = 1;
+    static constexpr double Iel = 1;
 
     // Chosen constants (I have used the same constants as Mirza for some of them)
     static constexpr double n1    = 1.6;         // Refractive index of the nanowire/nanostructure % 5.05506 - 1i*3.20418;
