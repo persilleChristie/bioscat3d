@@ -48,7 +48,7 @@ int main() {
     std::vector<std::shared_ptr<FieldCalculator>> sources_mirr;
     std::vector<std::shared_ptr<FieldCalculator>> sources_ext;
 
-    auto addDipoles = [&](const SurfaceSphere& surface, std::vector<std::shared_ptr<FieldCalculator>> sources) {
+    auto addDipoles = [&](const SurfaceSphere& surface, std::vector<std::shared_ptr<FieldCalculator>>& sources) {
         const MatrixXd& pts = surface.getPoints();
         const MatrixXd& t1 = surface.getTau1();
         const MatrixXd& t2 = surface.getTau2();
