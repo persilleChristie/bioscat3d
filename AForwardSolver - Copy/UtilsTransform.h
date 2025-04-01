@@ -65,7 +65,7 @@ inline Eigen::Vector3d translateVector(const Eigen::Vector3d& v, const Eigen::Ve
 // =========================================
 //  Compute E-Field Components
 // =========================================
-Eigen::Vector3cd computeECartesian(double sin_theta, double cos_theta, 
+inline Eigen::Vector3cd computeECartesian(double sin_theta, double cos_theta, 
     double sin_phi, double cos_phi, 
     const std::complex<double>& E_r, 
     const std::complex<double>& E_theta) {

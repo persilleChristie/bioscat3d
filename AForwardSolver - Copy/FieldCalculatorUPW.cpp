@@ -1,14 +1,14 @@
 #include "FieldCalculatorUPW.h"
 #include <complex>
 #include <Eigen/Dense>
-#include <UtilsTransform.h>
-#include <UtilsFresnel.h>
+#include "UtilsTransform.h"
+#include "UtilsFresnel.h"
 
 using namespace Eigen;
 using namespace std;
 
 FieldCalculatorUPW::FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in, 
-    const Constants& constants_in = Constants())
+    const Constants& constants_in)
 : k(k_in), E0(E0_in), polarization(polarization_in), constants(constants_in) {}
 
 
@@ -30,7 +30,7 @@ void FieldCalculatorUPW::computeReflectedFields(
     auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
 
-    Vector3d k_rot = Rz * k;
+    // Vector3d k_rot = Rz * k;
 
     complex<double> Gamma_r_perp = UtilsFresnel::fresnelTE(cosTheta_in, sinTheta_in, constants.epsilon0, constants.epsilon1).first;
     complex<double> Gamma_r_par = UtilsFresnel::fresnelTM(cosTheta_in, sinTheta_in, constants.epsilon0, constants.epsilon1).first;
@@ -73,10 +73,10 @@ void FieldCalculatorUPW::computeFields(
     double cosBeta = cos(polarization);
     double sinBeta = sin(polarization);
 
-    auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
-    auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
+    //auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
+    //auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
 
-    Vector3d k_rot = Rz * k;
+    //Vector3d k_rot = Rz * k;
 
     MatrixX3cd refE(N,3);
     MatrixX3cd refH(N,3);
@@ -97,8 +97,8 @@ void FieldCalculatorUPW::computeFields(
         Vector3cd H_in = cosBeta * H_in_perp + sinBeta * H_in_par;
 
 
-        outE.row(i) = E_in + refE.row(i);
-        outH.row(i) = H_in + refH.row(i);
+        outE.row(i) = E_in.transpose() + refE.row(i);
+        outH.row(i) = H_in.transpose() + refH.row(i);
     }
 }
 

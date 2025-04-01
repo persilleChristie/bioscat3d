@@ -15,7 +15,7 @@ private:
 
 public:
     FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in, 
-                        const Constants& constants = Constants());
+                        const Constants& constants);
 
 
     void computeReflectedFields(
@@ -26,9 +26,9 @@ public:
     
     
     virtual void computeFields(
-        Eigen::MatrixXcd& outE,
-        Eigen::MatrixXcd& outH,
-        const Eigen::MatrixXd& evalPoints
+        Eigen::MatrixX3cd& outE,
+        Eigen::MatrixX3cd& outH,
+        const Eigen::MatrixX3d& evalPoints
     ) const override;
 
 };
