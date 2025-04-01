@@ -82,6 +82,9 @@
         "xutility": "cpp",
         "core": "cpp",
         "dense": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "chrono": "cpp",
+        "codecvt": "cpp",
+        "iomanip": "cpp"
     }
 }
