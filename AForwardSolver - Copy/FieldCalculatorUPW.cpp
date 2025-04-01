@@ -64,6 +64,13 @@ void FieldCalculatorUPW::computeFields(
     const MatrixX3d& evalPoints
 ) const {
     int N = evalPoints.rows();
+    
+    if (evalPoints.rows() == 0) {
+        outE.resize(0, 3);
+        outH.resize(0, 3);
+        return;
+    }
+    
 
     double cosPhi, sinPhi, cosTheta_in, sinTheta_in; // azimuthal angle the same for k_in and k_rot????
 
@@ -82,6 +89,12 @@ void FieldCalculatorUPW::computeFields(
     MatrixX3cd refH(N,3);
 
     computeReflectedFields(refE, refH, evalPoints);
+
+    if (evalPoints.rows() == 0) {
+        refE.resize(0, 3);
+        refH.resize(0, 3);
+        return;
+    }    
 
     for (int i = 0; i < N; ++i) {
         Vector3d x = evalPoints.row(i);

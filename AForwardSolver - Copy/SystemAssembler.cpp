@@ -9,7 +9,7 @@
 using namespace Eigen;
 
 void SystemAssembler::assembleSystem(
-    Eigen::MatrixX3cd& A,
+    Eigen::MatrixXcd& A,
     Eigen::VectorXcd& b,
     const Surface& surface,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources_int,
@@ -23,13 +23,23 @@ void SystemAssembler::assembleSystem(
     const auto& tau2 = surface.getTau2();
 
     int M = points.rows();
+
+    if (M == 0) {
+        std::cerr << "[Error] Surface has no points!\n";
+        return;
+    }
+    if (tau1.rows() != M || tau2.rows() != M) {
+        std::cerr << "[Error] Tangents and points mismatch!\n";
+        return;
+    }
+    
     int Nprime_double = sources_int.size();
     int N2prime_double = sources_ext.size();
     int Nprime = Nprime_double/2;
     int N2prime = N2prime_double/2;
 
-    //A.resize(4 * M, Nprime_double + N2prime_double);
-    //b.resize(4 * M);
+    A.resize(4 * M, Nprime_double + N2prime_double);
+    b.resize(4 * M);
 
     MatrixX3cd E_inc_new(M,3);
     MatrixX3cd H_inc_new(M,3);

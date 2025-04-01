@@ -10,7 +10,7 @@
 class SystemAssembler {
 public:
     static void assembleSystem(
-        Eigen::MatrixX3cd& A,
+        Eigen::MatrixXcd& A,
         Eigen::VectorXcd& b,
         const Surface& surface,
         const std::vector<std::shared_ptr<FieldCalculator>>& sources_int,

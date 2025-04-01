@@ -13,6 +13,15 @@ FieldCalculatorDipole::FieldCalculatorDipole(const Dipole& dipole, const Constan
     ) const {
 
     int N = evalPoints.rows();
+        if (N == 0) {
+            outE.resize(0, 3);
+            outH.resize(0, 3);
+            return;
+        }
+
+        outE.resize(N, 3);
+        outH.resize(N, 3);
+
 
     // Compute dipole direction angles
     double cosTheta, sinTheta, cosPhi, sinPhi;

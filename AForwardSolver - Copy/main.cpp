@@ -39,7 +39,7 @@ int main() {
     int M = sphere_mu.getPoints().rows();
     int N = sphere_nu_prime.getPoints().rows() + sphere_nu_2prime.getPoints().rows();
     
-    Eigen::MatrixX3cd A(4 * M, 2*N);
+    Eigen::MatrixXcd A(4 * M, 2*N);
     Eigen::VectorXcd b(4 *M);
 
     std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, polarization, constants);
