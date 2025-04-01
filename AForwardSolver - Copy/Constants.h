@@ -21,11 +21,11 @@ struct Constants {
     static constexpr double omega = 1;
 
     // Chosen constants (I have used the same constants as Mirza for some of them)
-    static constexpr double lambda0 = 325e-9;    // Default value of wavelength in free space
     static constexpr double n1    = 1.6;         // Refractive index of the nanowire/nanostructure % 5.05506 - 1i*3.20418;
     static constexpr double alpha = 0.86;        // Scaling for placement of auxiliary sources for the nanowires
 
     // Computed constants
+    double lambda0 = 325e-9;    // Default value of wavelength in free space
     double k0;              // Wave number in free space
     double k1;              // Wave number in nanowire/nanostructure
 

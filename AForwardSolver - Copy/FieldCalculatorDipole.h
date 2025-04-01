@@ -11,14 +11,13 @@ class FieldCalculatorDipole : public FieldCalculator {
 public:
     FieldCalculatorDipole(const Dipole& dipole, double Iel = 1.0, const Constants& constants = Constants());
 
-    void computeFields(
-        Eigen::MatrixXd& outE_real,
-        Eigen::MatrixXd& outH_real,
+    virtual void computeFields(
+        Eigen::MatrixXd& outE,
+        Eigen::MatrixXd& outH,
         const Eigen::MatrixXd& evalPoints
     ) const override;
 
-    Eigen::Vector3cd getEField(const Eigen::Vector3d& x) const override;
-    Eigen::Vector3cd getHField(const Eigen::Vector3d& x) const override;
+    std::pair<Eigen::Vector3cd, Eigen::Vector3cd> getFields(const Eigen::Vector3d& x) const;
 
 private:
     Dipole dipole_;

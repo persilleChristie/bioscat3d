@@ -9,7 +9,11 @@ using namespace TransformUtils;
 FieldCalculatorDipole::FieldCalculatorDipole(const Dipole& dipole, double Iel, const Constants& constants) // drop Iel and constants, add k0 
     : dipole_(dipole), Iel_(Iel), constants_(constants) {}
 
-std::pair<Vector3cd, Vector3cd> FieldCalculatorDipole::computeFieldAt(const Vector3d& x) const {
+void FieldCalculatorDipole::computeFields(
+    Eigen::MatrixX3d& outE,
+    Eigen::MatrixX3d& outH,
+    const Eigen::MatrixX3d& evalPoints) const {
+
     // Compute dipole direction angles
     double cosTheta, sinTheta, cosPhi, sinPhi;
     computeAngles(dipole_.getDirection(), 1.0, cosTheta, sinTheta, cosPhi, sinPhi);
@@ -52,10 +56,7 @@ std::pair<Vector3cd, Vector3cd> FieldCalculatorDipole::computeFieldAt(const Vect
     return {E_global, H_global};
 }
 
-Vector3cd FieldCalculatorDipole::getEField(const Vector3d& x) const {
-    return computeFieldAt(x).first;
+std::pair<Eigen::Vector3cd, Eigen::Vector3cd> FieldCalculatorDipole::getFields(const Vector3d& x) const {
+    return computeFieldAt(x);
 }
 
-Vector3cd FieldCalculatorDipole::getHField(const Vector3d& x) const {
-    return computeFieldAt(x).second;
-}
