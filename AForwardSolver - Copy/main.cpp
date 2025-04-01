@@ -39,7 +39,7 @@ int main() {
     int M = sphere_mu.getPoints().rows();
     int N = sphere_nu_prime.getPoints().rows() + sphere_nu_2prime.getPoints().rows();
     
-    Eigen::MatrixX3cd A(4 * M, N);
+    Eigen::MatrixX3cd A(4 * M, 2*N);
     Eigen::VectorXcd b(4 *M);
 
     std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, polarization, constants);
@@ -63,7 +63,7 @@ int main() {
     addDipoles(*sphere_nu_prime_tilde, sources_mirr);
     addDipoles(sphere_nu_2prime, sources_ext);
 
-    SystemAssembler::assembleSystem(A, b, sphere_mu, sources_int, sources_mirr, sources_ext, incident, Gamma_r);
+    SystemAssembler::assembleSystem(A,b,sphere_mu, sources_int, sources_mirr,sources_ext,incident,Gamma_r);
     
     // solve with UtilsSolver
     auto y = UtilsSolvers::solveQR(A, b);

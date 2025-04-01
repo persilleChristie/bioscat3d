@@ -73,29 +73,29 @@ void SystemAssembler::assembleSystem(
 
             // Electric fields
             // A(1,1) 
-            A(mu, nu) = E_int1.dot(tau1) + Gamma_r * E_mirr1.dot(tau1);
+            A(mu, nu) = E_int1.dot(t1) + Gamma_r * E_mirr1.dot(t1);
             
             // A(1,2)
-            A(mu, nu + Nprime) = E_int2.dot(tau1) + Gamma_r * E_mirr2.dot(tau1);
+            A(mu, nu + Nprime) = E_int2.dot(t1) + Gamma_r * E_mirr2.dot(t1);
 
             // A(2,1)
-            A(mu + M, nu) = E_int1.dot(tau2) + Gamma_r * E_mirr1.dot(tau2);
+            A(mu + M, nu) = E_int1.dot(t2) + Gamma_r * E_mirr1.dot(t2);
             
             // A(2,2)
-            A(mu + M, nu + Nprime) = E_int2.dot(tau2) + Gamma_r * E_mirr2.dot(tau2);
+            A(mu + M, nu + Nprime) = E_int2.dot(t2) + Gamma_r * E_mirr2.dot(t2);
 
             // Magnetic fields
             // A(3,1)
-            A(mu + 2*M, nu) = H_int1.dot(tau1) + Gamma_r * H_mirr1.dot(tau1);
+            A(mu + 2*M, nu) = H_int1.dot(t1) + Gamma_r * H_mirr1.dot(t1);
             
             // A(3,2)
-            A(mu + 2*M, nu + Nprime) = H_int2.dot(tau1) + Gamma_r * H_mirr2.dot(tau1);
+            A(mu + 2*M, nu + Nprime) = H_int2.dot(t1) + Gamma_r * H_mirr2.dot(t1);
 
             // A(4,1)
-            A(mu + 3*M, nu) = H_int1.dot(tau2) + Gamma_r * H_mirr1.dot(tau2);
+            A(mu + 3*M, nu) = H_int1.dot(t2) + Gamma_r * H_mirr1.dot(t2);
             
             // A(4,2)
-            A(mu + 3*M, nu + Nprime) = H_int2.dot(tau2) + Gamma_r * H_mirr2.dot(tau2);
+            A(mu + 3*M, nu + Nprime) = H_int2.dot(t2) + Gamma_r * H_mirr2.dot(t2);
         }
 
         for (int nu = 0; nu < N2prime; ++nu) {
@@ -114,29 +114,29 @@ void SystemAssembler::assembleSystem(
 
             // Electric fields
             // A(1,3) 
-            A(mu, nu + 2*Nprime) = E_ext1.dot(tau1);
+            A(mu, nu + 2*Nprime) = E_ext1.dot(t1);
             
             // A(1,4)
-            A(mu, nu + 2*Nprime + N2prime) = E_ext2.dot(tau1);
+            A(mu, nu + 2*Nprime + N2prime) = E_ext2.dot(t1);
 
             // A(2,3)
-            A(mu + M, nu + 2*Nprime) = E_ext1.dot(tau2);
+            A(mu + M, nu + 2*Nprime) = E_ext1.dot(t2);
             
             // A(2,4)
-            A(mu + M, nu + 2*Nprime + N2prime)  = E_ext2.dot(tau2);
+            A(mu + M, nu + 2*Nprime + N2prime)  = E_ext2.dot(t2);
 
             // Magnetic fields
             // A(3,3)
-            A(mu + 2*M, nu + 2*Nprime) = H_ext1.dot(tau1);
+            A(mu + 2*M, nu + 2*Nprime) = H_ext1.dot(t1);
             
             // A(3,4)
-            A(mu + 2*M, nu + 2*Nprime + N2prime) = H_ext2.dot(tau1);
+            A(mu + 2*M, nu + 2*Nprime + N2prime) = H_ext2.dot(t1);
 
             // A(4,3)
-            A(mu + 3*M, nu + 2*Nprime) = H_ext1.dot(tau2);
+            A(mu + 3*M, nu + 2*Nprime) = H_ext1.dot(t2);
             
             // A(4,4)
-            A(mu + 3*M, nu + 2*Nprime + N2prime) = H_ext2.dot(tau2);
+            A(mu + 3*M, nu + 2*Nprime + N2prime) = H_ext2.dot(t2);
         }
     }
 }
