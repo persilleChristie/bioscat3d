@@ -28,8 +28,8 @@ void SystemAssembler::assembleSystem(
     int Nprime = Nprime_double/2;
     int N2prime = N2prime_double/2;
 
-    A.resize(4 * M, Nprime_double + N2prime_double);
-    b.resize(4 * M);
+    //A.resize(4 * M, Nprime_double + N2prime_double);
+    //b.resize(4 * M);
 
     MatrixX3cd E_inc_new(M,3);
     MatrixX3cd H_inc_new(M,3);
