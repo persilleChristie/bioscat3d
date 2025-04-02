@@ -1,4 +1,5 @@
 #include "SystemAssembler.h"
+#include "Surface.h"
 #include "UtilsSolvers.h"
 #include "FieldCalculator.h"
 #include "FieldCalculatorDipole.h"
