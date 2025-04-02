@@ -42,22 +42,28 @@ namespace UtilsSolvers {
     /// @param verbose Whether to print solver info (default: false).
     /// @return The solution vector x.
     inline VectorXcd solveQR(const MatrixXcd& A, const VectorXcd& b, bool verbose = false) {
+        if (A.rows() == 0 || A.cols() == 0 || b.size() == 0) {
+            std::cerr << "[solveQR] Error: received empty matrix or vector." << std::endl;
+            return VectorXcd::Zero(A.cols());
+        }
+    
         if (A.rows() != b.rows()) {
             std::cerr << "[solveQR] Dimension mismatch: A.rows() = " << A.rows()
                       << ", b.rows() = " << b.rows() << std::endl;
             return VectorXcd::Zero(A.cols());
         }
-
+    
         Eigen::ColPivHouseholderQR<MatrixXcd> solver(A);
         VectorXcd x = solver.solve(b);
-
+    
         if (verbose) {
             std::cout << "[solveQR] Solved system using ColPivHouseholderQR, relative error: "
                       << (A * x - b).norm() / b.norm() << std::endl;
         }
-
+    
         return x;
     }
+    
 
     /// Print a short summary of the solution quality.
     inline void reportResidual(const MatrixXcd& A, const VectorXcd& x, const VectorXcd& b, const std::string& label = "") {

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #ifndef FIELDCALCULATORUPW_H
 #define FIELDCALCULATORUPW_H
 
@@ -10,46 +9,28 @@
 class FieldCalculatorUPW : public FieldCalculator {
 private:
     Eigen::Vector3d k;
-    Eigen::Vector3cd E0;
+    double E0;
+    double polarization;
     Constants constants;
 
 public:
-    FieldCalculatorUPW(const Eigen::Vector3d& k_in, const Eigen::Vector3d& E0_in)
-        : k(k_in), E0(E0_in.cast<std::complex<double>>()), constants() {}
+    FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in, 
+                        const Constants& constants);
 
-    void computeFields(
-        Eigen::MatrixXd& outE,
-        Eigen::MatrixXd& outH,
-        const Eigen::MatrixXd& evalPoints
+
+    void computeReflectedFields(
+        Eigen::MatrixX3cd& refE,
+        Eigen::MatrixX3cd& refH,
+        const Eigen::MatrixX3d& evalPoints
+    ) const;
+    
+    
+    virtual void computeFields(
+        Eigen::MatrixX3cd& outE,
+        Eigen::MatrixX3cd& outH,
+        const Eigen::MatrixX3d& evalPoints
     ) const override;
 
-    Eigen::Vector3cd getEField(const Eigen::Vector3d& x) const override;
-    Eigen::Vector3cd getHField(const Eigen::Vector3d& x) const override;
 };
 
 #endif // FIELDCALCULATORUPW_H
-=======
-#ifndef UPWFIELDCALCULATOR_H
-#define UPWFIELDCALCULATOR_H
-
-#include "FieldCalculator.h"
-#include <Eigen/Dense>
-
-class FieldCalculatorUPW : public FieldCalculator {
-public:
-    FieldCalculatorUPW(const Eigen::Vector3d& waveVector,
-                       const Eigen::Vector3d& polarization);
-
-    void computeFields(
-        Eigen::MatrixXd& outE,
-        Eigen::MatrixXd& outH,
-        const Eigen::MatrixXd& evalPoints
-    ) const override;
-
-private:
-    Eigen::Vector3d k;   // wave vector
-    Eigen::Vector3d E0;  // polarization vector
-};
-
-#endif // UPWFIELDCALCULATOR_H
->>>>>>> a5573bfeda0575951aeed785824f8fe3a44f17d7
