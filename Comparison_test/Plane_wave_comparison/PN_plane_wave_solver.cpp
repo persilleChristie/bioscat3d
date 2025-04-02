@@ -1,8 +1,8 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <fstream>
-#include "../../AForwardSolver/FieldCalculatorUPW.h"
-#include "../../AForwardSolver/Constants.h"
+#include "../../ForwardSolver/FieldCalculatorUPW.h"
+#include "../../ForwardSolver/Constants.h"
 
 void saveToCSV(const Eigen::MatrixXcd& E, const Eigen::MatrixXcd& H, const std::string& filename) {
     std::ofstream file(filename);

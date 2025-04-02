@@ -80,8 +80,8 @@ void FieldCalculatorUPW::computeFields(
     double cosBeta = cos(polarization);
     double sinBeta = sin(polarization);
 
-    //auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
-    //auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
+    auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
+    auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
 
     //Vector3d k_rot = Rz * k;
 
@@ -99,15 +99,18 @@ void FieldCalculatorUPW::computeFields(
     for (int i = 0; i < N; ++i) {
         Vector3d x = evalPoints.row(i);
 
-        complex<double> phase1 = E0 * exp(- constants.j * constants.k0 * (k.dot(x)));
+        Eigen::Vector3d x_rot = Rz * x;
+        // Vector3d x_plane (x_rot[0], 0.0, x_rot[2]);
+
+        complex<double> phase1 = E0 * exp(- constants.j * constants.k0 * (k.dot(x_rot)));
         
         Vector3cd E_in_perp (0.0, phase1, 0.0);
         Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);
-        Vector3cd E_in = cosBeta * E_in_perp + sinBeta * E_in_par;
+        Vector3cd E_in = Rz_inv * (cosBeta * E_in_perp + sinBeta * E_in_par);
 
         Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
         Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);
-        Vector3cd H_in = cosBeta * H_in_perp + sinBeta * H_in_par;
+        Vector3cd H_in = Rz_inv * (cosBeta * H_in_perp + sinBeta * H_in_par);
 
 
         outE.row(i) = E_in.transpose() + refE.row(i);
