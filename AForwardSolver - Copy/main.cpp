@@ -17,7 +17,7 @@ int main() {
     double radius = 1.0;
     Vector3d center(0.0, 0.0, 1.0);
     Vector3d k_inc(0.0, 0.0, -1.0);
-    int resolution = 5;
+    int resolution = 10;
     double polarization = 0.2;
     double E0 = 1.0;
     std::complex<double> Gamma_r = 0.8; /////////////////////////////
