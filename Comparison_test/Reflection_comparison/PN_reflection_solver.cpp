@@ -1,8 +1,8 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <fstream>
-#include "../../AForwardSolver/FieldCalculatorUPW.h"
-#include "../../AForwardSolver/Constants.h"
+#include "../../ForwardSolver/FieldCalculatorUPW.h"
+#include "../../ForwardSolver/Constants.h"
 
 void saveToCSV(const Eigen::MatrixXcd& E, const Eigen::MatrixXcd& H, const std::string& filename) {
     std::ofstream file(filename);
@@ -74,9 +74,9 @@ int main(int argc, char* argv[]){
     
     // Assign values to Eigen vectors
     for (const auto& param : params) {
-        if (param.name == "direction_x") direction(0) = param.value;
-        else if (param.name == "direction_y") direction(1) = param.value;
-        else if (param.name == "direction_z") direction(2) = param.value;
+        if (param.name == "propagation_x") direction(0) = param.value;
+        else if (param.name == "propagation_y") direction(1) = param.value;
+        else if (param.name == "propagation_z") direction(2) = param.value;
         else if (param.name == "polarization") polarization = param.value;
     }
     

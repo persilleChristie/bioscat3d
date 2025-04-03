@@ -1,8 +1,8 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -I/usr/include/eigen3 -I../../AForwardSolver/
+CXXFLAGS = -std=c++17 -I/usr/include/eigen3 -I../../ForwardSolver/
 TARGET = PN_reflection_solver
 
-SRC = PN_reflection_solver.cpp ../../AForwardSolver/FieldCalculatorUPW.cpp
+SRC = PN_reflection_solver.cpp ../../ForwardSolver/FieldCalculatorUPW.cpp
 OBJ = $(SRC:.cpp=.o)
 
 all: $(TARGET)

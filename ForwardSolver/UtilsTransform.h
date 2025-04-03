@@ -16,7 +16,7 @@ inline void computeAngles(const Eigen::Vector3d& x, double r,
         return;
     }
 
-    cosTheta = x[2] / r;
+    cosTheta = -x[2] / r;
     sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
     double xy_norm = std::hypot(x[0], x[1]);
 
