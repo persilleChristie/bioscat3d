@@ -24,6 +24,8 @@ void FieldCalculatorUPW::computeReflectedFields(
     TransformUtils::computeAngles(k, 1.0, cosTheta_in, sinTheta_in,
         cosPhi, sinPhi);
 
+    cout << "cos(theta) = " << cosTheta_in << endl;
+
     double cosBeta = cos(polarization);
     double sinBeta = sin(polarization);
 
@@ -34,6 +36,13 @@ void FieldCalculatorUPW::computeReflectedFields(
 
     complex<double> Gamma_r_perp = UtilsFresnel::fresnelTE(cosTheta_in, sinTheta_in, constants.epsilon0, constants.epsilon1).first;
     complex<double> Gamma_r_par = UtilsFresnel::fresnelTM(cosTheta_in, sinTheta_in, constants.epsilon0, constants.epsilon1).first;
+
+    if (Gamma_r_perp.imag() == 0){
+    cout << "Gamma perp: " << Gamma_r_perp.real() << endl;}
+    else {cout << "Gamma perp: " << Gamma_r_perp.real() << "+" << Gamma_r_perp.imag() << "j" << endl;}
+    if (Gamma_r_par.imag() == 0){
+        cout << "Gamma par: " << Gamma_r_par.real() << endl;}
+    else {cout << "Gamma perp: " << Gamma_r_par.real() << "+" << Gamma_r_par.imag() << "j" << endl;}
 
 
     for (int i = 0; i < N; ++i) {

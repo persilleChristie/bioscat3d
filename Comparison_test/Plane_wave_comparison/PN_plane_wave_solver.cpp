@@ -74,12 +74,14 @@ int main(int argc, char* argv[]){
     
     // Assign values to Eigen vectors
     for (const auto& param : params) {
-        if (param.name == "direction_x") direction(0) = param.value;
-        else if (param.name == "direction_y") direction(1) = param.value;
-        else if (param.name == "direction_z") direction(2) = param.value;
+        if (param.name == "propagation_x") direction(0) = param.value;
+        else if (param.name == "propagation_y") direction(1) = param.value;
+        else if (param.name == "propagation_z") direction(2) = param.value;
         else if (param.name == "polarization") polarization = param.value;
     }
     
+    std::cout << "Propagation vector = (" << direction(0) << "," << direction(1) << "," << direction(2) << ")" << std::endl;
+
     // Read test points into an Eigen matrix
     std::ifstream matrix_file(testpoint_file); // Replace with your test points CSV filename
     if (!matrix_file.is_open()) {
