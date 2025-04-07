@@ -17,6 +17,8 @@ public:
         const Eigen::MatrixX3d& evalPoints
     ) const override;
 
+    const Eigen::Vector3d& getDirection() const { return dipole_.getDirection(); }
+
 private:
     Dipole dipole_;
     Constants constants_;

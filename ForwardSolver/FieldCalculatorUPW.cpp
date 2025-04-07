@@ -86,6 +86,9 @@ void FieldCalculatorUPW::computeFields(
     TransformUtils::computeAngles(k, 1.0, cosTheta_in, sinTheta_in,
         cosPhi, sinPhi);
 
+    cout << "cos(phi) = " << cosPhi << endl;
+    cout << "sin(phi) = " << sinPhi << endl;
+
     double cosBeta = cos(polarization);
     double sinBeta = sin(polarization);
 

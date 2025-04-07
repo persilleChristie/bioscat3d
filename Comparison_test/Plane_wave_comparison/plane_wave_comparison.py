@@ -142,9 +142,12 @@ def compute_fields_from_csv(param_file, testpoints_file, output_file):
     print(f"Propagation vector: {propagation_vector}, Polarization: {polarization}")
     print(f"Testpoints shape: {testpoints.shape}")
     
+    
     # Compute fields (assuming Plane_wave is defined elsewhere)
     PW = Plane_wave(propagation_vector, polarization, epsilon, mu, omega)
     E, H = PW.evaluate_at_points(testpoints)
+
+    print(f"Rotation matrix: {PW.rot_matrix}")
     
     # Prepare data for saving: split real and imaginary parts
     data = {

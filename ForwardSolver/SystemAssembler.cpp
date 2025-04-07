@@ -6,6 +6,7 @@
 #include "FieldCalculatorUPW.h"
 #include "Constants.h"
 #include <iostream>
+#include "UtilsFresnel.h"
 
 using namespace Eigen;
 
@@ -13,9 +14,9 @@ void SystemAssembler::assembleSystem(
     Eigen::MatrixXcd& A,
     Eigen::VectorXcd& b,
     const Surface& surface,
-    const std::vector<std::shared_ptr<FieldCalculator>>& sources_int,
-    const std::vector<std::shared_ptr<FieldCalculator>>& sources_mirr,
-    const std::vector<std::shared_ptr<FieldCalculator>>& sources_ext,
+    const std::vector<std::shared_ptr<FieldCalculatorDipole>>& sources_int,
+    const std::vector<std::shared_ptr<FieldCalculatorDipole>>& sources_mirr,
+    const std::vector<std::shared_ptr<FieldCalculatorDipole>>& sources_ext,
     const std::shared_ptr<FieldCalculator>& incident,
     const std::complex<double> Gamma_r
 ) {
@@ -81,6 +82,10 @@ void SystemAssembler::assembleSystem(
 
             Vector3cd E_mirr2 = E_HD.row(0);
             Vector3cd H_mirr2 = H_HD.row(0);
+
+            // Gamma coefficients
+            double cosTheta1 = sources_int[nu]->getDirection()(2);
+            std::complex<double> Gamma_r_1;
 
             // Electric fields
             // A(1,1) 

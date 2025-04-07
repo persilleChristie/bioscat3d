@@ -10,9 +10,10 @@ pad = 4
 dpml = 2
 
 sxy = 2*(r+w+pad+dpml)
-cell_size = mp.Vector3(sxy,sxy)
+cell_size = mp.Vector3(sxy,sxy) # Specifies the cell, sxy * sxy * 0
 
-pml_layers = [mp.PML(dpml)]
+pml_layers = [mp.PML(dpml)] # dpml specifies the thickness of the absorbing layer around the cell 
+                            # PML is INSIDE the cell
 
 nonpml_vol = mp.Volume(mp.Vector3(), size=mp.Vector3(sxy-2*dpml,sxy-2*dpml))
 

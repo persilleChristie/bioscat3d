@@ -44,11 +44,11 @@ int main() {
 
     std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, polarization, constants);
 
-    std::vector<std::shared_ptr<FieldCalculator>> sources_int;
-    std::vector<std::shared_ptr<FieldCalculator>> sources_mirr;
-    std::vector<std::shared_ptr<FieldCalculator>> sources_ext;
+    std::vector<std::shared_ptr<FieldCalculatorDipole>> sources_int;
+    std::vector<std::shared_ptr<FieldCalculatorDipole>> sources_mirr;
+    std::vector<std::shared_ptr<FieldCalculatorDipole>> sources_ext;
 
-    auto addDipoles = [&](const SurfaceSphere& surface, std::vector<std::shared_ptr<FieldCalculator>>& sources) {
+    auto addDipoles = [&](const SurfaceSphere& surface, std::vector<std::shared_ptr<FieldCalculatorDipole>>& sources) {
         const MatrixXd& pts = surface.getPoints();
         const MatrixXd& t1 = surface.getTau1();
         const MatrixXd& t2 = surface.getTau2();
