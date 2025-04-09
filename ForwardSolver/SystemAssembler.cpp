@@ -14,11 +14,11 @@ void SystemAssembler::assembleSystem(
     Eigen::MatrixXcd& A,
     Eigen::VectorXcd& b,
     const Surface& surface,
-    const std::vector<std::shared_ptr<FieldCalculatorDipole>>& sources_int,
-    const std::vector<std::shared_ptr<FieldCalculatorDipole>>& sources_mirr,
-    const std::vector<std::shared_ptr<FieldCalculatorDipole>>& sources_ext,
-    const std::shared_ptr<FieldCalculator>& incident,
-    const std::complex<double> Gamma_r
+    const std::vector<std::shared_ptr<FieldCalculator>>& sources_int,
+    const std::vector<std::shared_ptr<FieldCalculator>>& sources_mirr,
+    const std::vector<std::shared_ptr<FieldCalculator>>& sources_ext,
+    const std::shared_ptr<FieldCalculator>& incident
+    // const std::complex<double> Gamma_r
 ) {
     const auto& points = surface.getPoints();
     const auto& tau1 = surface.getTau1();
@@ -83,35 +83,32 @@ void SystemAssembler::assembleSystem(
             Vector3cd E_mirr2 = E_HD.row(0);
             Vector3cd H_mirr2 = H_HD.row(0);
 
-            // Gamma coefficients
-            double cosTheta1 = sources_int[nu]->getDirection()(2);
-            std::complex<double> Gamma_r_1;
 
             // Electric fields
             // A(1,1) 
-            A(mu, nu) = E_int1.dot(t1) + Gamma_r * E_mirr1.dot(t1);
+            A(mu, nu) = E_int1.dot(t1); // + Gamma_r * E_mirr1.dot(t1);
             
             // A(1,2)
-            A(mu, nu + Nprime) = E_int2.dot(t1) + Gamma_r * E_mirr2.dot(t1);
+            A(mu, nu + Nprime) = E_int2.dot(t1); // + Gamma_r * E_mirr2.dot(t1);
 
             // A(2,1)
-            A(mu + M, nu) = E_int1.dot(t2) + Gamma_r * E_mirr1.dot(t2);
+            A(mu + M, nu) = E_int1.dot(t2); // + Gamma_r * E_mirr1.dot(t2);
             
             // A(2,2)
-            A(mu + M, nu + Nprime) = E_int2.dot(t2) + Gamma_r * E_mirr2.dot(t2);
+            A(mu + M, nu + Nprime) = E_int2.dot(t2); // + Gamma_r * E_mirr2.dot(t2);
 
             // Magnetic fields
             // A(3,1)
-            A(mu + 2*M, nu) = H_int1.dot(t1) + Gamma_r * H_mirr1.dot(t1);
+            A(mu + 2*M, nu) = H_int1.dot(t1); // + Gamma_r * H_mirr1.dot(t1);
             
             // A(3,2)
-            A(mu + 2*M, nu + Nprime) = H_int2.dot(t1) + Gamma_r * H_mirr2.dot(t1);
+            A(mu + 2*M, nu + Nprime) = H_int2.dot(t1); // + Gamma_r * H_mirr2.dot(t1);
 
             // A(4,1)
-            A(mu + 3*M, nu) = H_int1.dot(t2) + Gamma_r * H_mirr1.dot(t2);
+            A(mu + 3*M, nu) = H_int1.dot(t2); // + Gamma_r * H_mirr1.dot(t2);
             
             // A(4,2)
-            A(mu + 3*M, nu + Nprime) = H_int2.dot(t2) + Gamma_r * H_mirr2.dot(t2);
+            A(mu + 3*M, nu + Nprime) = H_int2.dot(t2); // + Gamma_r * H_mirr2.dot(t2);
         }
 
         for (int nu = 0; nu < N2prime; ++nu) {

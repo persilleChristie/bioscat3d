@@ -20,7 +20,7 @@ int main() {
     int resolution = 10;
     double polarization = 0.2;
     double E0 = 1.0;
-    std::complex<double> Gamma_r = 0.8; /////////////////////////////
+    // std::complex<double> Gamma_r = 0.8; /////////////////////////////
 
 
     Constants constants;
@@ -44,11 +44,11 @@ int main() {
 
     std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, polarization, constants);
 
-    std::vector<std::shared_ptr<FieldCalculatorDipole>> sources_int;
-    std::vector<std::shared_ptr<FieldCalculatorDipole>> sources_mirr;
-    std::vector<std::shared_ptr<FieldCalculatorDipole>> sources_ext;
+    std::vector<std::shared_ptr<FieldCalculator>> sources_int;
+    std::vector<std::shared_ptr<FieldCalculator>> sources_mirr;
+    std::vector<std::shared_ptr<FieldCalculator>> sources_ext;
 
-    auto addDipoles = [&](const SurfaceSphere& surface, std::vector<std::shared_ptr<FieldCalculatorDipole>>& sources) {
+    auto addDipoles = [&](const SurfaceSphere& surface, std::vector<std::shared_ptr<FieldCalculator>>& sources) {
         const MatrixXd& pts = surface.getPoints();
         const MatrixXd& t1 = surface.getTau1();
         const MatrixXd& t2 = surface.getTau2();
@@ -63,7 +63,7 @@ int main() {
     addDipoles(*sphere_nu_prime_tilde, sources_mirr);
     addDipoles(sphere_nu_2prime, sources_ext);
 
-    SystemAssembler::assembleSystem(A, b, sphere_mu, sources_int, sources_mirr, sources_ext, incident, Gamma_r);
+    SystemAssembler::assembleSystem(A, b, sphere_mu, sources_int, sources_mirr, sources_ext, incident);
     
     // solve with UtilsSolver
     auto y = UtilsSolvers::solveQR(A, b);

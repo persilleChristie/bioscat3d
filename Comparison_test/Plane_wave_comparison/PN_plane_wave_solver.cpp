@@ -128,19 +128,19 @@ int main(int argc, char* argv[]){
     Constants constants;
     Eigen::MatrixX3cd E(test_vec_size, 3);
     Eigen::MatrixX3cd H(test_vec_size, 3);
-    Eigen::MatrixX3cd refE(test_vec_size, 3);
-    Eigen::MatrixX3cd refH(test_vec_size, 3);
+    // Eigen::MatrixX3cd refE(test_vec_size, 3);
+    // Eigen::MatrixX3cd refH(test_vec_size, 3);
 
     FieldCalculatorUPW U(direction, E0, polarization, constants);
     U.computeFields(E, H, testpoints);
-    U.computeReflectedFields(refE, refH, testpoints);
+    // U.computeReflectedFields(refE, refH, testpoints);
 
-    Eigen::MatrixX3cd Etest = E - refE;
-    Eigen::MatrixX3cd Htest = H - refH;
+    // Eigen::MatrixX3cd Etest = E - refE;
+    // Eigen::MatrixX3cd Htest = H - refH;
 
 
     // SAVE TO CSV
-    saveToCSV(Etest, Htest, output_file);
+    saveToCSV(E, H, output_file);
 
     return 0;
 }
