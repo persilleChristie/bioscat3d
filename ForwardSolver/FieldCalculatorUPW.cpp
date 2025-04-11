@@ -83,11 +83,8 @@ void FieldCalculatorUPW::computeFields(
 
     double cosPhi, sinPhi, cosTheta_in, sinTheta_in; // azimuthal angle the same for k_in and k_rot????
 
-    TransformUtils::computeAngles(k, 1.0, cosTheta_in, sinTheta_in,
+    TransformUtils::computeAngles(-k, 1.0, cosTheta_in, sinTheta_in,
         cosPhi, sinPhi);
-
-    cout << "cos(phi) = " << cosPhi << endl;
-    cout << "sin(phi) = " << sinPhi << endl;
 
     double cosBeta = cos(polarization);
     double sinBeta = sin(polarization);
@@ -95,18 +92,18 @@ void FieldCalculatorUPW::computeFields(
     auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
 
-    //Vector3d k_rot = Rz * k;
+    // Vector3d k_rot = Rz * k;
 
-    MatrixX3cd refE(N,3);
-    MatrixX3cd refH(N,3);
+    // MatrixX3cd refE(N,3);
+    // MatrixX3cd refH(N,3);
 
-    computeReflectedFields(refE, refH, evalPoints);
+    // computeReflectedFields(refE, refH, evalPoints);
 
-    if (evalPoints.rows() == 0) {
-        refE.resize(0, 3);
-        refH.resize(0, 3);
-        return;
-    }    
+    // if (evalPoints.rows() == 0) {
+    //     refE.resize(0, 3);
+    //     refH.resize(0, 3);
+    //     return;
+    // }    
 
     for (int i = 0; i < N; ++i) {
         Vector3d x = evalPoints.row(i);
@@ -120,13 +117,14 @@ void FieldCalculatorUPW::computeFields(
         Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);
         Vector3cd E_in = Rz_inv * (cosBeta * E_in_perp + sinBeta * E_in_par);
 
+
         Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
         Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);
         Vector3cd H_in = Rz_inv * (cosBeta * H_in_perp + sinBeta * H_in_par);
 
 
-        outE.row(i) = E_in.transpose() + refE.row(i);
-        outH.row(i) = H_in.transpose() + refH.row(i);
+        outE.row(i) = E_in.transpose(); // + refE.row(i);
+        outH.row(i) = H_in.transpose(); // + refH.row(i);
     }
 }
 
