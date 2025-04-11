@@ -36,12 +36,19 @@ void FieldCalculatorDipole::computeFields(
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
     Eigen::Matrix3d R_inverse = Ry_inv * Rz_inv;
 
+    // Reserve memory for later
+    double cosThetaX, sinThetaX, cosPhiX, sinPhiX;
+
     for (int i = 0; i < N; ++i) {
         const Eigen::Vector3d& x = evalPoints.row(i);
 
         Eigen::Vector3d x_local = R * (x - dipole_.getPosition());
         double r = x_local.norm();
-        std::complex<double> expK0r = exp(-constants_.j * constants_.k0 * r);
+
+        // Compute polar coordinates
+        TransformUtils::computeAngles(x_local, r, cosThetaX, sinThetaX, cosPhiX, sinPhiX);
+
+        std::complex<double> expK0r = std::exp(-constants_.j * constants_.k0 * r);
 
         if (r == 0.0) {
             outE.row(i) = Eigen::Vector3d::Zero();
@@ -49,18 +56,21 @@ void FieldCalculatorDipole::computeFields(
             continue;
         }
 
-        std::complex<double> E_r = constants_.eta0 * constants_.Iel* cosTheta / (2.0 * constants_.pi * r * r)
+        std::complex<double> E_r = constants_.eta0 * constants_.Iel* cosThetaX / (2.0 * constants_.pi * r * r)
                             * (1.0 + 1.0 / (constants_.j * constants_.k0 * r)) * expK0r;
 
-        std::complex<double> E_theta = constants_.j * constants_.eta0 * constants_.Iel * sinTheta / (4.0 * constants_.pi * r)
-                                * (1.0 + 1.0 / (constants_.j * constants_.k0 * r) - 1.0 / (constants_.k0 * constants_.k0 * r * r)) * expK0r;
+        std::complex<double> E_theta = (constants_.j * constants_.eta0 * constants_.Iel * sinThetaX / (4.0 * constants_.pi * r)
+                                * (1.0 + 1.0 / (constants_.j * constants_.k0 * r) - 1.0 / (constants_.k0 * constants_.k0 * r * r)) * expK0r);
 
-        Eigen::Vector3cd E_local = TransformUtils::computeECartesian(sinTheta, cosTheta, sinPhi, cosPhi, E_r, E_theta);
+        std::cout << "E_r: " << E_r << std::endl;
+        std::cout << "E_theta: " << E_theta << std::endl;
 
-        std::complex<double> H_phi = constants_.j * constants_.k0 * constants_.Iel * sinTheta / (4.0 * constants_.pi * r)
+        Eigen::Vector3cd E_local = TransformUtils::computeECartesian(sinThetaX, cosThetaX, sinPhiX, cosPhiX, E_r, E_theta);
+
+        std::complex<double> H_phi = constants_.j * constants_.k0 * constants_.Iel * sinThetaX / (4.0 * constants_.pi * r)
                             * (1.0 + 1.0 / (constants_.j * constants_.k0 * r)) * expK0r;
 
-        Eigen::Vector3cd H_local (-H_phi * sinPhi, H_phi * cosPhi, 0.0);
+        Eigen::Vector3cd H_local (-H_phi * sinPhiX, H_phi * cosPhiX, 0.0);
 
         outE.row(i) = R_inverse.cast<std::complex<double>>() * E_local;
         outH.row(i) = R_inverse.cast<std::complex<double>>() * H_local;

@@ -60,12 +60,16 @@ class Hertzian_Dipole():
         E_y=front_term1*dy+front_term2*( y**2*dy*term1+y*(x*dx+z*dz)*term1+r**2*dy*term2 )
         E_z=front_term1*dz+front_term2*( z**2*dz*term1+z*(x*dx+y*dy)*term1+r**2*dz*term2 )
         E=np.column_stack((E_x,E_y,E_z))
+
+        
         
         term3=exponential_term*(1+1j*k*r)/(4*np.pi*r**3)
         H_x=-(y*dz-z*dy)*term3
         H_y=(x*dz-z*dx)*term3
         H_z=-(x*dy-y*dx)*term3
         H=np.column_stack((H_x,H_y,H_z))
+
+        
         return [E,H]        
     
 
@@ -95,6 +99,10 @@ def compute_fields_from_csv(param_file, testpoints_file, output_file):
     # Compute fields (assuming Hertzian_Dipole is defined)
     DP = Hertzian_Dipole(position, direction, mu, epsilon, omega)
     E, H = DP.evaluate_at_points(testpoints)
+    print(f"E: {E}")
+    print(f"H: {H}")
+    print(f"Calculated impedance: {(np.linalg.norm(E, axis=1)/np.linalg.norm(H, axis=1))}")
+
 
     # Convert complex values into real & imaginary parts for saving
     data = {

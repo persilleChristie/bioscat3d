@@ -84,21 +84,22 @@ if True:
     # mu = np.random.uniform(0.5, 10)
     # epsilon = np.random.uniform(0.5, 10)
     # omega = np.random.uniform(0.5, 10)
-    mu=1
-    epsilon=1
+    mu=1.25663706127e-6
+    epsilon=8.8541878188e-12
     omega=1
 
     # Random position (assuming within a range, e.g., -10 to 10)
-    position = np.random.uniform(-10, 10, size=3).tolist()
-    # position = [0,0,0]
+    # position = np.random.uniform(-10, 10, size=3).tolist()
+    position = [1,1,1]
 
     # Random unit vector for direction
-    random_vector = np.random.uniform(-1, 1, size=3)
-    direction = (random_vector / np.linalg.norm(random_vector)).tolist()
-    # direction = [0,0,1]
+    # random_vector = np.random.uniform(-1, 1, size=3)
+    # direction = (random_vector / np.linalg.norm(random_vector)).tolist()
+    direction = [1,2,3]/np.sqrt(14)
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
-    testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
+    # testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
+    testpoints = [[4,7,10],[-2,3,100],[-200,700,1100]]
 
     param_data = [
     ["mu", mu],
@@ -167,7 +168,7 @@ if True:
     Ex_re,Ex_im,Ey_re,Ey_im,Ez_re,Ez_im,Hx_re,Hx_im,Hy_re,Hy_im,Hz_re,Hz_im
     '''   
     print("Running C++ implementation...")
-    run_cpp_code("./PN.exe", "dipole_params_random.csv", "dipole_testpoints_random.csv", "PN_random.csv")
+    run_cpp_code("./PN_dipole_solver", "dipole_params_random.csv", "dipole_testpoints_random.csv", "PN_random.csv")
 
     # -----------------------------------------------
     #               Compare Results
