@@ -15,7 +15,7 @@ void SystemAssembler::assembleSystem(
     Eigen::VectorXcd& b,
     const Surface& surface,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources_int,
-    const std::vector<std::shared_ptr<FieldCalculator>>& sources_mirr,
+    // const std::vector<std::shared_ptr<FieldCalculator>>& sources_mirr,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources_ext,
     const std::shared_ptr<FieldCalculator>& incident
     // const std::complex<double> Gamma_r
@@ -48,6 +48,10 @@ void SystemAssembler::assembleSystem(
 
     incident->computeFields(E_inc_new, H_inc_new, points);
 
+    // Allocate space for placeholders
+    MatrixX3cd E_HD(1,3);
+    MatrixX3cd H_HD(1,3);
+
     for (int mu = 0; mu < M; ++mu) {
         MatrixX3d x_mu = points.row(mu);
         Vector3d t1 = tau1.row(mu);
@@ -60,28 +64,27 @@ void SystemAssembler::assembleSystem(
         
 
         for (int nu = 0; nu < Nprime; ++nu) {
-            MatrixX3cd E_HD(1,3);
-            MatrixX3cd H_HD(1,3);
-
-            sources_int[nu]->computeFields(E_HD, H_HD, x_mu);
+            // sources_ext[nu]->computeFields(E_HD, H_HD, x_mu);
+            sources_ext[2*nu]->computeFields(E_HD, H_HD, x_mu);
 
             Vector3cd E_int1 = E_HD.row(0);
             Vector3cd H_int1 = H_HD.row(0);
 
-            sources_int[nu + Nprime]->computeFields(E_HD, H_HD, x_mu);
+            // sources_ext[nu + N2prime]->computeFields(E_HD, H_HD, x_mu);
+            sources_ext[2*nu + 1]->computeFields(E_HD, H_HD, x_mu);
 
             Vector3cd E_int2 = E_HD.row(0);
             Vector3cd H_int2 = H_HD.row(0);
             
-            sources_mirr[nu]->computeFields(E_HD, H_HD, x_mu);
+            // sources_mirr[nu]->computeFields(E_HD, H_HD, x_mu);
 
-            Vector3cd E_mirr1 = E_HD.row(0);
-            Vector3cd H_mirr1 = H_HD.row(0);
+            // Vector3cd E_mirr1 = E_HD.row(0);
+            // Vector3cd H_mirr1 = H_HD.row(0);
 
-            sources_mirr[nu + Nprime]->computeFields(E_HD, H_HD, x_mu);
+            // sources_mirr[nu + Nprime]->computeFields(E_HD, H_HD, x_mu);
 
-            Vector3cd E_mirr2 = E_HD.row(0);
-            Vector3cd H_mirr2 = H_HD.row(0);
+            // Vector3cd E_mirr2 = E_HD.row(0);
+            // Vector3cd H_mirr2 = H_HD.row(0);
 
 
             // Electric fields
@@ -112,18 +115,25 @@ void SystemAssembler::assembleSystem(
         }
 
         for (int nu = 0; nu < N2prime; ++nu) {
-            MatrixX3cd E_HD(1,3);
-            MatrixX3cd H_HD(1,3);
-
-            sources_ext[nu]->computeFields(E_HD, H_HD, x_mu);
+            // sources_ext[nu]->computeFields(E_HD, H_HD, x_mu);
+            sources_ext[2*nu]->computeFields(E_HD, H_HD, x_mu);
 
             Vector3cd E_ext1 = E_HD.row(0);
             Vector3cd H_ext1 = H_HD.row(0);
 
-            sources_ext[nu + N2prime]->computeFields(E_HD, H_HD, x_mu);
+            // sources_ext[nu + N2prime]->computeFields(E_HD, H_HD, x_mu);
+            sources_ext[2*nu + 1]->computeFields(E_HD, H_HD, x_mu);
 
             Vector3cd E_ext2 = E_HD.row(0);
             Vector3cd H_ext2 = H_HD.row(0);
+
+            std::cout << "Eext1" << E_ext1 << std::endl;
+            std::cout << "Eext2" << E_ext2 << std::endl;
+            std::cout << "Hext1" << H_ext1 << std::endl;
+            std::cout << "Hext2" << H_ext2 << std::endl;
+        
+            std::cout << "E/H 1: " << E_ext1.norm()/H_ext1.norm() << std::endl;
+            std::cout << "E/H 2: " << E_ext2.norm()/H_ext2.norm() << std::endl;
 
             // Electric fields
             // A(1,3) 

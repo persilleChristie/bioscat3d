@@ -83,7 +83,7 @@ void FieldCalculatorUPW::computeFields(
 
     double cosPhi, sinPhi, cosTheta_in, sinTheta_in; // azimuthal angle the same for k_in and k_rot????
 
-    TransformUtils::computeAngles(k, 1.0, cosTheta_in, sinTheta_in,
+    TransformUtils::computeAngles(-k, 1.0, cosTheta_in, sinTheta_in,
         cosPhi, sinPhi);
 
     double cosBeta = cos(polarization);
@@ -116,6 +116,7 @@ void FieldCalculatorUPW::computeFields(
         Vector3cd E_in_perp (0.0, phase1, 0.0);
         Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);
         Vector3cd E_in = Rz_inv * (cosBeta * E_in_perp + sinBeta * E_in_par);
+
 
         Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
         Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);

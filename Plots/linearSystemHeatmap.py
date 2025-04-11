@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('../matrix_A.csv', sep=",", header=None)
+df = pd.read_csv('../ForwardSolver/matrix_A_simple.csv', sep=",", header=None)
 
 df = df.astype('string')
 
