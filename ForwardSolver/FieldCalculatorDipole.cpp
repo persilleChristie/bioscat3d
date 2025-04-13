@@ -26,6 +26,12 @@ void FieldCalculatorDipole::computeFields(
     double cosTheta, sinTheta, cosPhi, sinPhi;
     TransformUtils::computeAngles(dipole_.getDirection(), 1.0, cosTheta, sinTheta, cosPhi, sinPhi);
 
+    std::cout << "Dipole direction angles:" << std::endl;
+    std::cout << "cos(theta): " << cosTheta << std::endl;
+    std::cout << "sin(theta): " << sinTheta << std::endl;
+    std::cout << "cos(phi): " << cosPhi << std::endl;
+    std::cout << "sin(phi): " << sinPhi << std::endl;
+
     // Rotate to local dipole coordinates
     auto Ry = TransformUtils::rotationMatrixY(cosTheta, sinTheta);
     auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
@@ -45,10 +51,22 @@ void FieldCalculatorDipole::computeFields(
         Eigen::Vector3d x_local = R * (x - dipole_.getPosition());
         double r = x_local.norm();
 
+        std::cout << "Point of evaluation: " << x_local << std::endl;
+        std::cout << "Point of evaluation norm: " << r << std::endl;
+        
+
         // Compute polar coordinates
         TransformUtils::computeAngles(x_local, r, cosThetaX, sinThetaX, cosPhiX, sinPhiX);
 
+        std::cout << "Point of evaluation angles:" << std::endl;
+        std::cout << "cos(theta): " << cosThetaX << std::endl;
+        std::cout << "sin(theta): " << sinThetaX << std::endl;
+        std::cout << "cos(phi): " << cosPhiX << std::endl;
+        std::cout << "sin(phi): " << sinPhiX << std::endl;
+
         std::complex<double> expK0r = std::exp(-constants_.j * constants_.k0 * r);
+
+        std::cout << "Exponential term: " << expK0r << std::endl;
 
         if (r == 0.0) {
             outE.row(i) = Eigen::Vector3d::Zero();
@@ -70,7 +88,12 @@ void FieldCalculatorDipole::computeFields(
         std::complex<double> H_phi = constants_.j * constants_.k0 * constants_.Iel * sinThetaX / (4.0 * constants_.pi * r)
                             * (1.0 + 1.0 / (constants_.j * constants_.k0 * r)) * expK0r;
 
+        std::cout << "H_phi: " << H_phi << std::endl;
+
         Eigen::Vector3cd H_local (-H_phi * sinPhiX, H_phi * cosPhiX, 0.0);
+
+        std::cout << "E rotated: " << R_inverse.cast<std::complex<double>>() * E_local << std::endl;
+        std::cout << "H rotated: " << R_inverse.cast<std::complex<double>>() * H_local << std::endl;
 
         outE.row(i) = R_inverse.cast<std::complex<double>>() * E_local;
         outH.row(i) = R_inverse.cast<std::complex<double>>() * H_local;
