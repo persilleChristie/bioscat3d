@@ -133,9 +133,6 @@ int main(int argc, char* argv[]){
     FieldCalculatorDipole EH_HD(HD, constants);
     EH_HD.computeFields(E, H, testpoints);
 
-    std::cout << "E (c++): " << E << std::endl;
-    std::cout << "H (c++): " << H << std::endl;
-
     // double mean = 0.0;
 
     // for (int i = 0; i < test_vec_size; ++i) {
@@ -149,7 +146,7 @@ int main(int argc, char* argv[]){
     for (int i = 0; i < test_vec_size; ++i) {
         calcImpedance(i) = E.row(i).norm()/H.row(i).norm();
     };
-
+    std::cout << "Wavenumber c++: " << constants.k0 << std::endl;
     std::cout << "Calculated impedance: " << calcImpedance << std::endl;
 
     // SAVE TO CSV

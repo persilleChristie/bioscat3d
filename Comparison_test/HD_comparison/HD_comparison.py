@@ -34,6 +34,7 @@ class Hertzian_Dipole():
         self.epsilon=epsilon
         self.omega=omega
         self.wavenumber=omega*np.sqrt(epsilon*mu)
+        print(f"Wavenumber, python: {self.wavenumber}")
         #vector values
         self.position = position
         self.direction = direction
@@ -97,6 +98,14 @@ def compute_fields_from_csv(param_file, testpoints_file, output_file):
     # Compute fields (assuming Hertzian_Dipole is defined)
     DP = Hertzian_Dipole(position, direction, mu, epsilon, omega)
     E, H = DP.evaluate_at_points(testpoints)
+    print("E:\n")
+    print(E,"\n")
+    print("H:\n")
+    print(H,"\n")
+
+    calc_impedance = np.linalg.norm(E,axis=1)/np.linalg.norm(H, axis=1)
+    print(f"Calculated impedance: {calc_impedance}")
+
 
     # Convert complex values into real & imaginary parts for saving
     data = {
