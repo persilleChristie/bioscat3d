@@ -86,11 +86,13 @@ if True:
     # omega = np.random.uniform(0.5, 10)
     mu=1.25663706127e-6
     epsilon=8.8541878188e-12
-    omega=1
+    wavelength = 325e-9
+    omega=2.99792458e8/wavelength
+    
 
     # Random position (assuming within a range, e.g., -10 to 10)
     # position = np.random.uniform(-10, 10, size=3).tolist()
-    position = [1,1,1]
+    position = [wavelength,wavelength,wavelength]
 
     # Random unit vector for direction
     # random_vector = np.random.uniform(-1, 1, size=3)
@@ -99,8 +101,7 @@ if True:
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
     # testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
-    testpoints = [[4,7,10],[-2,3,100],[-200,700,1100]]
-
+    testpoints = [[3*wavelength,2*wavelength,4*wavelength],[-2*wavelength,3*wavelength,1*wavelength],[-1*wavelength,-1*wavelength,-1*wavelength]]
     param_data = [
     ["mu", mu],
     ["epsilon", epsilon],
