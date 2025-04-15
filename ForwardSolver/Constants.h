@@ -14,11 +14,11 @@ struct Constants {
     static const inline std::complex<double> j = {0.0, 1.0}; // Imaginary unit
 
     // Physical constants
-    static constexpr double eta0     = 377.0;            // 377 Ohm, impedance of free space
+    static constexpr double eta0     = 1 // 377.0;            // 377 Ohm, impedance of free space
     static constexpr double n0       = 1.0;              // Refractive index of air
-    static constexpr double epsilon0 = 8.8541878188e-12; // Permittivity of free space
+    static constexpr double epsilon0 = 1 // 8.8541878188e-12; // Permittivity of free space
     static constexpr double epsilon1 = 1.0;              // Substrate epsilon value????
-    static constexpr double mu0      = 1.25663706127e-6; // Permeability of free space
+    static constexpr double mu0      = 1 // 1.25663706127e-6; // Permeability of free space
     static constexpr double Iel      = 1.0;              // Source current (default value)
 
     // Chosen constants (I have used the same constants as Mirza for some of them)
