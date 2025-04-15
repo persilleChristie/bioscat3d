@@ -19,7 +19,6 @@ struct Constants {
     static constexpr double epsilon0 = 8.8541878188e-12; // Permittivity of free space
     static constexpr double epsilon1 = 1.0;              // Substrate epsilon value????
     static constexpr double mu0      = 1.25663706127e-6; // Permeability of free space
-    static constexpr double omega    = 1.0;              // Angular frequency (assumed)
     static constexpr double Iel      = 1.0;              // Source current (default value)
 
     // Chosen constants (I have used the same constants as Mirza for some of them)
