@@ -20,10 +20,10 @@ private:
     Eigen::Vector3d center;
     int resolution;
 
-    Eigen::MatrixXd points;
-    Eigen::MatrixXd normals;
-    Eigen::MatrixXd tau1;
-    Eigen::MatrixXd tau2;
+    Eigen::MatrixX3d points;
+    Eigen::MatrixX3d normals;
+    Eigen::MatrixX3d tau1;
+    Eigen::MatrixX3d tau2;
 
     void generateSurface();
 };
