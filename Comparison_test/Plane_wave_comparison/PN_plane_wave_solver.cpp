@@ -133,10 +133,14 @@ int main(int argc, char* argv[]){
 
     FieldCalculatorUPW U(direction, E0, polarization, constants);
     U.computeFields(E, H, testpoints);
-    // U.computeReflectedFields(refE, refH, testpoints);
+    
+    Eigen::VectorXd calcImpedance(test_vec_size);
 
-    // Eigen::MatrixX3cd Etest = E - refE;
-    // Eigen::MatrixX3cd Htest = H - refH;
+    for (int i = 0; i < test_vec_size; ++i) {
+        calcImpedance(i) = E.row(i).norm()/H.row(i).norm();
+    };
+
+    std::cout << "Calculated impedance: " << calcImpedance << std::endl;
 
 
     // SAVE TO CSV

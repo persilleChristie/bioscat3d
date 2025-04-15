@@ -56,7 +56,7 @@ void FieldCalculatorUPW::computeReflectedFields(
         Eigen::Vector3cd E_perp(0.0, Gamma_r_perp * expk_rot, 0.0);
         Eigen::Vector3cd H_perp(cosTheta_in * Gamma_r_perp * expk_rot / constants.eta0, 0.0, sinTheta_in * Gamma_r_perp * expk_rot / constants.eta0);
 
-        Eigen::Vector3cd E_par(cosTheta_in * Gamma_r_par * expk_rot, 0.0, sinTheta_in * Gamma_r_par * expk_rot);
+        Eigen::Vector3cd E_par(-cosTheta_in * Gamma_r_par * expk_rot, 0.0, -sinTheta_in * Gamma_r_par * expk_rot);
         Eigen::Vector3cd H_par(0.0, - Gamma_r_perp * expk_rot/constants.eta0, 0);
 
         refE.row(i) = Rz_inv * (cosBeta * E_perp + sinBeta * E_par);

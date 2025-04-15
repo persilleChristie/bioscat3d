@@ -78,21 +78,29 @@ if True:
     np.random.seed(42)
 
     # Variables to fit PN's 
-    epsilon = 8.8541878188e-12
-    mu      = 1.25663706127e-6
-    omega   = 1.0
+    epsilon    = 8.8541878188e-12
+    mu         = 1.25663706127e-6
+    wavelength = 325e-9
+    omega      = 2.99792458e8 / wavelength
 
     # Generate random values
     # mu = np.random.uniform(0.5, 10)
     # epsilon = np.random.uniform(0.5, 10)
     # omega = np.random.uniform(0.5, 10)
-    polarization = np.random.uniform(0,np.pi/2)
+    
+    
+    polarization = 0.2 # np.random.uniform(0,np.pi/2)
+    
+
     # Random unit vector for direction
-    random_vector = np.random.uniform(-1, 1, size=3)
-    propagation_vector = (random_vector / np.linalg.norm(random_vector)).tolist()
+    # random_vector = np.random.uniform(-1, 1, size=3)
+    # propagation_vector = (random_vector / np.linalg.norm(random_vector)).tolist()
+    propagation_vector = [1, 1, -1]/np.sqrt(3)
+
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
-    testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
+    # testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
+    testpoints = [[2*wavelength, 3*wavelength, 10*wavelength]]
 
     param_data = [
     ["mu", mu],
@@ -114,7 +122,7 @@ if True:
     param_df.to_csv("PW_params_random.csv", index=False)
     testpoints_df.to_csv("PW_testpoints_random.csv", index=False)
 
-    print("printed successfully!")
+    
 #----------------------------------------------------------------------------
 #                         Simple case for planewave
 #----------------------------------------------------------------------------
