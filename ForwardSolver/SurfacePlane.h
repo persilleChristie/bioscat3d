@@ -18,6 +18,8 @@ public:
     const Eigen::MatrixXd& getTau1() const override;
     const Eigen::MatrixXd& getTau2() const override;
 
+    std::unique_ptr<Surface> mirrored(const Eigen::Vector3d& normal) const override;
+
 
 private:   
     Eigen::Vector3d cornerPoint_;

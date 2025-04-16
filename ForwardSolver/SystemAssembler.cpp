@@ -127,13 +127,13 @@ void SystemAssembler::assembleSystem(
             Vector3cd E_ext2 = E_HD.row(0);
             Vector3cd H_ext2 = H_HD.row(0);
 
-            std::cout << "Eext1" << E_ext1 << std::endl;
-            std::cout << "Eext2" << E_ext2 << std::endl;
-            std::cout << "Hext1" << H_ext1 << std::endl;
-            std::cout << "Hext2" << H_ext2 << std::endl;
+            // std::cout << "Eext1" << E_ext1 << std::endl;
+            // std::cout << "Eext2" << E_ext2 << std::endl;
+            // std::cout << "Hext1" << H_ext1 << std::endl;
+            // std::cout << "Hext2" << H_ext2 << std::endl;
         
-            std::cout << "E/H 1: " << E_ext1.norm()/H_ext1.norm() << std::endl;
-            std::cout << "E/H 2: " << E_ext2.norm()/H_ext2.norm() << std::endl;
+            // std::cout << "E/H 1: " << E_ext1.norm()/H_ext1.norm() << std::endl;
+            // std::cout << "E/H 2: " << E_ext2.norm()/H_ext2.norm() << std::endl;
 
             // Electric fields
             // A(1,3) 

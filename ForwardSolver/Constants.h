@@ -32,7 +32,7 @@ struct Constants {
     // Constructor
     Constants() {
         // Computed constants
-        setWavelength(325e-9); // Default value of wavelength in free space
+        setWavelength(1.0); // setWavelength(325e-9); // Default value of wavelength in free space
         //printf("Constants initialized!\n");
     }
 

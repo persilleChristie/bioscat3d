@@ -13,8 +13,8 @@ class FieldCalculatorTotal : public FieldCalculator {
 public:
     FieldCalculatorTotal(
         const Eigen::VectorXcd & amplitudes,
-        const std::vector<std::shared_ptr<FieldCalculatorDipole>>& dipoles,
-        const std::shared_ptr<FieldCalculatorUPW>& UPW
+        const std::vector<std::shared_ptr<FieldCalculator>>& dipoles,
+        const std::shared_ptr<FieldCalculator>& UPW
     );
 
     void computeFields(
@@ -28,9 +28,9 @@ public:
     );
 
 private:
-    Eigen::Vector3cd amplitudes_;
-    std::vector<std::shared_ptr<FieldCalculatorDipole>> dipoles_;
-    std::shared_ptr<FieldCalculatorUPW> UPW_;
+    Eigen::VectorXcd amplitudes_;
+    std::vector<std::shared_ptr<FieldCalculator>> dipoles_;
+    std::shared_ptr<FieldCalculator> UPW_;
 };
 
 #endif // FIELDCALCULATORTOTAL_H

@@ -18,6 +18,15 @@ const Eigen::MatrixXd& SurfacePlane::getNormals() const { return normals_;  }
 const Eigen::MatrixXd& SurfacePlane::getTau1()    const { return tau1_;    }
 const Eigen::MatrixXd& SurfacePlane::getTau2()    const { return tau2_;    }
 
+std::unique_ptr<Surface> SurfacePlane::mirrored(const Eigen::Vector3d& normal) const {
+    auto mirroredSurface = std::make_unique<SurfacePlane>(*this);
+    mirroredSurface->points_.col(2) *= -1;
+    mirroredSurface->normals_.col(2) *= -1;
+    mirroredSurface->tau1_.col(2) *= -1;
+    mirroredSurface->tau2_.col(2) *= -1;
+    return mirroredSurface;
+}
+
 
 
 void SurfacePlane::generateSurface() {
@@ -47,7 +56,9 @@ void SurfacePlane::generateSurface() {
     this->tau2_.resize(total, 3);
     
     // Same normal and tangents for all points
-    Eigen::Vector3d cross = basis1_.cross(basis2_);
+    Eigen::Vector3d n = basis1_.cross(basis2_).normalized();
+    Eigen::Vector3d basis1_n = basis1_.normalized();
+    Eigen::Vector3d basis2_n = basis2_.normalized();
 
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
@@ -55,8 +66,9 @@ void SurfacePlane::generateSurface() {
             Eigen::Vector3d p(x(i, j), y(i, j), z(i, j));
             points_.row(idx) = p;
 
-            normals_.row(idx) = cross;
-            tau1_.row(idx) = basis1_;
-            tau2_.row(idx) = basis2_;
+            normals_.row(idx) = n;
+            tau1_.row(idx) = basis1_n;
+            tau2_.row(idx) = basis2_n;
+        }
     }
 }

@@ -84,10 +84,10 @@ if True:
     # mu = np.random.uniform(0.5, 10)
     # epsilon = np.random.uniform(0.5, 10)
     # omega = np.random.uniform(0.5, 10)
-    mu         = 1.25663706127e-6
-    epsilon    = 8.8541878188e-12
-    wavelength = 325e-9
-    omega      = 2.99792458e8 / wavelength
+    mu         = 1 # 1.25663706127e-6
+    epsilon    = 1 # 8.8541878188e-12
+    wavelength = 1
+    omega      = 2 * np.pi / wavelength  # 2.99792458e8
     
 
     # Random position (assuming within a range, e.g., -10 to 10)
@@ -104,7 +104,8 @@ if True:
     testpoints = [[3*wavelength,2*wavelength,4*wavelength],
                   [-2*wavelength,3*wavelength,1*wavelength],
                   [-1*wavelength,-1*wavelength,-1*wavelength],
-                  [-1,2,3]]
+                  [-1,2,3],
+                  [10,10,10]]
     param_data = [
     ["mu", mu],
     ["epsilon", epsilon],

@@ -133,20 +133,12 @@ int main(int argc, char* argv[]){
     FieldCalculatorDipole EH_HD(HD, constants);
     EH_HD.computeFields(E, H, testpoints);
 
-    // double mean = 0.0;
-
-    // for (int i = 0; i < test_vec_size; ++i) {
-    //     mean += E.row(i).squaredNorm()/H.row(i).squaredNorm();
-    // };
-
-    // mean /= test_vec_size;
-
     Eigen::VectorXd calcImpedance(test_vec_size);
 
     for (int i = 0; i < test_vec_size; ++i) {
         calcImpedance(i) = E.row(i).norm()/H.row(i).norm();
     };
-    std::cout << "Wavenumber c++: " << constants.k0 << std::endl;
+
     std::cout << "Calculated impedance: " << calcImpedance << std::endl;
 
     // SAVE TO CSV

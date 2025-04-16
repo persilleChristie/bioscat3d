@@ -4,12 +4,12 @@
 
 FieldCalculatorTotal::FieldCalculatorTotal(
     const Eigen::VectorXcd & amplitudes,
-    const std::vector<std::shared_ptr<FieldCalculatorDipole>>& dipoles,
-    const std::shared_ptr<FieldCalculatorUPW>& UPW
+    const std::vector<std::shared_ptr<FieldCalculator>>& dipoles,
+    const std::shared_ptr<FieldCalculator>& UPW
 ) 
     : amplitudes_(amplitudes), dipoles_(dipoles), UPW_(UPW)
 {
-    if (amplitudes_.size() != dipoles_.size()) {
+    if (amplitudes_.size() != static_cast<int>(dipoles_.size())) {
         throw std::invalid_argument("Amplitudes and dipoles must have the same size.");
     }
 }
@@ -44,16 +44,21 @@ double FieldCalculatorTotal::computePower(
     // We assume uniform grid distances
     double dx = (points.row(1) - points.row(0)).norm();
     double dA = dx * dx;
-
-    Eigen::MatrixX3cd outE(N,3), outH(N,3);
     
-    computeFields(outE, outH, points);
+    Eigen::MatrixX3cd outE, outH;
+    outE = Eigen::MatrixX3cd::Zero(N,3);
+    outH = Eigen::MatrixX3cd::Zero(N,3);
 
+    computeFields(outE, outH, points);
     std::complex<double> integrand, integral = 0.0;
+    Eigen::Vector3cd cross;
 
     for (int i = 0; i < N; ++i){
-        integrand = (1/2 * outE.row(i).cross(outH.row(i).conjugate())).dot(normals.row(i));
+        cross = 0.5 * outE.row(i).cross(outH.row(i).conjugate());
+        integrand = cross.dot(normals.row(i));
 
         integral += integrand * dA;
     }
+
+    return integral.real();
 }

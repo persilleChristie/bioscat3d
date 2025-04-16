@@ -7,6 +7,8 @@
 #include "FieldCalculatorUPW.h"
 #include "UtilsSolvers.h"
 #include <iostream>
+#include "FieldCalculatorTotal.h"
+#include "SurfacePlane.h"
 
 Constants constants;
 
@@ -20,7 +22,6 @@ int main() {
     int resolution = 10;
     double polarization = 0.2;
     double E0 = 1.0;
-    // std::complex<double> Gamma_r = 0.8; /////////////////////////////
 
 
     Constants constants;
@@ -37,7 +38,8 @@ int main() {
     
     // call System Assembler
     int M = sphere_mu.getPoints().rows();
-    int N = sphere_nu_prime.getPoints().rows() + sphere_nu_2prime.getPoints().rows();
+    int Nprime = sphere_nu_prime.getPoints().rows();
+    int N = Nprime + sphere_nu_2prime.getPoints().rows();
     
     Eigen::MatrixXcd A(4 * M, 2*N);
     Eigen::VectorXcd b(4 *M);
@@ -52,7 +54,6 @@ int main() {
         const MatrixXd& pts = surface.getPoints();
         const MatrixXd& t1 = surface.getTau1();
         const MatrixXd& t2 = surface.getTau2();
-
         for (int i = 0; i < pts.rows(); ++i) {
             sources.emplace_back(std::make_shared<FieldCalculatorDipole>(Dipole(pts.row(i), t1.row(i)), constants));
             sources.emplace_back(std::make_shared<FieldCalculatorDipole>(Dipole(pts.row(i), t2.row(i)), constants));
@@ -67,7 +68,7 @@ int main() {
     
     // solve with UtilsSolver
     auto y = UtilsSolvers::solveQR(A, b);
-
+    
     // Output sizes
     std::cout << "Linear system A has size: " << A.rows() << " x " << A.cols() << std::endl;
     std::cout << "Right-hand side b has size: " << b.size() << std::endl;
@@ -77,6 +78,20 @@ int main() {
     Export::saveMatrixCSV("matrix_A_simple.csv", A);
     Export::saveVectorCSV("vector_b_simple.csv", b);
     Export::saveVectorCSV("solution_y_simple.csv", y);
+
+
+    // Calculate total field and power
+    Eigen::VectorXcd amplitudes = y.segment(0,2*Nprime);
+    FieldCalculatorTotal field(amplitudes, sources_int, incident);
+    std::cout << "main" << std::endl;
+    Eigen::Vector3d Cornerpoint(-5.0,-5.0,10.0), basis1(1.0,1.0,0.0), basis2(-1.0,1.0,0.0);
+    double size1 = 10.0, size2 = 10.0;
+    
+    SurfacePlane testPlane(Cornerpoint, basis1, basis2, size1, size2, resolution);
+
+    double power = field.computePower(testPlane);
+
+    std::cout << "Calculated power: " << power << std::endl;
 
     return 0;
 }

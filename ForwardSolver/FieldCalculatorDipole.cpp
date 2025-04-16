@@ -42,7 +42,7 @@ void FieldCalculatorDipole::computeFields(
     for (int i = 0; i < N; ++i) {
         const Eigen::Vector3d& x = evalPoints.row(i);
 
-        Eigen::Vector3d x_local = R * (x - dipole_.getPosition());
+        Eigen::Vector3d x_local = R_inverse * (x - dipole_.getPosition());
         double r = x_local.norm();
         
 
@@ -70,11 +70,8 @@ void FieldCalculatorDipole::computeFields(
 
         Eigen::Vector3cd H_local (-H_phi * sinPhiX, H_phi * cosPhiX, 0.0);
 
-        std::cout << "E rotated: " << R_inverse.cast<std::complex<double>>() * E_local << std::endl;
-        std::cout << "H rotated: " << R_inverse.cast<std::complex<double>>() * H_local << std::endl;
-
-        outE.row(i) = R_inverse.cast<std::complex<double>>() * E_local;
-        outH.row(i) = R_inverse.cast<std::complex<double>>() * H_local;
+        outE.row(i) = R.cast<std::complex<double>>() * E_local;
+        outH.row(i) = R.cast<std::complex<double>>() * H_local;
     };
 }
 
