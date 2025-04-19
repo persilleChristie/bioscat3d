@@ -1,145 +1,108 @@
+"""
+Launch a 3D oblique incidence planewave using EigenModeSource.
+Reference: https://github.com/NanoComp/meep/discussions/2589
+"""
+
 import meep as mp
 import numpy as np
 import matplotlib.pyplot as plt
-import cmath
-import plotly.graph_objects as go
+import matplotlib.gridspec as gridspec
 
+mp.verbosity(2)
 
-# === Parameters ===
-lambda0 = 325e-3        # wavelength (μm)
-fcen = 1 / lambda0      # frequency
-theta = 30              # angle of incidence (degrees) in x–z plane
+resolution = 20
+pml_thickness = 2.0
+size = 10.0
 
-resolution = 10         # pixels/μm
+cell_size = mp.Vector3(size + 2*pml_thickness,
+                       size + 2*pml_thickness,
+                       size + 2*pml_thickness)
 
-dpml = 1.0              # PML thickness
-sx = 3
-sy = 3
-sz = 3
-cell = mp.Vector3(sx, sy, sz)
-pml_layers = [mp.PML(dpml)]
+pml_layers = [mp.PML(pml_thickness)]
 
-# === Wavevector Components (for amp_func) ===
-theta_rad = np.radians(theta)
-k = 2 * np.pi * fcen
-kx = k * np.sin(theta_rad)
-kz = k * np.cos(theta_rad)
+# Incident angles in radians
+theta = np.radians(40)  # from z-axis
+phi = np.radians(30)    # in xy-plane
 
-def oblique_amp_func(pos):
-    return cmath.exp(1j * (kx * pos.x + kz * pos.z))
+# Physical parameters
+wavelength = 1.0
+frequency = 1 / wavelength
+n = 1.5
+k_mag = n * frequency
 
-# === Plane Wave Source ===
-sources = [mp.Source(
-    src=mp.ContinuousSource(frequency=fcen),
-    component=mp.Ey,
-    center=mp.Vector3(-0.5 * sx + dpml + 0.1),
-    size=mp.Vector3(0, sy, sz),  # source is y–z plane at x = const
-    amp_func=oblique_amp_func
-)]
+# Wavevector components
+kx = k_mag * np.sin(theta) * np.cos(phi)
+ky = k_mag * np.sin(theta) * np.sin(phi)
+kz = k_mag * np.cos(theta)
+k_point = mp.Vector3(kx, ky, kz)
+print("Wavevector k_point:", k_point)
 
-# === Simulation ===
+# Set the direction perpendicular to the wavevector (2D plane)
+k_dir = np.array([kx, ky, kz])
+k_dir /= np.linalg.norm(k_dir)
+
+# Choose arbitrary perpendicular vectors
+if np.allclose(k_dir, [1, 0, 0]):
+    perp1 = np.array([0, 1, 0])
+else:
+    perp1 = np.cross(k_dir, [1, 0, 0])
+perp1 /= np.linalg.norm(perp1)
+perp2 = np.cross(k_dir, perp1)
+
+# Set the size along the 2 orthogonal directions only
+plane_size = size
+vol_size = perp1 * plane_size + perp2 * plane_size
+
+# Zero out the dimension along k_dir (Meep requires strictly 2D volume)
+zero_dim = np.argmax(np.abs(k_dir))
+vol_size[zero_dim] = 0.0
+vol_size = mp.Vector3(*[v if abs(v) > 1e-6 else 1/resolution for v in vol_size])
+
+# Source definition
+sources = [
+    mp.EigenModeSource(
+        src=mp.ContinuousSource(frequency=frequency),
+        center=mp.Vector3(),
+        size=vol_size,
+        direction=mp.NO_DIRECTION,
+        eig_kpoint=k_point,
+        eig_band=1,
+        eig_parity=mp.ODD_Z,
+        eig_vol=mp.Volume(center=mp.Vector3(), size=vol_size),
+    )
+]
+
 sim = mp.Simulation(
-    cell_size=cell,
+    cell_size=cell_size,
     resolution=resolution,
     boundary_layers=pml_layers,
     sources=sources,
-    geometry=[],
+    k_point=k_point,
+    default_material=mp.Medium(index=n),
     dimensions=3,
     force_complex_fields=True
 )
 
-# === Solve in frequency domain ===
-sim.init_sim()
-sim.solve_cw(tol=1e-4)
+sim.run(until_after_sources=mp.stop_when_fields_decayed(50, mp.Ex, mp.Vector3(), 1e-6))
 
-# === Extract a 2D slice of Ey (x–z at y = 0) ===
-ey = sim.get_array(center=mp.Vector3(y=0), size=mp.Vector3(sx, 0, sz), component=mp.Ey)
+# Extract and plot Ex, Ey, Ez on x=0 plane
+vol = mp.Volume(center=mp.Vector3(), size=mp.Vector3(0, size, size))
+Ex = sim.get_array(center=vol.center, size=vol.size, component=mp.Ex)
+Ey = sim.get_array(center=vol.center, size=vol.size, component=mp.Ey)
+Ez = sim.get_array(center=vol.center, size=vol.size, component=mp.Ez)
 
-# === Plot: x–z plane slice ===
-plt.figure(figsize=(10, 4))
-plt.imshow(np.real(ey).T, interpolation='spline36', cmap='RdBu',
-           extent=[-sx/2, sx/2, -sz/2, sz/2])
-plt.title(f"Re(Ey) in x–z plane (y = 0), Oblique Incidence θ = {theta}°")
-plt.xlabel("x (μm)")
-plt.ylabel("z (μm)")
-plt.colorbar(label="Re(Ey)")
-plt.show(block=False)
-input("✅ Press Enter to exit...")
+fig = plt.figure(figsize=(18, 5))
+gs = gridspec.GridSpec(1, 3)
 
+for idx, (field, label) in enumerate(zip([Ex, Ey, Ez], ["Ex", "Ey", "Ez"])):
+    ax = fig.add_subplot(gs[idx])
+    im = ax.imshow(np.real(field.T), interpolation="spline36", cmap="RdBu",
+                   extent=[-0.5*size, 0.5*size, -0.5*size, 0.5*size], origin="lower")
+    ax.set_title(f"Re({label}) at x = 0")
+    ax.set_xlabel("y (um)")
+    ax.set_ylabel("z (um)")
+    plt.colorbar(im, ax=ax)
 
-def save_field_surface(field, x_range, y_range, title, filename):
-    nx, ny = field.shape
-    x = np.linspace(x_range[0], x_range[1], nx)
-    y = np.linspace(y_range[0], y_range[1], ny)
-    X, Y = np.meshgrid(x, y, indexing='ij')
-
-    fig = go.Figure(data=[go.Surface(z=np.real(field), x=X, y=Y, colorscale='RdBu')])
-
-    fig.update_layout(
-        scene=dict(
-            xaxis_title="x (μm)",
-            yaxis_title="y (μm)",
-            zaxis_title="Re(Field)",
-            aspectmode='data'
-        ),
-        title=title
-    )
-
-    fig.write_html(filename)
-    print(f"✅ Field slice saved to: {filename}")
-
-# === Save interactive 3D surface plot (Plotly)
-save_field_surface(
-    field=ey.T,
-    x_range=[-sx/2, sx/2],
-    y_range=[-sy/2, sy/2],
-    title=f"Re(Ey) in x–y plane (z = 0), Oblique Incidence θ = {theta}°",
-    filename="field_slice_ey_oblique.html"
-)
-
-def save_vector_field_plot(Ex, Ey, Ez, extent, spacing=3, filename="vector_field.html"):
-    import plotly.graph_objects as go
-    sx, sy, sz = extent
-
-    # Downsample
-    Ex_ds = Ex[::spacing, ::spacing, ::spacing]
-    Ey_ds = Ey[::spacing, ::spacing, ::spacing]
-    Ez_ds = Ez[::spacing, ::spacing, ::spacing]
-
-    nx, ny, nz = Ex_ds.shape
-    x = np.linspace(-sx/2, sx/2, nx)
-    y = np.linspace(-sy/2, sy/2, ny)
-    z = np.linspace(-sz/2, sz/2, nz)
-
-    X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
-
-    fig = go.Figure(data=go.Cone(
-        x=X.flatten(), y=Y.flatten(), z=Z.flatten(),
-        u=np.real(Ex_ds).flatten(),
-        v=np.real(Ey_ds).flatten(),
-        w=np.real(Ez_ds).flatten(),
-        sizemode="absolute",
-        sizeref=2,
-        anchor="tail",
-        colorscale='Bluered'
-    ))
-
-    fig.update_layout(
-        scene=dict(
-            xaxis_title='x',
-            yaxis_title='y',
-            zaxis_title='z',
-            aspectmode='cube'
-        ),
-        title="3D Vector Field (E-field)",
-    )
-    fig.write_html(filename)
-    print(f"✅ Saved 3D vector field to: {filename}")
-
-
-# After solve_cw
-Ex = sim.get_array(center=mp.Vector3(), size=mp.Vector3(sx, sy, sz), component=mp.Ex)
-Ey = sim.get_array(center=mp.Vector3(), size=mp.Vector3(sx, sy, sz), component=mp.Ey)
-Ez = sim.get_array(center=mp.Vector3(), size=mp.Vector3(sx, sy, sz), component=mp.Ez)
-
-save_vector_field_plot(Ex, Ey, Ez, extent=(sx, sy, sz), spacing=3, filename="3D_vector_field.html")
+plt.tight_layout()
+plt.savefig("planewave_3D_vector_fields.png")
+plt.show()
