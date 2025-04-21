@@ -37,7 +37,7 @@ void FieldCalculatorUPW::computeReflectedFields(
     for (int i = 0; i < N; ++i) {
         Vector3d x = evalPoints.row(i);
         
-        Eigen::Vector3d x_rot = Rz * x;
+        Eigen::Vector3d x_rot = Rz_inv * x;
         // Vector3d x_plane (x_rot[0], 0.0, x_rot[2]);
 
         complex<double> expk_rot = E0 * exp(-constants.j * constants.k0 * (sinTheta_in * x_rot[0] - cosTheta_in * x_rot[2]));
@@ -48,8 +48,8 @@ void FieldCalculatorUPW::computeReflectedFields(
         Eigen::Vector3cd E_par(-cosTheta_in * Gamma_r_par * expk_rot, 0.0, -sinTheta_in * Gamma_r_par * expk_rot);
         Eigen::Vector3cd H_par(0.0, - Gamma_r_perp * expk_rot/constants.eta0, 0);
 
-        refE.row(i) = Rz_inv * (cosBeta * E_perp + sinBeta * E_par);
-        refH.row(i) = Rz_inv * (cosBeta * H_perp + sinBeta * H_par);
+        refE.row(i) = Rz * (cosBeta * E_perp + sinBeta * E_par);
+        refH.row(i) = Rz * (cosBeta * H_perp + sinBeta * H_par);
 
     }
 }
@@ -84,18 +84,18 @@ void FieldCalculatorUPW::computeFields(
     for (int i = 0; i < N; ++i) {
         Vector3d x = evalPoints.row(i);
 
-        Eigen::Vector3d x_rot = Rz * x;
+        Eigen::Vector3d x_rot = Rz_inv * x;
 
         complex<double> phase1 = E0 * exp(- constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in));
         
         Vector3cd E_in_perp (0.0, phase1, 0.0);
         Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);
-        Vector3cd E_in = Rz_inv * (cosBeta * E_in_perp + sinBeta * E_in_par);
+        Vector3cd E_in = Rz * (cosBeta * E_in_perp + sinBeta * E_in_par);
 
 
         Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
         Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);
-        Vector3cd H_in = Rz_inv * (cosBeta * H_in_perp + sinBeta * H_in_par);
+        Vector3cd H_in = Rz * (cosBeta * H_in_perp + sinBeta * H_in_par);
 
         outE.row(i) = E_in.transpose(); // + refE.row(i);
         outH.row(i) = H_in.transpose(); // + refH.row(i);

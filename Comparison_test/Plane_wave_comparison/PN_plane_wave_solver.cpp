@@ -69,6 +69,8 @@ int main(int argc, char* argv[]){
     file.close();
     
     // Initialize Eigen vectors
+    Constants constants;
+    double wavelength;
     Eigen::Vector3d direction = Eigen::Vector3d::Zero();
     double polarization;
     
@@ -78,7 +80,10 @@ int main(int argc, char* argv[]){
         else if (param.name == "propagation_y") direction(1) = param.value;
         else if (param.name == "propagation_z") direction(2) = param.value;
         else if (param.name == "polarization") polarization = param.value;
+        else if (param.name == "omega") wavelength = 2*constants.pi/param.value;
     }
+
+    constants.setWavelength(wavelength);
     
     std::cout << "Propagation vector = (" << direction(0) << "," << direction(1) << "," << direction(2) << ")" << std::endl;
 
@@ -125,7 +130,6 @@ int main(int argc, char* argv[]){
 
     ////////////////////////////////
     double E0 = 1.0;
-    Constants constants;
     Eigen::MatrixX3cd E(test_vec_size, 3);
     Eigen::MatrixX3cd H(test_vec_size, 3);
     // Eigen::MatrixX3cd refE(test_vec_size, 3);

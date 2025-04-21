@@ -2,7 +2,7 @@ Parameter,Value
 mu,1.25663706127e-06
 epsilon,8.8541878188e-12
 omega,922438332307692.2
-polarization,0.2
+polarization,1.0
 propagation_x,0.5773502691896258
 propagation_y,0.5773502691896258
 propagation_z,-0.5773502691896258

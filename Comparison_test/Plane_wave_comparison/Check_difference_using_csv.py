@@ -82,6 +82,7 @@ if True:
     mu         = 1.25663706127e-6
     wavelength = 325e-9
     omega      = 2.99792458e8 / wavelength
+    length = 1
 
     # Generate random values
     # mu = np.random.uniform(0.5, 10)
@@ -89,7 +90,7 @@ if True:
     # omega = np.random.uniform(0.5, 10)
     
     
-    polarization = 0.2 # np.random.uniform(0,np.pi/2)
+    polarization = 1 # np.random.uniform(0,np.pi/2)
     
 
     # Random unit vector for direction
@@ -100,7 +101,7 @@ if True:
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
     # testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
-    testpoints = [[2*wavelength, 3*wavelength, 10*wavelength]]
+    testpoints = [[2*length, 3*length, 10*length]]
 
     param_data = [
     ["mu", mu],

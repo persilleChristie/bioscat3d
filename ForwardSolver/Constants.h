@@ -4,6 +4,7 @@
 
 #include <complex>
 #include <iostream>
+#include <stdio.h>
 
 struct Constants {
 
@@ -33,7 +34,7 @@ struct Constants {
     Constants() {
         // Computed constants
         setWavelength(1.0); // setWavelength(325e-9); // Default value of wavelength in free space
-        //printf("Constants initialized!\n");
+        printf("Constants initialized!\n");
     }
 
     // Change wavelength and update wave numbers
@@ -41,7 +42,7 @@ struct Constants {
         lambda0 = lambda;
         k0 = 2 * pi / lambda0;         // Wave number in free space
         k1 = k0 * n1 / n0;             // Wave number in nanowire/nanostructure
-        //printf("Constants updated with new wavelength!\n");
+        printf("Constants updated with new wavelength!\n");
     }
 
     // Read current wavelength

@@ -86,24 +86,25 @@ if True:
     # omega = np.random.uniform(0.5, 10)
     mu         = 1 # 1.25663706127e-6
     epsilon    = 1 # 8.8541878188e-12
-    wavelength = 0.002
+    wavelength = 0.0001
+    #wavelength = 0.325e-6
     omega      = 2 * np.pi / wavelength  # 2.99792458e8
-    wavelength = 10
+    length = 1
 
     # Random position (assuming within a range, e.g., -10 to 10)
     # position = np.random.uniform(-10, 10, size=3).tolist()
-    position = [wavelength,wavelength,wavelength]
+    position = [0,0,0]
 
     # Random unit vector for direction
     # random_vector = np.random.uniform(-1, 1, size=3)
     # direction = (random_vector / np.linalg.norm(random_vector)).tolist()
-    direction = [1,2,3]/np.sqrt(14)
+    direction = [2,3,1]/np.sqrt(14)
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
     # testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
-    testpoints = [[3*wavelength,2*wavelength,4*wavelength],
-                  [-2*wavelength,3*wavelength,1*wavelength],
-                  [-1*wavelength,-1*wavelength,-1*wavelength],
+    testpoints = [[3*length,2*length,4*length],
+                  [-2*length,3*length,1*length],
+                  [-1*length,-1*length,-1*length],
                   [-1,2,3],
                   [10,10,10]]
     param_data = [

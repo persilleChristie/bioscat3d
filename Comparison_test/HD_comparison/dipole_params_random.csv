@@ -1,10 +1,10 @@
 Parameter,Value
 mu,1.0
 epsilon,1.0
-omega,3141.592653589793
-position_x,-10.0
-position_y,-10.0
-position_z,-10.0
-direction_x,0.2672612419124244
-direction_y,0.5345224838248488
-direction_z,0.8017837257372732
+omega,62831.85307179586
+position_x,0.0
+position_y,0.0
+position_z,0.0
+direction_x,0.5345224838248488
+direction_y,0.8017837257372732
+direction_z,0.2672612419124244

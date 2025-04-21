@@ -72,6 +72,10 @@ int main(int argc, char* argv[]){
     // Initialize Eigen vectors
     Eigen::Vector3d position = Eigen::Vector3d::Zero();
     Eigen::Vector3d direction = Eigen::Vector3d::Zero();
+
+    // Initialize wavelength
+    Constants constants;
+    double wavelength;
     
     // Assign values to Eigen vectors
     for (const auto& param : params) {
@@ -81,7 +85,11 @@ int main(int argc, char* argv[]){
         else if (param.name == "direction_x") direction(0) = param.value;
         else if (param.name == "direction_y") direction(1) = param.value;
         else if (param.name == "direction_z") direction(2) = param.value;
+        else if (param.name == "omega") wavelength = 2*constants.pi/param.value;
     }
+    constants.setWavelength(wavelength);
+    std::cout << "new wavelength should have been set here" << constants.getWavelength() << std::endl;
+
     
     // Read test points into an Eigen matrix
     std::ifstream matrix_file(testpoint_file); // Replace with your test points CSV filename
@@ -125,7 +133,6 @@ int main(int argc, char* argv[]){
 
 
     ////////////////////////////////
-    Constants constants;
     Eigen::MatrixX3cd E(test_vec_size, 3);
     Eigen::MatrixX3cd H(test_vec_size, 3);
 
