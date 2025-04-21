@@ -78,11 +78,11 @@ if True:
     np.random.seed(42)
 
     # Variables to fit PN's 
-    epsilon    = 8.8541878188e-12
-    mu         = 1.25663706127e-6
-    wavelength = 325e-9
-    omega      = 2.99792458e8 / wavelength
-    length = 1
+    epsilon    = 1 # 8.8541878188e-12
+    mu         = 1 # 1.25663706127e-6
+    wavelength = 1
+    omega      = 2*np.pi / wavelength
+    length     = 1
 
     # Generate random values
     # mu = np.random.uniform(0.5, 10)
@@ -101,7 +101,12 @@ if True:
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
     # testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
-    testpoints = [[2*length, 3*length, 10*length]]
+    testpoints = [[2*length, 3*length, 10*length],
+                  [3*length,2*length,4*length],
+                  [-2*length,3*length,1*length],
+                  [-1*length,-1*length,-1*length],
+                  [-1,2,3],
+                  [10,10,10]]
 
     param_data = [
     ["mu", mu],

@@ -125,6 +125,8 @@ def compute_fields_from_csv(param_file, testpoints_file, output_file):
     # Compute fields (assuming Plane_wave is defined elsewhere)
     PW = Plane_wave(propagation_vector, polarization, epsilon, mu, omega)
     E, H = PW.evaluate_at_points(testpoints)
+
+    print(f"Calculated impedance: {np.linalg.norm(E,axis=1)/np.linalg.norm(H, axis=1)}")
     
     # Prepare data for saving: split real and imaginary parts
     data = {

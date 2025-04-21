@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){
         else if (param.name == "propagation_y") direction(1) = param.value;
         else if (param.name == "propagation_z") direction(2) = param.value;
         else if (param.name == "polarization") polarization = param.value;
-        else if (param.name == "omega") wavelength = 2*constants.pi/param.value;
+        else if (param.name == "omega") wavelength = 2 * constants.pi /param.value;
     }
 
     constants.setWavelength(wavelength);
