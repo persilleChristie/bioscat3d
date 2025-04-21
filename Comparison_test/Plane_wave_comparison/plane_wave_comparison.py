@@ -28,56 +28,36 @@ class Plane_wave():
         self.wavenumber=omega*np.sqrt(epsilon*mu)
         self.mu=mu
         self.omega=omega
+        self.eta=np.sqrt(mu/epsilon)
 
-        if np.array_equal(self.propagation_vector,np.array([0,0,-1])):
-            self.rot_matrix=np.eye(3)
-        elif np.array_equal(self.propagation_vector,np.array([0,0,1])):
-            self.rot_matrix=np.array([
-                [1,0,0],
-                [0,-1,0],
-                [0,0,-1]
-            ])
-        else:
-            N=np.sqrt(self.propagation_vector[0]**2+self.propagation_vector[1]**2)
-            self.rot_matrix=-1*np.array([
-                [ self.propagation_vector[1]/N , self.propagation_vector[0]*self.propagation_vector[2]/N, self.propagation_vector[0]  ],
-                [ -self.propagation_vector[0]/N, self.propagation_vector[1]*self.propagation_vector[2]/N, self.propagation_vector[1]  ],
-                [         0           ,                 -N                   , self.propagation_vector[2]  ]
-            ])
-        self.rot_matrix_inv=np.linalg.inv(self.rot_matrix)
     def evaluate_at_points(self,X):
-        #---------------------------------------------------------------------------
-        #                           Rotate points and precompute
-        #---------------------------------------------------------------------------
+        k=self.propagation_vector
+        kxy=-k[:2]
+        phi=np.arctan2(kxy[1],kxy[0])
+        R_z=np.array([
+            [np.cos(phi),-np.sin(phi),0],
+            [np.sin(phi),np.cos(phi), 0],
+            [0,0,1]
+        ])
+        k_rot= R_z@k
+        X_rot=(R_z @ X.T).T
+        x,y,z=X_rot[:,0],X_rot[:,1],X_rot[:,2]
+        theta=np.arccos(-k_rot[2])
 
-        rotated_points=(self.rot_matrix_inv @ X.T).T
-        exponential_term=np.exp(1j*self.wavenumber*rotated_points[:,2])
-        eta=self.omega*self.mu/self.wavenumber
+        exp_term=np.exp( -1j*self.wavenumber* ( x*np.sin(theta)-z*np.cos(theta) ) )
+        oner,zoer=np.ones_like(x),np.zeros_like(x)
 
+        E_perp=np.column_stack( (zoer,oner*exp_term,zoer) )
+        E_par =np.column_stack( (-oner*np.cos(theta)*exp_term,zoer,-oner*np.sin(theta)*exp_term) )
 
-        #---------------------------------------------------------------------------
-        #                           Electric field computation
-        #---------------------------------------------------------------------------
-
-        Ex=np.sin(self.polarization)*exponential_term
-        Ey=np.cos(self.polarization)*exponential_term
-        Ez=np.zeros_like(Ex)
-        E=np.column_stack((Ex,Ey,Ez))
-        #---------------------------------------------------------------------------
-        #                           Magnetic field computation
-        #---------------------------------------------------------------------------
-        Hx=-np.cos(self.polarization)*exponential_term/eta
-        Hy=np.sin(self.polarization)*exponential_term/eta
-        Hz=np.zeros_like(Hx)
-        H=np.column_stack((Hx,Hy,Hz))
-
-        #---------------------------------------------------------------------------
-        #                           rotate fields back
-        #---------------------------------------------------------------------------
-        
-        E_rotated = (self.rot_matrix @ E.T).T
-        H_rotated = (self.rot_matrix @ H.T).T
-        return [E_rotated, H_rotated]
+        H_perp=np.column_stack( (-oner*np.cos(theta)*exp_term,zoer,-oner*np.sin(theta)*exp_term) )/self.eta
+        H_par =np.column_stack( (zoer,oner*exp_term,zoer))/self.eta
+        E=np.cos(self.polarization)*E_perp+np.sin(self.polarization)*E_par
+        H=np.cos(self.polarization)*H_perp+np.sin(self.polarization)*H_par
+        R_inv=R_z.T
+        E=(R_inv @ E.T).T
+        H=(R_inv @ H.T).T
+        return E,H
 
 def get_reflected_field_at_points(points,PW,mu,epsilon_substrate,epsilon_air):
     #---------------------------------------------------------------
@@ -142,12 +122,9 @@ def compute_fields_from_csv(param_file, testpoints_file, output_file):
     print(f"Propagation vector: {propagation_vector}, Polarization: {polarization}")
     print(f"Testpoints shape: {testpoints.shape}")
     
-    
     # Compute fields (assuming Plane_wave is defined elsewhere)
     PW = Plane_wave(propagation_vector, polarization, epsilon, mu, omega)
     E, H = PW.evaluate_at_points(testpoints)
-
-    print(f"Rotation matrix: {PW.rot_matrix}")
     
     # Prepare data for saving: split real and imaginary parts
     data = {
