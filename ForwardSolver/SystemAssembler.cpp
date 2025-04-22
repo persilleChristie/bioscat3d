@@ -13,16 +13,19 @@ using namespace Eigen;
 void SystemAssembler::assembleSystem(
     Eigen::MatrixXcd& A,
     Eigen::VectorXcd& b,
-    const Surface& surface,
+    //const Surface& surface,
+    Eigen::MatrixX3d points,
+    Eigen::MatrixX3d tau1,
+    Eigen::MatrixX3d tau2,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources_int,
     // const std::vector<std::shared_ptr<FieldCalculator>>& sources_mirr,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources_ext,
     const std::shared_ptr<FieldCalculator>& incident
     // const std::complex<double> Gamma_r
 ) {
-    const auto& points = surface.getPoints();
-    const auto& tau1 = surface.getTau1();
-    const auto& tau2 = surface.getTau2();
+    // const auto& points = surface.getPoints();
+    // const auto& tau1 = surface.getTau1();
+    // const auto& tau2 = surface.getTau2();
 
     int M = points.rows();
 

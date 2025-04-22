@@ -80,7 +80,7 @@ if True:
     # Variables to fit PN's 
     epsilon    = 1 # 8.8541878188e-12
     mu         = 1 # 1.25663706127e-6
-    wavelength = 1
+    wavelength = 325e-9
     omega      = 2*np.pi / wavelength
     length     = 1
 
@@ -96,7 +96,7 @@ if True:
     # Random unit vector for direction
     # random_vector = np.random.uniform(-1, 1, size=3)
     # propagation_vector = (random_vector / np.linalg.norm(random_vector)).tolist()
-    propagation_vector = [1, 1, -1]/np.sqrt(3)
+    propagation_vector = [1, 0.5, -1]/np.sqrt(2.25)
 
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)

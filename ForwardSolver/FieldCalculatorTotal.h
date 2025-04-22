@@ -8,12 +8,16 @@
 #include <memory>
 #include <Eigen/Dense>
 #include "Surface.h"
+#include <fstream>
+#include <iostream>
 
 class FieldCalculatorTotal : public FieldCalculator {
 public:
     FieldCalculatorTotal(
-        const Eigen::VectorXcd & amplitudes,
-        const std::vector<std::shared_ptr<FieldCalculator>>& dipoles,
+        std::string testpoint_file,
+        std::string aux_point_file,
+        // const Eigen::VectorXcd & amplitudes,
+        // const std::vector<std::shared_ptr<FieldCalculator>>& dipoles,
         const std::shared_ptr<FieldCalculator>& UPW
     );
 
@@ -31,6 +35,9 @@ private:
     Eigen::VectorXcd amplitudes_;
     std::vector<std::shared_ptr<FieldCalculator>> dipoles_;
     std::shared_ptr<FieldCalculator> UPW_;
+
+    void constructor(std::string testpoint_file,
+                     std::string aux_point_file);
 };
 
 #endif // FIELDCALCULATORTOTAL_H

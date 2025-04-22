@@ -39,8 +39,9 @@ class Plane_wave():
             [np.sin(phi),np.cos(phi), 0],
             [0,0,1]
         ])
-        k_rot= R_z@k
-        X_rot=(R_z @ X.T).T
+        R_inv=R_z.T
+        k_rot= R_inv@k
+        X_rot=(R_inv @ X.T).T
         x,y,z=X_rot[:,0],X_rot[:,1],X_rot[:,2]
         theta=np.arccos(-k_rot[2])
 
@@ -48,15 +49,15 @@ class Plane_wave():
         oner,zoer=np.ones_like(x),np.zeros_like(x)
 
         E_perp=np.column_stack( (zoer,oner*exp_term,zoer) )
-        E_par =np.column_stack( (-oner*np.cos(theta)*exp_term,zoer,-oner*np.sin(theta)*exp_term) )
+        E_par =np.column_stack( (oner*np.cos(theta)*exp_term,zoer,oner*np.sin(theta)*exp_term) )
 
         H_perp=np.column_stack( (-oner*np.cos(theta)*exp_term,zoer,-oner*np.sin(theta)*exp_term) )/self.eta
         H_par =np.column_stack( (zoer,oner*exp_term,zoer))/self.eta
         E=np.cos(self.polarization)*E_perp+np.sin(self.polarization)*E_par
         H=np.cos(self.polarization)*H_perp+np.sin(self.polarization)*H_par
-        R_inv=R_z.T
-        E=(R_inv @ E.T).T
-        H=(R_inv @ H.T).T
+       
+        E=(R_z @ E.T).T
+        H=(R_z @ H.T).T
         return E,H
 
 def get_reflected_field_at_points(points,PW,mu,epsilon_substrate,epsilon_air):
@@ -125,6 +126,8 @@ def compute_fields_from_csv(param_file, testpoints_file, output_file):
     # Compute fields (assuming Plane_wave is defined elsewhere)
     PW = Plane_wave(propagation_vector, polarization, epsilon, mu, omega)
     E, H = PW.evaluate_at_points(testpoints)
+
+    print(f"E field: {E}")
 
     print(f"Calculated impedance: {np.linalg.norm(E,axis=1)/np.linalg.norm(H, axis=1)}")
     

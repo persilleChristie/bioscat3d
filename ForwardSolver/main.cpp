@@ -64,7 +64,12 @@ int main() {
     // addDipoles(*sphere_nu_prime_tilde, sources_mirr);
     addDipoles(sphere_nu_2prime, sources_ext);
 
-    SystemAssembler::assembleSystem(A, b, sphere_mu, sources_int, sources_ext, incident);
+
+    const auto& points = sphere_mu.getPoints();
+    const auto& tau1 = sphere_mu.getTau1();
+    const auto& tau2 = sphere_mu.getTau2();
+
+    SystemAssembler::assembleSystem(A, b, points, tau1, tau2, sources_int, sources_ext, incident);
     
     // solve with UtilsSolver
     auto y = UtilsSolvers::solveQR(A, b);
@@ -81,9 +86,12 @@ int main() {
 
 
     // Calculate total field and power
-    Eigen::VectorXcd amplitudes = y.segment(0,2*Nprime);
-    FieldCalculatorTotal field(amplitudes, sources_int, incident);
-    std::cout << "main" << std::endl;
+    
+    FieldCalculatorTotal field("../MeepTests/test_points.csv", "../MeepTests/aux_points.csv", incident);
+    
+    // Eigen::VectorXcd amplitudes = y.segment(0,2*Nprime);
+    // FieldCalculatorTotal field(amplitudes, sources_int, incident);
+
     Eigen::Vector3d Cornerpoint(-5.0,-5.0,10.0), basis1(1.0,1.0,0.0), basis2(-1.0,1.0,0.0);
     double size1 = 10.0, size2 = 10.0;
     
