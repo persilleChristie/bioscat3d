@@ -216,7 +216,7 @@ def visualize_surface_and_points(X, Y, Z, mas_data, path_prefix):
 
 def main():
     np.random.seed(42)
-    width = 10
+    width = 1
     resol = 20
     num_bumps = 3
     data_path = "./SurfaceData"
