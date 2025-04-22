@@ -87,13 +87,15 @@ int main() {
 
     // Calculate total field and power
     
-    FieldCalculatorTotal field("../MeepTests/test_points.csv", "../MeepTests/aux_points.csv", incident);
+    FieldCalculatorTotal field("../MeepTests/SurfaceData/test_points.csv", 
+                                "../MeepTests/SurfaceData/aux_points.csv", 
+                                incident);
     
     // Eigen::VectorXcd amplitudes = y.segment(0,2*Nprime);
     // FieldCalculatorTotal field(amplitudes, sources_int, incident);
 
     Eigen::Vector3d Cornerpoint(-5.0,-5.0,10.0), basis1(1.0,1.0,0.0), basis2(-1.0,1.0,0.0);
-    double size1 = 10.0, size2 = 10.0;
+    double size1 = 1.0, size2 = 1.0;
     
     SurfacePlane testPlane(Cornerpoint, basis1, basis2, size1, size2, resolution);
 

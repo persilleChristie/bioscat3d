@@ -124,7 +124,7 @@ void FieldCalculatorTotal::constructor(std::string testpoint_file,
     int Nprime = static_cast<int>(sources_int.size());
     int N      = Nprime + static_cast<int>(sources_ext.size());
 
-    Eigen::MatrixXcd A(4 * M, 2 * N);
+    Eigen::MatrixXcd A(4 * M, 2 * N); 
     Eigen::VectorXcd b(4 * M);
 
     // Save dipoles for calculating total field
