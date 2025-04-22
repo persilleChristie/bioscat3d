@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.graph_objects as go
+import h5py
 
 
 # Surface data and material
@@ -25,9 +26,6 @@ plt.tight_layout()
 # Save the figure before showing it
 plt.savefig("SimData/surface_plot.png", dpi=300)
 print("✅ Plot saved to surface_plot.png")
-
-plt.show()
-print("✅ Contour plot from scattered point file displayed.")
 
 
 # Surface data and material
@@ -54,7 +52,7 @@ def bump_surface_material(p):
 # Simulation
 
 # Simulation parameters
-width = 2
+width = 4
 resol = 20
 pml_thickness = 2
 resolution = resol # pixels/um
@@ -135,6 +133,16 @@ flux_monitors = {name: sim.add_flux(frequency, 0, 1, region)
 # Run the simulation
 sim.run(until=60)
 
+
+with h5py.File("SimData/field_data.h5", "w") as f:
+    f.create_dataset("Ex", data=ex)
+    f.create_dataset("Ey", data=ey)
+    f.create_dataset("Ez", data=ez)
+    f.create_dataset("abs_E", data=abs_E)
+    f.create_dataset("x_vals", data=x_vals)
+    f.create_dataset("z_vals", data=z_vals)
+print("✅ Field data saved to SimData/field_data.h5")
+
 # Print flux values
 for name, monitor in flux_monitors.items():
     flux_val = mp.get_fluxes(monitor)[0]
@@ -161,8 +169,6 @@ plt.tight_layout()
 plt.savefig("SimData/field_magnitude_slice.png", dpi=300)
 print("✅ Field plot saved to field_magnitude_slice.png")
 
-plt.show()
-
 
 # Create x and z axes
 x_vals = np.linspace(-cell_x/2, cell_x/2, abs_E.shape[0])
@@ -187,7 +193,4 @@ fig.update_layout(
 
 fig.write_html("SimData/field_magnitude_surface.html")
 print("✅ 3D surface plot saved to field_magnitude_surface.html")
-
-fig.show()
-
 
