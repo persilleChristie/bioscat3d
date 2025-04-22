@@ -123,23 +123,20 @@ void FieldCalculatorTotal::constructor(std::string testpoint_file,
 
     int Nprime = static_cast<int>(sources_int.size());
     int N      = Nprime + static_cast<int>(sources_ext.size());
-    std::cout << "Field calc total, l. 132" << std::endl;
-    std::cout << "N: " << N << std::endl;
-    std::cout << "M: " << M << std::endl;
+
     Eigen::MatrixXcd A(4 * M, 2 * N);
     Eigen::VectorXcd b(4 * M);
-    std::cout << "Field calc total, l. 129" << std::endl;
+
     // Save dipoles for calculating total field
     this->dipoles_ = sources_int;
-    std::cout << "Field calc total, l. 138" << std::endl;
+
     ///// SOLVE SYSTEM /////
     SystemAssembler::assembleSystem(A, b, pts, t1, t2, sources_int, sources_ext, UPW_);
-    std::cout << "Field calc total, l. 141" << std::endl;
+
     // solve with UtilsSolver
     auto amps = UtilsSolvers::solveQR(A, b);
 
     this->amplitudes_ = amps.head(Nprime);
-    std::cout << "Field calc total, l. 146" << std::endl;
 }
 
 
