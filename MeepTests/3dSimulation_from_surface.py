@@ -2,6 +2,8 @@ import meep as mp
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.graph_objects as go
+
 
 # Surface data and material
 surface_df = pd.read_csv("SurfaceData/SurfaceData.csv")
@@ -19,8 +21,14 @@ plt.xlabel("x (μm)")
 plt.ylabel("y (μm)")
 plt.axis("equal")
 plt.tight_layout()
+
+# Save the figure before showing it
+plt.savefig("SimData/surface_plot.png", dpi=300)
+print("✅ Plot saved to surface_plot.png")
+
 plt.show()
 print("✅ Contour plot from scattered point file displayed.")
+
 
 # Surface data and material
 bump_df = pd.read_csv("SurfaceData/bumpData.csv")
@@ -47,7 +55,7 @@ def bump_surface_material(p):
 
 # Simulation parameters
 width = 2
-resol = 50
+resol = 20
 pml_thickness = 2
 resolution = resol # pixels/um
 dim = width + 2 * pml_thickness
@@ -85,7 +93,7 @@ eig_kpoint = k_unit.scale(frequency)
 sources = [
     mp.EigenModeSource(
         src=mp.ContinuousSource(frequency=frequency),
-        center=mp.Vector3(0, 0, 0.5 * cell_z - pml_thickness - 1),
+        center=mp.Vector3(0, 0, 0.5 * cell_z - pml_thickness - 0.5),
         size=mp.Vector3(cell_x, cell_y, 0),
         direction=mp.Z,  # still Z, but mode defines propagation
         eig_kpoint=eig_kpoint,
@@ -141,10 +149,45 @@ abs_E = np.sqrt(np.abs(ex)**2 + np.abs(ey)**2 + np.abs(ez)**2)
 
 # Plot total field magnitude
 plt.figure(dpi=100)
-plt.imshow(abs_E.T, cmap='inferno', origin='lower', extent=[-cell_x/2, cell_x/2, -cell_z/2, cell_z/2])
+plt.imshow(abs_E.T, cmap='inferno', origin='lower',
+           extent=[-cell_x/2, cell_x/2, -cell_z/2, cell_z/2])
 plt.colorbar(label='|E|')
 plt.xlabel('x (µm)')
 plt.ylabel('z (µm)')
 plt.title('Total Electric Field Magnitude |E| (slice at y=0)')
 plt.tight_layout()
+
+# Save to file
+plt.savefig("SimData/field_magnitude_slice.png", dpi=300)
+print("✅ Field plot saved to field_magnitude_slice.png")
+
 plt.show()
+
+
+# Create x and z axes
+x_vals = np.linspace(-cell_x/2, cell_x/2, abs_E.shape[0])
+z_vals = np.linspace(-cell_z/2, cell_z/2, abs_E.shape[1])
+X, Z = np.meshgrid(x_vals, z_vals)
+
+# Create 3D surface plot of |E|
+fig = go.Figure()
+fig.add_trace(go.Surface(z=abs_E.T, x=X, y=Z, colorscale='Inferno', colorbar=dict(title='|E|')))
+
+fig.update_layout(
+    title='3D Surface Plot of |E| (at y = 0)',
+    scene=dict(
+        xaxis_title='x (µm)',
+        yaxis_title='z (µm)',
+        zaxis_title='|E|',
+        aspectmode='data'
+    ),
+    width=800,
+    height=700
+)
+
+fig.write_html("SimData/field_magnitude_surface.html")
+print("✅ 3D surface plot saved to field_magnitude_surface.html")
+
+fig.show()
+
+
