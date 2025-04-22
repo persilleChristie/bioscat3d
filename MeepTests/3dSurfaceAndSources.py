@@ -218,7 +218,7 @@ def main():
     np.random.seed(42)
     width = 1
     resol = 20
-    num_bumps = 1
+    num_bumps = 3
     data_path = "./SurfaceData"
     import os
     os.makedirs(data_path, exist_ok=True)

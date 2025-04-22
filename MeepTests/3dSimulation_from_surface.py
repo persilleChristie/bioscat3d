@@ -133,16 +133,6 @@ flux_monitors = {name: sim.add_flux(frequency, 0, 1, region)
 # Run the simulation
 sim.run(until=60)
 
-
-with h5py.File("SimData/field_data.h5", "w") as f:
-    f.create_dataset("Ex", data=ex)
-    f.create_dataset("Ey", data=ey)
-    f.create_dataset("Ez", data=ez)
-    f.create_dataset("abs_E", data=abs_E)
-    f.create_dataset("x_vals", data=x_vals)
-    f.create_dataset("z_vals", data=z_vals)
-print("✅ Field data saved to SimData/field_data.h5")
-
 # Print flux values
 for name, monitor in flux_monitors.items():
     flux_val = mp.get_fluxes(monitor)[0]
@@ -174,6 +164,15 @@ print("✅ Field plot saved to field_magnitude_slice.png")
 x_vals = np.linspace(-cell_x/2, cell_x/2, abs_E.shape[0])
 z_vals = np.linspace(-cell_z/2, cell_z/2, abs_E.shape[1])
 X, Z = np.meshgrid(x_vals, z_vals)
+
+with h5py.File("SimData/field_data.h5", "w") as f:
+    f.create_dataset("Ex", data=ex)
+    f.create_dataset("Ey", data=ey)
+    f.create_dataset("Ez", data=ez)
+    f.create_dataset("abs_E", data=abs_E)
+    f.create_dataset("x_vals", data=x_vals)
+    f.create_dataset("z_vals", data=z_vals)
+print("✅ Field data saved to SimData/field_data.h5")
 
 # Create 3D surface plot of |E|
 fig = go.Figure()
