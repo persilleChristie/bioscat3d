@@ -4,6 +4,7 @@
 #include "FieldCalculator.h"
 #include "FieldCalculatorDipole.h"
 #include "FieldCalculatorUPW.h"
+#include "Constants.h"
 #include <vector>
 #include <memory>
 #include <Eigen/Dense>
@@ -18,7 +19,8 @@ public:
         std::string aux_point_file,
         // const Eigen::VectorXcd & amplitudes,
         // const std::vector<std::shared_ptr<FieldCalculator>>& dipoles,
-        const std::shared_ptr<FieldCalculator>& UPW
+        const std::shared_ptr<FieldCalculator>& UPW,
+        Constants constants
     );
 
     void computeFields(
@@ -35,6 +37,7 @@ private:
     Eigen::VectorXcd amplitudes_;
     std::vector<std::shared_ptr<FieldCalculator>> dipoles_;
     std::shared_ptr<FieldCalculator> UPW_;
+    Constants constants_;
 
     void constructor(std::string testpoint_file,
                      std::string aux_point_file);

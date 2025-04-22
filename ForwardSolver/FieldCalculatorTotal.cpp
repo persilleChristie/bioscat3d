@@ -13,8 +13,9 @@ FieldCalculatorTotal::FieldCalculatorTotal(
     std::string aux_point_file,
     // const Eigen::VectorXcd & amplitudes,
     // const std::vector<std::shared_ptr<FieldCalculator>>& dipoles,
-    const std::shared_ptr<FieldCalculator>& UPW
-) : UPW_(UPW)
+    const std::shared_ptr<FieldCalculator>& UPW,
+    Constants constants
+) : UPW_(UPW), constants_(constants)
 {
     // if (amplitudes_.size() != static_cast<int>(dipoles_.size())) {
     //     throw std::invalid_argument("Amplitudes and dipoles must have the same size.");
@@ -25,8 +26,6 @@ FieldCalculatorTotal::FieldCalculatorTotal(
 void FieldCalculatorTotal::constructor(std::string testpoint_file,
     std::string aux_point_file)
 {
-    Constants constants;
-
     ///// LOAD TESTPOINTS /////
     // Read test points into an Eigen matrix
     std::ifstream file(testpoint_file);
@@ -109,15 +108,15 @@ void FieldCalculatorTotal::constructor(std::string testpoint_file,
         if (type == "int") {
             // std::cout << "INT type line: x = " << x << ", y = " << y << ", z = " << z << ", test_index = " << test_index << "\n";
             sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t1.row(test_index)), constants));
+                            Dipole(point, t1.row(test_index)), constants_));
             sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t2.row(test_index)), constants));
+                            Dipole(point, t2.row(test_index)), constants_));
             
         } else if (type == "ext") {
             sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t1.row(test_index)), constants));
+                            Dipole(point, t1.row(test_index)), constants_));
             sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t2.row(test_index)), constants));
+                            Dipole(point, t2.row(test_index)), constants_));
         }
     }
 
