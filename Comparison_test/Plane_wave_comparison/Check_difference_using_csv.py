@@ -80,9 +80,9 @@ if True:
     # Variables to fit PN's 
     epsilon    = 1 # 8.8541878188e-12
     mu         = 1 # 1.25663706127e-6
-    wavelength = 1
+    wavelength = 325e-9
     omega      = 2*np.pi / wavelength
-    length     = 1
+    length     = 1*wavelength
 
     # Generate random values
     # mu = np.random.uniform(0.5, 10)
@@ -90,7 +90,7 @@ if True:
     # omega = np.random.uniform(0.5, 10)
     
     
-    polarization = 1 # np.random.uniform(0,np.pi/2)
+    polarization = 0.2 # np.random.uniform(0,np.pi/2)
     
 
     # Random unit vector for direction
