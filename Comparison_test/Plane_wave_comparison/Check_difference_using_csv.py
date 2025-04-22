@@ -96,7 +96,7 @@ if True:
     # Random unit vector for direction
     # random_vector = np.random.uniform(-1, 1, size=3)
     # propagation_vector = (random_vector / np.linalg.norm(random_vector)).tolist()
-    propagation_vector = [1, 1, -1]/np.sqrt(3)
+    propagation_vector = [1, 0.5, -1]/np.sqrt(2.25)
 
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)

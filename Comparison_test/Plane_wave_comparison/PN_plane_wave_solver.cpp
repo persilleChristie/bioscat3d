@@ -137,6 +137,8 @@ int main(int argc, char* argv[]){
 
     FieldCalculatorUPW U(direction, E0, polarization, constants);
     U.computeFields(E, H, testpoints);
+
+    std::cout << "E-field: " << E << std::endl;
     
     Eigen::VectorXd calcImpedance(test_vec_size);
 
