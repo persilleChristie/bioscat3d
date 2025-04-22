@@ -38,9 +38,13 @@ def export_bump_data(bump_data, path):
     bump_df = pd.DataFrame(bump_data)
     bump_df.to_csv(path, index=False)
 
-def export_surface_data(Z, path):
-    df = pd.DataFrame(Z)
-    df.to_csv(path, index=False, header=False)
+def export_surface_full(X, Y, Z, path):
+    df = pd.DataFrame({
+        'x': X.ravel(),
+        'y': Y.ravel(),
+        'z': Z.ravel()
+    })
+    df.to_csv(path, index=False)
 
 def export_MAS_data(data, path):
     # --- Export test points with normals and tangents ---
@@ -72,7 +76,7 @@ def export_MAS_data(data, path):
     })
     df_aux.to_csv(path + "/aux_points.csv", index=False)
 
-    print("✅ Data exported to test_points.csv and aux_points.csv")
+    print("✅ MAS data exported to test_points.csv and aux_points.csv")
 
 def plot_surface_contour(X, Y, Z):
     plt.figure(figsize=(7, 6))
@@ -148,8 +152,8 @@ def generate_MAS_model(x, y, X, Y, Z, lambda_0=0.325, d = 0.14, testPointPerLamb
     aux_test_points = test_points[aux_test_indices]
     aux_test_normals = test_normals[aux_test_indices]
 
-    aux_points_int = aux_test_points + d * aux_test_normals
-    aux_points_ext = aux_test_points - d * aux_test_normals
+    aux_points_int = aux_test_points - d * aux_test_normals
+    aux_points_ext = aux_test_points + d * aux_test_normals
 
     # --- Return full structured data ---
     return {
@@ -162,14 +166,62 @@ def generate_MAS_model(x, y, X, Y, Z, lambda_0=0.325, d = 0.14, testPointPerLamb
     "aux_indices": aux_test_indices,
     }
 
+def visualize_surface_and_points(X, Y, Z, mas_data, path_prefix):
+    def plot_points(points, color, name, filename):
+        fig = go.Figure()
+        fig.add_trace(go.Surface(z=Z, x=X, y=Y, colorscale='Viridis', opacity=0.6))
+        fig.add_trace(go.Scatter3d(x=points[:, 0], y=points[:, 1], z=points[:, 2],
+                                   mode='markers', marker=dict(size=2, color=color), name=name))
+        fig.update_layout(scene=dict(xaxis_title='x (μm)', yaxis_title='y (μm)', zaxis_title='z (μm)', aspectmode='data'),
+                          title=f"3D Surface with {name}")
+        fig.write_html(filename)
+        print(f"✅ Saved: {filename}")
+
+    # Plot all combined
+    fig = go.Figure()
+    fig.add_trace(go.Surface(z=Z, x=X, y=Y, colorscale='Viridis', opacity=0.6))
+    fig.add_trace(go.Scatter3d(x=mas_data["test_points"][:, 0], y=mas_data["test_points"][:, 1], z=mas_data["test_points"][:, 2],
+                               mode='markers', marker=dict(size=2, color='red'), name="Test points"))
+    fig.add_trace(go.Scatter3d(x=mas_data["aux_points_int"][:, 0], y=mas_data["aux_points_int"][:, 1], z=mas_data["aux_points_int"][:, 2],
+                               mode='markers', marker=dict(size=2, color='orange'), name="Aux (int)"))
+    fig.add_trace(go.Scatter3d(x=mas_data["aux_points_ext"][:, 0], y=mas_data["aux_points_ext"][:, 1], z=mas_data["aux_points_ext"][:, 2],
+                               mode='markers', marker=dict(size=2, color='cyan'), name="Aux (ext)"))
+    fig.update_layout(scene=dict(xaxis_title='x (μm)', yaxis_title='y (μm)', zaxis_title='z (μm)', aspectmode='data'),
+                      title="Interactive 3D Surface with Points")
+    fig.write_html(path_prefix + "/surface_with_points.html")
+
+    # Individual sets
+    plot_points(mas_data["test_points"], 'red', "Test Points", path_prefix + "/surface_test_points.html")
+    plot_points(mas_data["aux_points_int"], 'orange', "Auxiliary Interior Points", path_prefix + "/surface_aux_int.html")
+    plot_points(mas_data["aux_points_ext"], 'cyan', "Auxiliary Exterior Points", path_prefix + "/surface_aux_ext.html")
+
+    # Test points with and without aux
+    mask_with_aux = np.zeros(len(mas_data["test_points"]), dtype=bool)
+    mask_with_aux[mas_data["aux_indices"]] = True
+    test_with_aux = mas_data["test_points"][mask_with_aux]
+    test_without_aux = mas_data["test_points"][~mask_with_aux]
+
+    fig = go.Figure()
+    fig.add_trace(go.Surface(z=Z, x=X, y=Y, colorscale='Viridis', opacity=0.6))
+    fig.add_trace(go.Scatter3d(x=test_with_aux[:, 0], y=test_with_aux[:, 1], z=test_with_aux[:, 2],
+                               mode='markers', marker=dict(size=3, color='blue'), name="Test points with aux"))
+    fig.add_trace(go.Scatter3d(x=test_without_aux[:, 0], y=test_without_aux[:, 1], z=test_without_aux[:, 2],
+                               mode='markers', marker=dict(size=2, color='gray'), name="Other test points"))
+    fig.update_layout(scene=dict(xaxis_title='x (μm)', yaxis_title='y (μm)', zaxis_title='z (μm)', aspectmode='data'),
+                      title="Test Points With vs Without Aux Points")
+    fig.write_html(path_prefix + "/test_points_with_vs_without_aux.html")
+    print("✅ Saved: ./SurfaceData/test_points_with_vs_without_aux.html")
+
 
 
 def main():
     np.random.seed(42)
-    width = 1
+    width = 10
     resol = 20
     num_bumps = 3
     data_path = "./SurfaceData"
+    import os
+    os.makedirs(data_path, exist_ok=True)
 
     x, y, X, Y, Z = generate_grid(width, resol)
     bump_data = []
@@ -179,7 +231,7 @@ def main():
 
     export_bump_data(bump_data, data_path + "/bumpData.csv")
 
-    export_surface_data(Z, data_path + "/SurfaceData.csv")
+    export_surface_full(X, Y, Z, data_path + "/SurfaceData.csv")
 
     plot_surface_contour(X, Y, Z)
 
@@ -206,6 +258,8 @@ def main():
     aux_test_idx = data["aux_indices"]
 
     export_MAS_data(data, data_path)
+
+    visualize_surface_and_points(X, Y, Z, data, data_path)
 
 if __name__ == "__main__":
     main()
