@@ -52,8 +52,8 @@ def bump_surface_material(p):
 # Simulation
 
 # Simulation parameters
-width = 4
-resol = 20
+width = 3
+resol = 12
 pml_thickness = 2
 resolution = resol # pixels/um
 dim = width + 2 * pml_thickness
@@ -90,7 +90,7 @@ eig_kpoint = k_unit.scale(frequency)
 # Source: downward plane wave at angles
 sources = [
     mp.EigenModeSource(
-        src=mp.ContinuousSource(frequency=frequency),
+        src=mp.ContinuousSource(frequency=frequency, is_integrated=True),
         center=mp.Vector3(0, 0, 0.5 * cell_z - pml_thickness - 0.5),
         size=mp.Vector3(cell_x, cell_y, 0),
         direction=mp.Z,  # still Z, but mode defines propagation
@@ -158,6 +158,47 @@ plt.tight_layout()
 # Save to file
 plt.savefig("SimData/field_magnitude_slice.png", dpi=300)
 print("✅ Field plot saved to field_magnitude_slice.png")
+
+# Get all field components for total |E| calculation (3D volume)
+ex_3d = sim.get_array(center=mp.Vector3(), size=mp.Vector3(cell_x, cell_y, cell_z), component=mp.Ex)
+ey_3d = sim.get_array(center=mp.Vector3(), size=mp.Vector3(cell_x, cell_y, cell_z), component=mp.Ey)
+ez_3d = sim.get_array(center=mp.Vector3(), size=mp.Vector3(cell_x, cell_y, cell_z), component=mp.Ez)
+
+# Compute the total electric field magnitude at each (x, y, z) point
+abs_E = np.sqrt(np.abs(ex_3d)**2 + np.abs(ey_3d)**2 + np.abs(ez_3d)**2)
+
+# Parameters
+sample_factor = 20  # Keep every 10th point
+
+# Downsample the fields
+ex_s = ex_3d[::sample_factor, ::sample_factor, ::sample_factor]
+ey_s = ey_3d[::sample_factor, ::sample_factor, ::sample_factor]
+ez_s = ez_3d[::sample_factor, ::sample_factor, ::sample_factor]
+abs_E_s = abs_E[::sample_factor, ::sample_factor, ::sample_factor]
+
+# Get spatial coordinates
+nx, ny, nz = ex_s.shape
+x_vals = np.linspace(-cell_x/2, cell_x/2, nx)
+y_vals = np.linspace(-cell_y/2, cell_y/2, ny)
+z_vals = np.linspace(-cell_z/2, cell_z/2, nz)
+
+# Meshgrid and flatten everything
+X, Y, Z = np.meshgrid(x_vals, y_vals, z_vals, indexing="ij")
+
+data = {
+    "x": X.flatten(),
+    "y": Y.flatten(),
+    "z": Z.flatten(),
+    "Ex": ex_s.flatten(),
+    "Ey": ey_s.flatten(),
+    "Ez": ez_s.flatten(),
+    "|E|": abs_E_s.flatten()
+}
+
+df = pd.DataFrame(data)
+df.to_csv("SimData/field_sampled.csv", index=False)
+print("✅ Saved sampled 3D field data to SimData/field_3d_sampled.csv")
+
 
 
 # Create x and z axes
