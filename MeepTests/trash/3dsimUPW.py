@@ -1,7 +1,7 @@
 import meep as mp
 import numpy as np
 import matplotlib.pyplot as plt
-from Mie_theory import Mie_Solver
+from MeepTests.trash.Mie_theory import Mie_Solver
 from meep.materials import Ag
 
 Size_x = 2

@@ -167,6 +167,16 @@ ez_3d = sim.get_array(center=mp.Vector3(), size=mp.Vector3(cell_x, cell_y, cell_
 # Compute the total electric field magnitude at each (x, y, z) point
 abs_E = np.sqrt(np.abs(ex_3d)**2 + np.abs(ey_3d)**2 + np.abs(ez_3d)**2)
 
+with h5py.File("SimData/field_3d_data.h5", "w") as f:
+    f.create_dataset("Ex", data=ex_3d)
+    f.create_dataset("Ey", data=ey_3d)
+    f.create_dataset("Ez", data=ez_3d)
+    f.create_dataset("abs_E", data=abs_E)
+    f.create_dataset("x", data=np.linspace(-cell_x/2, cell_x/2, ex_3d.shape[0]))
+    f.create_dataset("y", data=np.linspace(-cell_y/2, cell_y/2, ex_3d.shape[1]))
+    f.create_dataset("z", data=np.linspace(-cell_z/2, cell_z/2, ex_3d.shape[2]))
+print("✅ Saved full 3D data to SimData/field_3d_data.h5")
+
 # Parameters
 sample_factor = 20  # Keep every 10th point
 
@@ -198,22 +208,6 @@ data = {
 df = pd.DataFrame(data)
 df.to_csv("SimData/field_sampled.csv", index=False)
 print("✅ Saved sampled 3D field data to SimData/field_3d_sampled.csv")
-
-
-
-# Create x and z axes
-x_vals = np.linspace(-cell_x/2, cell_x/2, abs_E.shape[0])
-z_vals = np.linspace(-cell_z/2, cell_z/2, abs_E.shape[1])
-X, Z = np.meshgrid(x_vals, z_vals)
-
-with h5py.File("SimData/field_data.h5", "w") as f:
-    f.create_dataset("Ex", data=ex)
-    f.create_dataset("Ey", data=ey)
-    f.create_dataset("Ez", data=ez)
-    f.create_dataset("abs_E", data=abs_E)
-    f.create_dataset("x_vals", data=x_vals)
-    f.create_dataset("z_vals", data=z_vals)
-print("✅ Field data saved to SimData/field_data.h5")
 
 # Create 3D surface plot of |E|
 fig = go.Figure()
