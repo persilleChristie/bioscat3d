@@ -33,6 +33,8 @@ public:
         const Surface& surface
     );
 
+    Eigen::VectorXcd getAmplitudes() {return amplitudes_;}
+
 private:
     Eigen::VectorXcd amplitudes_;
     std::vector<std::shared_ptr<FieldCalculator>> dipoles_;

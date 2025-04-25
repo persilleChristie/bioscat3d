@@ -19,17 +19,24 @@ int main() {
 
     // Incident field
     Vector3d k_inc(0.0, 0.0, -1.0);
-    double polarization = 0.2;
+    // double polarization = 0.2;
     double E0 = 1.0;
 
-    // Cell definitions, Meep
+    // Simulation parameters
+    // double width = 2.0;
+    // int resol = 10; 
+    // double pml_thickness = 2;
+    // int resolution = resol;
+    // double dim = width + 2 * pml_thickness;
 
+    // double cell_x = dim;
+    // double cell_y = dim;
+    // double cell_z = dim;
 
-    // Other constants
-    double dim = 2.0;
-    double ;
-    int resolution = 10;
-    constants.setWavelength(325e-3);
+    double waveLength = 325e-3;
+    // double frequency = 1/waveLength;
+
+    constants.setWavelength(waveLength);
     
     // create spheres
     // SurfaceSphere sphere_mu(radius, center, resolution);
@@ -87,25 +94,89 @@ int main() {
     // Export::saveVectorCSV("solution_y_simple.csv", y);
 
 
-    // Calculate total field and power
-    std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, polarization, constants);
-    
-    FieldCalculatorTotal field("../MeepTests/SurfaceData/test_points.csv", 
-                                "../MeepTests/SurfaceData/aux_points.csv", 
-                                incident,
-                                constants);
     
     // Eigen::VectorXcd amplitudes = y.segment(0,2*Nprime);
     // FieldCalculatorTotal field(amplitudes, sources_int, incident);
 
-    Eigen::Vector3d Cornerpoint(-5.0,-5.0,10.0), basis1(1.0,1.0,0.0), basis2(-1.0,1.0,0.0);
-    double size1 = 1.0, size2 = 1.0;
+    // double size1 = dim, size2 = dim;
     
-    SurfacePlane testPlane(Cornerpoint, basis1, basis2, size1, size2, resolution);
+    // // Top
+    // Eigen::Vector3d Cornerpoint (-cell_x, -cell_y, 0.5*cell_z - pml_thickness - 0.1);
+    // Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
+    // SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, resolution);
 
-    double power = field.computePower(testPlane);
 
-    std::cout << "Calculated power: " << power << std::endl;
+    // // Bottom
+    // Cornerpoint << -cell_x, -cell_y, -0.5*cell_z + pml_thickness + 0.1;
+    // SurfacePlane bottom(Cornerpoint, basis1, basis2, size1, size2, resolution);
+
+
+    // // Left
+    // Cornerpoint << -0.5*cell_x + pml_thickness + 0.1, -cell_y, -cell_z;
+    // basis1 << 0,1,0;
+    // basis2 << 0,0,1;
+    // SurfacePlane left(Cornerpoint, basis1, basis2, size1, size2, resolution);
+
+    
+    // // Right
+    // Cornerpoint << 0.5*cell_x - pml_thickness - 0.1, -cell_y, -cell_z;
+    // SurfacePlane right(Cornerpoint, basis1, basis2, size1, size2, resolution);
+
+    
+
+    // // Back
+    // Cornerpoint << -cell_x, -0.5*cell_y + pml_thickness + 0.1, -cell_z;
+    // basis1 << 1,0,0;
+    // basis2 << 0,0,1;
+    // SurfacePlane back(Cornerpoint, basis1, basis2, size1, size2, resolution);
+
+    // // Front
+    // Cornerpoint << -cell_x, 0.5*cell_y - pml_thickness - 0.1, -cell_z;
+    // SurfacePlane front(Cornerpoint, basis1, basis2, size1, size2, resolution);
+
+    // Top
+    double size1 = 2, size2 = 2;
+    Eigen::Vector3d Cornerpoint (-1, -1, 10);
+    Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
+    SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 10);
+
+
+    int pol_nr = 1;
+    Eigen::VectorXd betas = Eigen::VectorXd::LinSpaced(pol_nr, 0, 0.5 * constants.pi);
+    double beta;
+    Eigen::VectorXd powers(pol_nr);
+    
+    for (int i = 0; i < pol_nr; ++i){
+        beta = betas(i);
+        // Calculate total field and power
+        std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, beta, constants);
+        
+        FieldCalculatorTotal field("../MeepTests/SurfaceData/test_points.csv", 
+                                    "../MeepTests/SurfaceData/aux_points.csv", 
+                                    incident,
+                                    constants);
+
+        double power_top = field.computePower(top);
+
+        powers(i) = power_top;
+
+        // double power_bottom = field.computePower(bottom);
+        // double power_left = field.computePower(left);
+        // double power_right = field.computePower(right);
+        // double power_front = field.computePower(front);
+        // double power_back = field.computePower(back);
+
+        // std::cout << "----------- Calculated power for beta = " << beta << ": -----------" << std::endl;
+        // std::cout << "Top:    " << power_top << std::endl;
+        // std::cout << "Bottom: " << power_bottom << std::endl;
+        // std::cout << "Left:   " << power_left << std::endl;
+        // std::cout << "Right:  " << power_right << std::endl;
+        // std::cout << "Front:  " << power_front << std::endl;
+        // std::cout << "Back:   " << power_back << std::endl;
+
+    }
+
+    Export::saveRealVectorCSV("FilesCSV/powers_polarization.csv", powers);
 
     return 0;
 }

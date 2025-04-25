@@ -7,6 +7,7 @@
 #include "Constants.h"
 #include "SystemAssembler.h"
 #include "UtilsSolvers.h"
+#include "UtilsExport.h"
 
 FieldCalculatorTotal::FieldCalculatorTotal(
     std::string testpoint_file,
@@ -23,8 +24,7 @@ FieldCalculatorTotal::FieldCalculatorTotal(
     constructor(testpoint_file, aux_point_file);
 }
 
-void FieldCalculatorTotal::constructor(std::string testpoint_file,
-    std::string aux_point_file)
+void FieldCalculatorTotal::constructor(std::string testpoint_file, std::string aux_point_file)
 {
     ///// LOAD TESTPOINTS /////
     // Read test points into an Eigen matrix
@@ -132,8 +132,23 @@ void FieldCalculatorTotal::constructor(std::string testpoint_file,
     ///// SOLVE SYSTEM /////
     SystemAssembler::assembleSystem(A, b, pts, t1, t2, sources_int, sources_ext, UPW_);
 
+    // Eigen::JacobiSVD<Eigen::MatrixXcd> svd(A);
+    // auto singular_vals = svd.singularValues();
+    // double cond = singular_vals(0) / singular_vals(singular_vals.size() - 1);
+    // std::cout << "Condition number: " << cond << std::endl;
+
+    // Eigen::CompleteOrthogonalDecomposition<Eigen::MatrixXcd> cod(A);
+    // Eigen::VectorXcd amps = cod.solve(b);
+
     // solve with UtilsSolver
-    auto amps = UtilsSolvers::solveQR(A, b);
+    // auto amps = UtilsSolvers::solveLU(A, b);
+    Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::VectorXcd amps = svd1.solve(b);
+
+    // // Save to files
+    Export::saveMatrixCSV("matrix_A_simple.csv", A);
+    Export::saveVectorCSV("vector_b_simple.csv", b);
+    Export::saveVectorCSV("solution_y_simple.csv", amps);
 
     this->amplitudes_ = amps.head(Nprime);
 }
@@ -154,9 +169,9 @@ void FieldCalculatorTotal::computeFields(
         outH += amplitudes_[i] * Hi;
     }
 
-    UPW_->computeFields(Ei, Hi, evalPoints);
-    outE += Ei;
-    outH += Hi;
+    // UPW_->computeFields(Ei, Hi, evalPoints);
+    // outE += Ei;
+    // outH += Hi;
 }
 
 double FieldCalculatorTotal::computePower(
@@ -175,7 +190,7 @@ double FieldCalculatorTotal::computePower(
     outH = Eigen::MatrixX3cd::Zero(N,3);
 
     computeFields(outE, outH, points);
-    std::complex<double> integrand, integral = 0.0;
+    std::complex<double> integrand, integral = 0.0;  
     Eigen::Vector3cd cross;
 
     for (int i = 0; i < N; ++i){
@@ -185,5 +200,5 @@ double FieldCalculatorTotal::computePower(
         integral += integrand * dA;
     }
 
-    return integral.real();
+    return abs(integral);
 }
