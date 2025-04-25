@@ -73,7 +73,7 @@ void SystemAssembler::assembleSystem(
             Vector3cd E_int1 = E_HD.row(0);
             Vector3cd H_int1 = H_HD.row(0);
 
-
+        
             sources_int[2*nu + 1]->computeFields(E_HD, H_HD, x_mu);
 
             Vector3cd E_int2 = E_HD.row(0);

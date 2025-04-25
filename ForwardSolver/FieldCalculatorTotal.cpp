@@ -190,15 +190,15 @@ double FieldCalculatorTotal::computePower(
     outH = Eigen::MatrixX3cd::Zero(N,3);
 
     computeFields(outE, outH, points);
-    std::complex<double> integrand, integral = 0.0;  
-    Eigen::Vector3cd cross;
+    double integrand, integral = 0.0;  
+    Eigen::Vector3d cross;
 
     for (int i = 0; i < N; ++i){
-        cross = 0.5 * outE.row(i).cross(outH.row(i).conjugate());
+        cross = 0.5 * outE.row(i).cross(outH.row(i).conjugate()).real();
         integrand = cross.dot(normals.row(i));
 
         integral += integrand * dA;
     }
 
-    return abs(integral);
+    return integral;
 }

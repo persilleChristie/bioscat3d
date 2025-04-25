@@ -42,7 +42,7 @@ def construct_RHSs(Surface, propagation_vectors, polarizations, epsilon_air, mu,
 
     # Evaluate fields for all M plane waves
     planewaves = PW.Plane_wave(propagation_vectors, polarizations, epsilon_air, mu, omegas)
-    E_all, H_all = planewaves.evaluate_at_points(points)  # (2, M, N, 3)
+    H_all, E_all = planewaves.evaluate_at_points(points)  # (2, M, N, 3)
 
     # Compute tangential components → shape (M, N)
     b1 = -np.einsum("mnj,nj->mn", E_all, tau1)
@@ -301,7 +301,7 @@ def compute_flux_integral_scattered_field(plane, dipoles, coefficients):
     #---------------------------------------------------------------------
     E, H = compute_scattered_field_at_point(points, coefficients, dipoles)
 
-    Cross = 0.5 * np.cross(E, np.conj(H))           # shape: (M, N, 3)
+    Cross = np.real(0.5 * np.cross(E, np.conj(H)))     # shape: (M, N, 3)
     Cross_dot_n = np.einsum("mnj,nj->mn", Cross, normals)  # (M, N)
 
     # Integrate over surface → sum over points
@@ -428,8 +428,8 @@ def bump_test(width=1,resol=20):
     #---------------------------------------------
     #           Incident information
     #---------------------------------------------
-    pol_nr = 1
-    propagation_vector = np.tile([0, 0, -1], (pol_nr, 1))
+    pol_nr = 100
+    propagation_vector = np.tile([0, 1, -1]/np.sqrt(2), (pol_nr, 1))
     polarization=np.linspace(0,np.pi/2,pol_nr)
     epsilon_air=1
     wavelength=325e-3
@@ -444,7 +444,7 @@ def bump_test(width=1,resol=20):
     # Plane=C2.generate_plane_xy(0.9,-3,3,60)
     print(int_coeff)
     power_int=compute_flux_integral_scattered_field(Plane,InteriorDipoles,int_coeff)
-    plt.plot(np.abs(power_int))
+    plt.plot(power_int)
     plt.show()
 
 
