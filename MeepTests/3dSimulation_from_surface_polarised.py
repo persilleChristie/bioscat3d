@@ -86,7 +86,7 @@ k_unit = mp.Vector3(
 # Scale for Meep's eig_kpoint (|k| = frequency in Meep units)
 eig_kpoint = k_unit.scale(frequency)
 
-beta_deg = 30
+beta_deg = 80
 beta_rad = np.radians(beta_deg)
 
 Ey_amp = np.cos(beta_rad)
