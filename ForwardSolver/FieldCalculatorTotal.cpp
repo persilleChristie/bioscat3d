@@ -106,17 +106,16 @@ void FieldCalculatorTotal::constructor(std::string testpoint_file, std::string a
 
         // Conditional logic based on type
         if (type == "int") {
-            // std::cout << "INT type line: x = " << x << ", y = " << y << ", z = " << z << ", test_index = " << test_index << "\n";
             sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t1.row(test_index)), constants_));
+                            Dipole(point, t1.row(test_index)), constants_, true));
             sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t2.row(test_index)), constants_));
+                            Dipole(point, t2.row(test_index)), constants_, true));
             
         } else if (type == "ext") {
             sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t1.row(test_index)), constants_));
+                            Dipole(point, t1.row(test_index)), constants_, false));
             sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t2.row(test_index)), constants_));
+                            Dipole(point, t2.row(test_index)), constants_, false));
         }
     }
 

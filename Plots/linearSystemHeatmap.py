@@ -74,25 +74,41 @@ plt.colorbar(im0, ax=axs)
 # Comparisons of absolute values
 fig, axs = plt.subplots(1, 3, figsize=(15, 5))
 
-im0 = axs[0].imshow(abs(abs(A)-abs(AA)), cmap='viridis')
+im0 = axs[0].imshow(np.abs(np.abs(A)-np.abs(AA)), cmap='viridis')
 axs[0].set_title('abs(abs(A)-abs(AA))')
 plt.colorbar(im0, ax=axs[0])
 
-im1 = axs[1].imshow(abs(A), cmap='viridis')
+im1 = axs[1].imshow(np.abs(A), cmap='viridis')
 axs[1].set_title('abs(A)')
 plt.colorbar(im1, ax=axs[1])
 im1.set_clim(0,21)
 
-im2=axs[2].imshow(abs(AA), cmap='viridis')
+im2=axs[2].imshow(np.abs(AA), cmap='viridis')
 axs[2].set_title('abs(AA)')
 plt.colorbar(im2, ax=axs[2])
 im2.set_clim(0,21)
 
 plt.show()
 
+
+fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+
+im0 = axs[0].imshow(np.abs((A)-(AA)), cmap='viridis')
+axs[0].set_title('abs(A-AA)')
+plt.colorbar(im0, ax=axs[0])
+
+im1 = axs[1].imshow(np.real((A)-(AA)), cmap='viridis')
+axs[1].set_title('Re(A-AA)')
+plt.colorbar(im1, ax=axs[1])
+
+im2 = axs[2].imshow(np.imag((A)-(AA)), cmap='viridis')
+axs[2].set_title('Im(A-AA)')
+plt.colorbar(im1, ax=axs[2])
+
+
 # How often do we disagree on values?
-print(f"How often do we disagree: {np.sum(abs(abs(A)-abs(AA)) < tol)}")
-print(f"Max difference: {max(abs(abs(A)-abs(AA)).flatten())}")
+print(f"How often do we disagree: {np.sum(np.abs(np.abs(A)-np.abs(AA)) > tol)}")
+print(f"Max difference: {max(abs((A)-(AA)).flatten())}")
 
 
 # Comparison of RHS

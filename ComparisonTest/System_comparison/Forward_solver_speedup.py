@@ -325,7 +325,7 @@ def test_instance():
     Surface=C2.C2_surface(point_cloud,normals,tau1,tau2)
     inneraux=C2.C2_surface(inner_cloud,normals,tau1,tau2)
     outeraux=C2.C2_surface(outer_cloud,normals,tau1,tau2)
-    scatter_epsilon=2
+    scatter_epsilon=2.56
     mu=1
     Scatterinformation={'Surface': Surface,'inneraux': inneraux, 'outeraux': outeraux,'epsilon': scatter_epsilon,'mu': mu}
     iter=1
@@ -428,7 +428,7 @@ def bump_test(width=1,resol=20):
     #---------------------------------------------
     #           Incident information
     #---------------------------------------------
-    pol_nr = 100
+    pol_nr = 1
     propagation_vector = np.tile([0, 1, -1]/np.sqrt(2), (pol_nr, 1))
     polarization=np.linspace(0,np.pi/2,pol_nr)
     epsilon_air=1

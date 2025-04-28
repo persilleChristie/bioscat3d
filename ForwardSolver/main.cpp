@@ -141,7 +141,7 @@ int main() {
     SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 10);
 
 
-    int pol_nr = 100;
+    int pol_nr = 1;
     Eigen::VectorXd betas = Eigen::VectorXd::LinSpaced(pol_nr, 0, 0.5 * constants.pi);
     double beta;
     Eigen::VectorXd powers(pol_nr);

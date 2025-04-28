@@ -31,53 +31,48 @@ class Plane_wave:
         self.wavenumber = omega * np.sqrt(epsilon * mu)  # scalar
         self.eta = np.sqrt(mu / epsilon)
 
-    def evaluate_at_points(self, X):
-        """
-        Evaluate the fields from M plane waves at N points.
-
-        X: Nx3 array of points
-        Returns: 2xMxNx3 array (fields: 0 -> E, 1 -> H)
-        """
-        X = np.asarray(X)
-        M = self.propagation_vectors.shape[0]
-        N = X.shape[0]
-
+    def evaluate_at_points(self,X):
+        
+        M=self.propagation_vectors.shape[0]
+        N=X.shape[0]
+        
         E_fields = np.zeros((M, N, 3), dtype=complex)
         H_fields = np.zeros((M, N, 3), dtype=complex)
 
-        for i in range(M):
-            k = self.propagation_vectors[i]
-            phi = np.arctan2(-k[1], -k[0])
+        for PW_index in range(M):
+            k=self.propagation_vectors[PW_index,:]
+            polarization=self.polarizations[PW_index]
+            kxy=-k[:2]
+            phi=np.arctan2(kxy[1],kxy[0])
+            R_z=np.array([
+                [np.cos(phi),np.sin(phi),0],
+                [-np.sin(phi),np.cos(phi), 0],
+                [0,0,1]
+                        ])
+            
+            R_inv=R_z.T
+            k_rot= R_inv@k
+            X_rot=(R_inv @ X.T).T
 
-            R_z = np.array([
-                [np.cos(phi), np.sin(phi), 0],
-                [-np.sin(phi),  np.cos(phi), 0],
-                [0,            0,           1]
-            ])
+            x,y,z=X_rot[:,0],X_rot[:,1],X_rot[:,2]
+            theta=np.arccos(-k_rot[2])
 
-            k_rot = R_z @ k
-            X_rot = (R_z @ X.T).T
-            x, y, z = X_rot[:, 0], X_rot[:, 1], X_rot[:, 2]
-            theta = np.arccos(-k_rot[2])
+            exp_term=np.exp( -1j*self.wavenumber* ( x*np.sin(theta)-z*np.cos(theta) ) )
+            oner,zoer=np.ones_like(x),np.zeros_like(x)
 
-            exp_term = np.exp(-1j * self.wavenumber * (x * np.sin(theta) - z * np.cos(theta)))
-            ones = np.ones_like(x)
-            zeros = np.zeros_like(x)
+            E_perp=np.column_stack( (zoer,oner*exp_term,zoer) )
+            E_par =np.column_stack( (oner*np.cos(theta)*exp_term,zoer,oner*np.sin(theta)*exp_term) )
 
-            E_perp = np.stack((zeros, ones * exp_term, zeros), axis=1)
-            E_par  = np.stack((-ones * np.cos(theta) * exp_term, zeros, -ones * np.sin(theta) * exp_term), axis=1)
-
-            H_perp = E_par / self.eta
-            H_par  = E_perp / self.eta
-
-            polarization = self.polarizations[i]
-            E = np.cos(polarization) * E_perp + np.sin(polarization) * E_par
-            H = np.cos(polarization) * H_perp + np.sin(polarization) * H_par
-
-            E_fields[i] = (R_z.T @ E.T).T
-            H_fields[i] = (R_z.T @ H.T).T
-
-        return np.stack((E_fields, H_fields), axis=0)  # shape (2, M, N, 3)
+            H_perp=np.column_stack( (-oner*np.cos(theta)*exp_term,zoer,-oner*np.sin(theta)*exp_term) )/self.eta
+            H_par =np.column_stack( (zoer,oner*exp_term,zoer))/self.eta
+            E=np.cos(polarization)*E_perp+np.sin(polarization)*E_par
+            H=np.cos(polarization)*H_perp+np.sin(polarization)*H_par
+        
+            E=(R_z @ E.T).T
+            H=(R_z @ H.T).T
+            E_fields[PW_index,:]=E
+            H_fields[PW_index,:]=H
+        return  E_fields, H_fields
 
 
 

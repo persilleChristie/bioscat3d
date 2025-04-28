@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 import multiprocessing
+# from numba import jit
 
 class Hertzian_Dipole():
     def __init__(self, positions, directions, mu, epsilon, omega):
@@ -131,7 +132,7 @@ class Hertzian_Dipole():
         factor = 1/(4*np.pi)
         H_x = factor * ((dy*z - dz*y) * R) * phase
         H_y = factor * ((dz*x - dx*z) * R) * phase
-        H_z = factor * ((dx*y - dy*z) * R) * phase
+        H_z = factor * ((dx*y - dy*x) * R) * phase
         
         # Stack the magnetic components; shape (M, N, 3)
         H = np.stack((H_x, H_y, H_z), axis=2)
