@@ -20,6 +20,11 @@ print(f"Condition number PN: {S[0]/S[-1]}")
 print(f"Total zeros: {np.sum(A<tol)}")
 print(f"Actual zeros: {np.sum(A == 0)}")
 
+fig, axs = plt.subplots(1, 1, figsize=(5, 5))
+im0 = axs.imshow(A == 0, cmap='viridis')
+axs.set_title("PN actual 0")
+plt.colorbar(im0, ax=axs)
+
 # Load RHS
 df1 = pd.read_csv('../ForwardSolver/vector_b_simple.csv', sep=",", header=None)
 

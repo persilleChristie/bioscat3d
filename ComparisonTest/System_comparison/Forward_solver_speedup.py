@@ -301,6 +301,12 @@ def compute_flux_integral_scattered_field(plane, dipoles, coefficients):
     #---------------------------------------------------------------------
     E, H = compute_scattered_field_at_point(points, coefficients, dipoles)
 
+    df = pd.DataFrame(E[0])
+    df.to_csv("E_Andreas.csv", header=False, index=False)
+
+    df1 = pd.DataFrame(H[0])
+    df1.to_csv("H_Andreas.csv", header=False, index=False)
+
     Cross = np.real(0.5 * np.cross(E, np.conj(H)))     # shape: (M, N, 3)
     Cross_dot_n = np.einsum("mnj,nj->mn", Cross, normals)  # (M, N)
 
@@ -430,7 +436,9 @@ def bump_test(width=1,resol=20):
     #---------------------------------------------
     pol_nr = 1
     propagation_vector = np.tile([0, 1, -1]/np.sqrt(2), (pol_nr, 1))
-    polarization=np.linspace(0,np.pi/2,pol_nr)
+    # polarization=np.linspace(0,np.pi/2,pol_nr)
+    # print(f"Polarization: ", polarization)
+    polarization = np.array([np.pi/4])
     epsilon_air=1
     wavelength=325e-3
     omega=2*np.pi/wavelength

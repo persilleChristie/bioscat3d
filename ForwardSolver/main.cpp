@@ -138,16 +138,16 @@ int main() {
     double size1 = 2, size2 = 2;
     Eigen::Vector3d Cornerpoint (-1, -1, 10);
     Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
-    SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 10);
-
+    SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 20);
 
     int pol_nr = 1;
     Eigen::VectorXd betas = Eigen::VectorXd::LinSpaced(pol_nr, 0, 0.5 * constants.pi);
+    // std::cout << "Polarization: " << betas << std::endl;
     double beta;
     Eigen::VectorXd powers(pol_nr);
     
     for (int i = 0; i < pol_nr; ++i){
-        beta = betas(i);
+        beta = 0.25 * constants.pi; // betas(i);
         // Calculate total field and power
         std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, beta, constants);
         
@@ -156,6 +156,19 @@ int main() {
                                     incident,
                                     constants);
 
+        Eigen::MatrixX3d points = top.getPoints();
+
+        int N = points.rows();
+
+        Eigen::MatrixX3cd outE, outH;
+        outE = Eigen::MatrixX3cd::Zero(N,3);
+        outH = Eigen::MatrixX3cd::Zero(N,3);
+        
+        field.computeFields(outE, outH, points);
+
+        Export::saveMatrixCSV("FilesCSV/scatteredFieldE_PN.csv", outE);
+        Export::saveMatrixCSV("FilesCSV/scatteredFieldH_PN.csv", outH);
+        
         double power_top = field.computePower(top);
 
         powers(i) = power_top;

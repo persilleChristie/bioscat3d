@@ -140,7 +140,7 @@ void FieldCalculatorTotal::constructor(std::string testpoint_file, std::string a
     // Eigen::VectorXcd amps = cod.solve(b);
 
     // solve with UtilsSolver
-    // auto amps = UtilsSolvers::solveLU(A, b);
+    // auto amps = UtilsSolvers::solveQR(A, b);
     Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::VectorXcd amps = svd1.solve(b);
 
