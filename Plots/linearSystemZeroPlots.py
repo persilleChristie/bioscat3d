@@ -45,7 +45,7 @@ AA = df1.applymap(lambda x: complex(x.replace(' ', '')) if pd.notnull(x) else np
 # Calculate condition number and number of zeros
 _, S, _ = np.linalg.svd(AA)
 print(f"Condition number A:  {S[0]/S[-1]}")
-print(f"Total zeros: {np.sum(AA<tol)}")
+print(f"Total <<: {np.sum(AA<tol)}")
 print(f"Actual zeros AA: {np.sum(AA == 0)}")
 
 # Load solution
@@ -114,7 +114,6 @@ plt.show()
 
 
 fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-
 im0 = axs[0].imshow(np.abs((A)-(AA)), cmap='viridis')
 axs[0].set_title('abs(A-AA)')
 plt.colorbar(im0, ax=axs[0])
@@ -135,7 +134,6 @@ print(f"Max difference: {max(abs((A)-(AA)).flatten())}")
 
 # Comparison of RHS
 fig, axs = plt.subplots(1, 1, figsize=(5, 5))
-
 axs.plot(abs(b))
 axs.plot(abs(bA))
 axs.set_title("Comparison of RHS")
