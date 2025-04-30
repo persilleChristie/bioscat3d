@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import json
 import argparse
 import os
+import pandas as pd
 
 def load_params(path):
     with open(path, "r") as f:
@@ -12,18 +13,23 @@ def load_params(path):
 def compute_TE_TM_vectors(k_vec, beta):
     k_hat = np.array(k_vec) / np.linalg.norm(k_vec)
 
-    if np.allclose(k_hat, [0, 0, -1]):  # Special case: normal incidence
-        TE = np.array([1, 0, 0])
-        TM = np.array([0, 1, 0])
-    else:
-        ref_vec = np.array([0, 0, 1])
-        TE = np.cross(k_hat, ref_vec)
-        TE /= np.linalg.norm(TE)
-        TM = np.cross(TE, k_hat)
-        TM /= np.linalg.norm(TM)
+    # Reference vector for defining polarization plane
+    ref_vec = np.array([0, 0, 1])
+    
+    # If k is parallel or anti-parallel to z-axis, choose a different ref_vec
+    if np.allclose(np.abs(np.dot(k_hat, ref_vec)), 1.0):
+        ref_vec = np.array([1, 0, 0])
 
+    TE = np.cross(k_hat, ref_vec)
+    TE /= np.linalg.norm(TE)
+    
+    TM = np.cross(TE, k_hat)
+    TM /= np.linalg.norm(TM)
+
+    # Final polarization vector
     pol_vec = np.cos(beta) * TE + np.sin(beta) * TM
     return pol_vec
+
 
 def material_function(p, bump_dict, substrate_material, is_reference):
     if is_reference:
@@ -36,15 +42,18 @@ def material_function(p, bump_dict, substrate_material, is_reference):
 
 def run_meep_sim(params, beta, is_reference=False):
     bump_dict = params["bumpData"]
-    width = params["width"]
+    halfWidth_x = params["halfWidth_x"]
+    halfWidth_y = params["halfWidth_y"]
+    halfWidth_z = params["halfWidth_z"]
     resolution = params["resolution"]
     epsilon1 = params["epsilon1"]
     omega = params["omega"]
     k_vector = np.array(params["k"])
 
     pml_thickness = 2
-    dim = width + 2 * pml_thickness
-    cell_x = cell_y = cell_z = dim
+    cell_x = halfWidth_x + 2 * pml_thickness
+    cell_y = halfWidth_y + 2 * pml_thickness
+    cell_z = halfWidth_z + 2 * pml_thickness
     cell_size = mp.Vector3(cell_x, cell_y, cell_z)
     frequency = omega
     substrate_material = mp.Medium(epsilon=epsilon1)
@@ -75,19 +84,25 @@ def run_meep_sim(params, beta, is_reference=False):
         default_material=lambda p: material_function(p, bump_dict, substrate_material, is_reference)
     )
 
-    # --- Flux monitors ---
     flux_regions = {
-        'top':    mp.FluxRegion(center=mp.Vector3(0, 0, 0.5*cell_z - pml_thickness - 0.1), size=mp.Vector3(cell_x, cell_y, 0)),
-        'bottom': mp.FluxRegion(center=mp.Vector3(0, 0, -0.5*cell_z + pml_thickness + 0.1), size=mp.Vector3(cell_x, cell_y, 0)),
-        'left':   mp.FluxRegion(center=mp.Vector3(-0.5*cell_x + pml_thickness + 0.1, 0, 0), size=mp.Vector3(0, cell_y, cell_z)),
-        'right':  mp.FluxRegion(center=mp.Vector3(0.5*cell_x - pml_thickness - 0.1, 0, 0), size=mp.Vector3(0, cell_y, cell_z)),
-        'front':  mp.FluxRegion(center=mp.Vector3(0, -0.5*cell_y + pml_thickness + 0.1, 0), size=mp.Vector3(cell_x, 0, cell_z)),
-        'back':   mp.FluxRegion(center=mp.Vector3(0, 0.5*cell_y - pml_thickness - 0.1, 0), size=mp.Vector3(cell_x, 0, cell_z)),
+        'top':    mp.FluxRegion(center=mp.Vector3(0, 0, 0.5*cell_z - pml_thickness - 1.0),
+                                size=mp.Vector3(cell_x - 2*- pml_thickness, cell_y - 2*pml_thickness, 0)),
+        'bottom': mp.FluxRegion(center=mp.Vector3(0, 0, -0.5*cell_z + pml_thickness + 0.1),
+                                size=mp.Vector3(cell_x - 2*pml_thickness, cell_y - 2*pml_thickness, 0)),
+        'left':   mp.FluxRegion(center=mp.Vector3(-0.5*cell_x + pml_thickness + 0.1, 0, 0),
+                                size=mp.Vector3(0, cell_y - 2*pml_thickness, cell_z - 2*pml_thickness)),
+        'right':  mp.FluxRegion(center=mp.Vector3(0.5*cell_x - pml_thickness - 0.1, 0, 0),
+                                size=mp.Vector3(0, cell_y - 2*pml_thickness, cell_z - 2*pml_thickness)),
+        'front':  mp.FluxRegion(center=mp.Vector3(0, -0.5*cell_y + pml_thickness + 0.1, 0),
+                                size=mp.Vector3(cell_x - 2*pml_thickness, 0, cell_z - 2*pml_thickness)),
+        'back':   mp.FluxRegion(center=mp.Vector3(0, 0.5*cell_y - pml_thickness - 0.1, 0),
+                                size=mp.Vector3(cell_x - 2*pml_thickness, 0, cell_z - 2*pml_thickness)),
     }
+
 
     flux_monitors = {name: sim.add_flux(frequency, 0, 1, region)
                      for name, region in flux_regions.items()}
-
+    
     sim.run(until=60)
 
     return {name: mp.get_fluxes(mon)[0] for name, mon in flux_monitors.items()}
@@ -98,14 +113,21 @@ def main():
     args = parser.parse_args()
 
     params = load_params(args.param_path)
+    betas = params.get("betas")             # <- from the JSON file
+
     
     scattered_powers = []
+
+    all_ref_flux = {}
+    all_full_flux = {}
+
 
     for beta in betas:
         print(f"\n📐 Polarization angle β = {np.degrees(beta):.1f}°")
         ref_flux = run_meep_sim(params, beta, is_reference=True)
         full_flux = run_meep_sim(params, beta, is_reference=False)
-
+        all_ref_flux[beta] = ref_flux
+        all_full_flux[beta] = full_flux
         scattered_flux = {k: full_flux[k] - ref_flux[k] for k in full_flux}
         total_scattered = sum(scattered_flux.values())
         incident_power = abs(ref_flux["bottom"])
@@ -121,6 +143,26 @@ def main():
     plt.savefig("SimData/scattered_vs_polarization.png")
     plt.show()
     print("✅ Done and saved plot to SimData/scattered_vs_polarization.png")
+    
+    # Assemble into a DataFrame
+    records = []
+    for beta in betas:
+        for m in all_ref_flux[beta].keys():
+            ref_val = all_ref_flux[beta][m]
+            full_val = all_full_flux[beta][m]
+            diff = full_val - ref_val
+            records.append({
+                "beta (rad)": beta,
+                "monitor": m,
+                "ref_flux": ref_val,
+                "full_flux": full_val,
+                "scattered_flux": diff
+            })
+
+    df = pd.DataFrame(records)
+    df.to_csv("SimData/flux_comparison.csv", index=False)
+    print("✅ Flux comparison saved to SimData/flux_comparison.csv")
+
 
 if __name__ == "__main__":
     main()

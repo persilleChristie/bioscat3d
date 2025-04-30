@@ -5,20 +5,23 @@ import json
 def run_meep_sim(is_reference=False):
     # --- Load surface parameters ---
     with open("SurfaceData/surfaceParams.json", "r") as f:
-        surfaceParams = json.load(f)
+        params = json.load(f)
 
-    bump_dict = surfaceParams["bumpData"]
-    width = surfaceParams["width"]
-    resolution = surfaceParams["resolution"]
-    epsilon1 = surfaceParams["epsilon1"]
-    omega = surfaceParams["omega"]
-    k_vector = surfaceParams["k"]
+    bump_dict = params["bumpData"]
+    halfWidth_x = params["halfWidth_x"]
+    halfWidth_y = params["halfWidth_y"]
+    halfWidth_z = params["halfWidth_z"]
+    resolution = params["resolution"]
+    epsilon1 = params["epsilon1"]
+    omega = params["omega"]
+    k_vector = params["k"]
+    
     pml_thickness = 2
-    dim = width + 2 * pml_thickness
-
-    cell_x = cell_y = cell_z = dim
-    frequency = omega
+    cell_x = halfWidth_x + 2 * pml_thickness
+    cell_y = halfWidth_y + 2 * pml_thickness
+    cell_z = halfWidth_z + 2 * pml_thickness
     cell_size = mp.Vector3(cell_x, cell_y, cell_z)
+    frequency = omega
     substrate_material = mp.Medium(epsilon=epsilon1)
 
     def material_function(p):
@@ -40,7 +43,7 @@ def run_meep_sim(is_reference=False):
             src=mp.ContinuousSource(frequency=frequency, is_integrated=True),
             center=mp.Vector3(0, 0, 0.5 * cell_z - pml_thickness - 0.5),
             size=mp.Vector3(cell_x, cell_y, 0),
-            direction=mp.Z,
+            direction = mp.Z,
             eig_kpoint=mp.Vector3(*k_vector),
             eig_band=1,
             eig_match_freq=True

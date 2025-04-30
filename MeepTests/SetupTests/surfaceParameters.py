@@ -5,26 +5,29 @@ import os
 
 def generate_surface_params(
     filename="SurfaceData/surfaceParams.json",
-    width=1.0,
-    resolution=20,
+    halfWidth_x=1.0,
+    halfWidth_y=1.0,
+    halfWidth_z=2.0,
+    resolution=10,
     seed=42,
     num_bumps=3,
     epsilon1 = 2.56,
     alpha = 0.86,
     omega=1.0,
-    k = [1.0, 1.0, -1.0],
-    numBetas = 5
+    k = [50.0, 50.0, -1.0],
+    numBetas = 1 # makes unidistant betas on the interval [0, pi/2]
 ):
     np.random.seed(seed)
 
     # Normalize k vector
     k = np.array(k, dtype=float)
-    k /= np.linalg.norm(k).tolist()  # Now k is a unit vector
+    k = (k / np.linalg.norm(k)).tolist()  # Convert to plain Python list after normalization
+
 
     bumpData = []
     for _ in range(num_bumps):
-        x0 = np.random.uniform(-width, width)
-        y0 = np.random.uniform(-width, width)
+        x0 = np.random.uniform(-halfWidth_x, halfWidth_x)
+        y0 = np.random.uniform(-halfWidth_y, halfWidth_y)
         height = np.random.uniform(0.1, 0.4)
         sigma = np.random.uniform(0.2, 0.7)
         bumpData.append({"x0": x0, "y0": y0, "height": height, "sigma": sigma})
@@ -34,7 +37,9 @@ def generate_surface_params(
     surfaceParams = {
         "bumpData": bumpData,
         "seed": seed,
-        "width": width,
+        "halfWidth_x": halfWidth_x,
+        "halfWidth_y": halfWidth_y,
+        "halfWidth_z": halfWidth_z,
         "resolution": resolution,
         "omega": omega,
         "epsilon1": epsilon1,
