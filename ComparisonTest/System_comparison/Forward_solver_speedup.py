@@ -434,11 +434,11 @@ def bump_test(width=1,resol=20):
     #---------------------------------------------
     #           Incident information
     #---------------------------------------------
-    pol_nr = 1
+    pol_nr = 100
     propagation_vector = np.tile([0, 1, -1]/np.sqrt(2), (pol_nr, 1))
-    # polarization=np.linspace(0,np.pi/2,pol_nr)
+    polarization=np.linspace(0,np.pi/2,pol_nr)
     # print(f"Polarization: ", polarization)
-    polarization = np.array([np.pi/4])
+    # polarization = np.array([np.pi/4])
     epsilon_air=1
     wavelength=325e-3
     omega=2*np.pi/wavelength

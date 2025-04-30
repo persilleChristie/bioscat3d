@@ -4,6 +4,7 @@ CXXFLAGS := -std=c++17 -Wall -O2
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
     CXXFLAGS += -I/usr/include/eigen3
+	CXXFLAGS += -Iexternal/rapidjson/include
 endif
 ifeq ($(UNAME_S),Darwin)
     CXXFLAGS += -I/usr/local/include/eigen3

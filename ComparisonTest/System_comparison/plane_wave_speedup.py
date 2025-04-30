@@ -60,11 +60,11 @@ class Plane_wave:
             exp_term=np.exp( -1j*self.wavenumber* ( x*np.sin(theta)-z*np.cos(theta) ) )
             oner,zoer=np.ones_like(x),np.zeros_like(x)
 
-            E_par  = np.column_stack( (zoer,oner*exp_term,zoer) )
-            E_perp = np.column_stack( (oner*np.cos(theta)*exp_term,zoer,oner*np.sin(theta)*exp_term) )
+            E_perp = np.column_stack( (zoer,oner*exp_term,zoer) )
+            E_par = np.column_stack( (oner*np.cos(theta)*exp_term,zoer,oner*np.sin(theta)*exp_term) )
 
-            H_par  = np.column_stack( (-oner*np.cos(theta)*exp_term,zoer,-oner*np.sin(theta)*exp_term) )/self.eta
-            H_perp = np.column_stack( (zoer,oner*exp_term,zoer))/self.eta
+            H_perp = np.column_stack( (-oner*np.cos(theta)*exp_term,zoer,-oner*np.sin(theta)*exp_term) )/self.eta
+            H_par  = np.column_stack( (zoer,oner*exp_term,zoer))/self.eta
             E=np.cos(polarization)*E_perp+np.sin(polarization)*E_par
             H=np.cos(polarization)*H_perp+np.sin(polarization)*H_par
         

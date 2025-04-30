@@ -18,7 +18,8 @@ int main() {
     ///// PARAMETERS /////
 
     // Incident field
-    Vector3d k_inc(0.0, 1.0/sqrt(2), -1.0/sqrt(2));
+    Vector3d k_inc(1.0, 1.0, -1.0);
+    k_inc = k_inc.normalized();
     // double polarization = 0.2;
     double E0 = 1.0;
 
@@ -140,14 +141,14 @@ int main() {
     Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
     SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 20);
 
-    int pol_nr = 1;
+    int pol_nr = 100;
     Eigen::VectorXd betas = Eigen::VectorXd::LinSpaced(pol_nr, 0, 0.5 * constants.pi);
     // std::cout << "Polarization: " << betas << std::endl;
     double beta;
     Eigen::VectorXd powers(pol_nr);
     
     for (int i = 0; i < pol_nr; ++i){
-        beta = 0.25 * constants.pi; // betas(i);
+        beta = betas(i);
         // Calculate total field and power
         std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, beta, constants);
         

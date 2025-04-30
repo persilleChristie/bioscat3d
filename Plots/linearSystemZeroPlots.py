@@ -76,9 +76,11 @@ plt.colorbar(im0, ax=axs)
 
 # Where is A True zeros?
 fig, axs = plt.subplots(1, 1, figsize=(5, 5))
-im0 = axs.imshow((A == 0), cmap='viridis')
+im0 = axs.imshow((A < tol), cmap='viridis')
 axs.set_title("PN True 0")
 plt.colorbar(im0, ax=axs)
+
+print(f"Actual zeros: {np.sum(A < tol)}")
 
 # Where is AA True zeros?
 fig, axs = plt.subplots(1, 1, figsize=(5, 5))

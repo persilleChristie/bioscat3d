@@ -83,6 +83,10 @@ void FieldCalculatorTotal::constructor(std::string testpoint_file, std::string a
     double x, y, z;
     int test_index;
 
+    // double angle = constants.pi * 2;
+    // double sinangle = 1.0;
+    // double cosangle = 0.0;
+
     // Skip the header
     std::getline(file2, line);
 
@@ -106,16 +110,27 @@ void FieldCalculatorTotal::constructor(std::string testpoint_file, std::string a
 
         // Conditional logic based on type
         if (type == "int") {
+            Eigen::Vector3d t1_row = t1.row(test_index);
+            Eigen::Vector3d t2_row = t2.row(test_index);
+            // Eigen::Vector3d norm_row = nrmls.row(test_index);
+            // Eigen::Vector3d t1_rot = t1_row * cosangle + (norm_row.cross(t1_row))*sinangle + norm_row * (norm_row.dot(t1_row)) * (1 - cosangle);
+            // Eigen::Vector3d t2_rot = t2_row * cosangle + (norm_row.cross(t2_row))*sinangle + norm_row * (norm_row.dot(t2_row)) * (1 - cosangle);
             sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t1.row(test_index)), constants_, true));
+                            Dipole(point, t1_row), constants_, true));
             sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t2.row(test_index)), constants_, true));
+                            Dipole(point, t2_row), constants_, true));
             
         } else if (type == "ext") {
+            Eigen::Vector3d t1_row = t1.row(test_index);
+            Eigen::Vector3d t2_row = t2.row(test_index);
+            // Eigen::Vector3d norm_row = nrmls.row(test_index);
+            // Eigen::Vector3d t1_rot = t1_row * cosangle + (norm_row.cross(t1_row))*sinangle + norm_row * (norm_row.dot(t1_row)) * (1 - cosangle);
+            // Eigen::Vector3d t2_rot = t2_row * cosangle + (norm_row.cross(t2_row))*sinangle + norm_row * (norm_row.dot(t2_row)) * (1 - cosangle);
+            
             sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t1.row(test_index)), constants_, false));
+                            Dipole(point, t1_row), constants_, false));
             sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                            Dipole(point, t2.row(test_index)), constants_, false));
+                            Dipole(point, t2_row), constants_, false));
         }
     }
 
