@@ -8,10 +8,10 @@
 
 class FieldCalculatorUPW : public FieldCalculator {
 private:
-    Eigen::Vector3d k;
-    double E0;
-    double polarization;
-    Constants constants;
+    Eigen::Vector3d k_;
+    double E0_;
+    double polarization_;
+    Constants constants_;
 
 public:
     FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in, 
@@ -28,7 +28,8 @@ public:
     virtual void computeFields(
         Eigen::MatrixX3cd& outE,
         Eigen::MatrixX3cd& outH,
-        const Eigen::MatrixX3d& evalPoints
+        const Eigen::MatrixX3d& evalPoints,
+        int polarization_idx = 0 // Only used in total fields
     ) const override;
 
 };

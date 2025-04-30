@@ -85,6 +85,9 @@
         "fstream": "cpp",
         "chrono": "cpp",
         "codecvt": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp",
+        "cinttypes": "cpp"
     }
 }

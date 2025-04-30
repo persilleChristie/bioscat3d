@@ -10,7 +10,8 @@ public:
     virtual void computeFields(
         Eigen::MatrixX3cd& outE,
         Eigen::MatrixX3cd& outH,
-        const Eigen::MatrixX3d& evalPoints
+        const Eigen::MatrixX3d& evalPoints, 
+        int polarization_idx = 0 // Only used in total fields
     ) const = 0;
 
     // Tangential components

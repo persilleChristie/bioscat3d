@@ -3,13 +3,14 @@
 #include <complex>
 
 
-FieldCalculatorDipole::FieldCalculatorDipole(const Dipole& dipole, const Constants& constants, const bool interior) // drop Iel and constants, add k0 
+FieldCalculatorDipole::FieldCalculatorDipole(const Dipole& dipole, const Constants& constants, const bool interior)
     : dipole_(dipole), constants_(constants), interiorBool_(interior) {}
 
 void FieldCalculatorDipole::computeFields(
     Eigen::MatrixX3cd& outE,
     Eigen::MatrixX3cd& outH,
-    const Eigen::MatrixX3d& evalPoints
+    const Eigen::MatrixX3d& evalPoints,
+    int polarization_idx // Only used in total fields
 ) const {
 
     int N = evalPoints.rows();

@@ -13,31 +13,46 @@
 Constants constants;
 
 int main() {
-    using namespace Eigen;
+    char path = '../MeepTests/SetupTests/SurfaceData/surfaceParams.json';
+    char* jsonPath = &path;
+
+    MASSystem masSystem(jsonPath, "Bump", constants);
+
+    FieldCalculatorTotal field(masSystem, constants);
+
+    // Top
+    double size1 = 2, size2 = 2;
+    Eigen::Vector3d Cornerpoint (-1, -1, 10);
+    Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
+    SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 20);
+
+    Eigen::VectorXd powers = field.computePower(top);
+
+    Export::saveRealVectorCSV("FilesCSV/powers_polarization.csv", powers);
 
     ///// PARAMETERS /////
 
-    // Incident field
-    Vector3d k_inc(1.0, 1.0, -1.0);
-    k_inc = k_inc.normalized();
-    // double polarization = 0.2;
-    double E0 = 1.0;
+    // // Incident field
+    // Vector3d k_inc(1.0, 1.0, -1.0);
+    // k_inc = k_inc.normalized();
+    // // double polarization = 0.2;
+    // double E0 = 1.0;
 
-    // Simulation parameters
-    // double width = 2.0;
-    // int resol = 10; 
-    // double pml_thickness = 2;
-    // int resolution = resol;
-    // double dim = width + 2 * pml_thickness;
+    // // Simulation parameters
+    // // double width = 2.0;
+    // // int resol = 10; 
+    // // double pml_thickness = 2;
+    // // int resolution = resol;
+    // // double dim = width + 2 * pml_thickness;
 
-    // double cell_x = dim;
-    // double cell_y = dim;
-    // double cell_z = dim;
+    // // double cell_x = dim;
+    // // double cell_y = dim;
+    // // double cell_z = dim;
 
-    double waveLength = 325e-3;
-    // double frequency = 1/waveLength;
+    // double waveLength = 325e-3;
+    // // double frequency = 1/waveLength;
 
-    constants.setWavelength(waveLength);
+    // constants.setWavelength(waveLength);
     
     // create spheres
     // SurfaceSphere sphere_mu(radius, center, resolution);
@@ -136,61 +151,61 @@ int main() {
     // SurfacePlane front(Cornerpoint, basis1, basis2, size1, size2, resolution);
 
     // Top
-    double size1 = 2, size2 = 2;
-    Eigen::Vector3d Cornerpoint (-1, -1, 10);
-    Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
-    SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 20);
+    // double size1 = 2, size2 = 2;
+    // Eigen::Vector3d Cornerpoint (-1, -1, 10);
+    // Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
+    // SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 20);
 
-    int pol_nr = 100;
-    Eigen::VectorXd betas = Eigen::VectorXd::LinSpaced(pol_nr, 0, 0.5 * constants.pi);
-    // std::cout << "Polarization: " << betas << std::endl;
-    double beta;
-    Eigen::VectorXd powers(pol_nr);
+    // int pol_nr = 100;
+    // Eigen::VectorXd betas = Eigen::VectorXd::LinSpaced(pol_nr, 0, 0.5 * constants.pi);
+    // // std::cout << "Polarization: " << betas << std::endl;
+    // double beta;
+    // Eigen::VectorXd powers(pol_nr);
     
-    for (int i = 0; i < pol_nr; ++i){
-        beta = betas(i);
-        // Calculate total field and power
-        std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, beta, constants);
+    // for (int i = 0; i < pol_nr; ++i){
+    //     beta = betas(i);
+    //     // Calculate total field and power
+    //     std::shared_ptr<FieldCalculatorUPW> incident = std::make_shared<FieldCalculatorUPW>(k_inc, E0, beta, constants);
         
-        FieldCalculatorTotal field("../MeepTests/SurfaceData/test_points.csv", 
-                                    "../MeepTests/SurfaceData/aux_points.csv", 
-                                    incident,
-                                    constants);
+    //     FieldCalculatorTotal field("../MeepTests/SurfaceData/test_points.csv", 
+    //                                 "../MeepTests/SurfaceData/aux_points.csv", 
+    //                                 incident,
+    //                                 constants);
 
-        Eigen::MatrixX3d points = top.getPoints();
+    //     Eigen::MatrixX3d points = top.getPoints();
 
-        int N = points.rows();
+    //     int N = points.rows();
 
-        Eigen::MatrixX3cd outE, outH;
-        outE = Eigen::MatrixX3cd::Zero(N,3);
-        outH = Eigen::MatrixX3cd::Zero(N,3);
+    //     Eigen::MatrixX3cd outE, outH;
+    //     outE = Eigen::MatrixX3cd::Zero(N,3);
+    //     outH = Eigen::MatrixX3cd::Zero(N,3);
         
-        field.computeFields(outE, outH, points);
+    //     field.computeFields(outE, outH, points);
 
-        Export::saveMatrixCSV("FilesCSV/scatteredFieldE_PN.csv", outE);
-        Export::saveMatrixCSV("FilesCSV/scatteredFieldH_PN.csv", outH);
+    //     Export::saveMatrixCSV("FilesCSV/scatteredFieldE_PN.csv", outE);
+    //     Export::saveMatrixCSV("FilesCSV/scatteredFieldH_PN.csv", outH);
         
-        double power_top = field.computePower(top);
+    //     double power_top = field.computePower(top);
 
-        powers(i) = power_top;
+    //     powers(i) = power_top;
 
-        // double power_bottom = field.computePower(bottom);
-        // double power_left = field.computePower(left);
-        // double power_right = field.computePower(right);
-        // double power_front = field.computePower(front);
-        // double power_back = field.computePower(back);
+    //     // double power_bottom = field.computePower(bottom);
+    //     // double power_left = field.computePower(left);
+    //     // double power_right = field.computePower(right);
+    //     // double power_front = field.computePower(front);
+    //     // double power_back = field.computePower(back);
 
-        // std::cout << "----------- Calculated power for beta = " << beta << ": -----------" << std::endl;
-        // std::cout << "Top:    " << power_top << std::endl;
-        // std::cout << "Bottom: " << power_bottom << std::endl;
-        // std::cout << "Left:   " << power_left << std::endl;
-        // std::cout << "Right:  " << power_right << std::endl;
-        // std::cout << "Front:  " << power_front << std::endl;
-        // std::cout << "Back:   " << power_back << std::endl;
+    //     // std::cout << "----------- Calculated power for beta = " << beta << ": -----------" << std::endl;
+    //     // std::cout << "Top:    " << power_top << std::endl;
+    //     // std::cout << "Bottom: " << power_bottom << std::endl;
+    //     // std::cout << "Left:   " << power_left << std::endl;
+    //     // std::cout << "Right:  " << power_right << std::endl;
+    //     // std::cout << "Front:  " << power_front << std::endl;
+    //     // std::cout << "Back:   " << power_back << std::endl;
 
-    }
+    // }
 
-    Export::saveRealVectorCSV("FilesCSV/powers_polarization.csv", powers);
+    // Export::saveRealVectorCSV("FilesCSV/powers_polarization.csv", powers);
 
     return 0;
 }

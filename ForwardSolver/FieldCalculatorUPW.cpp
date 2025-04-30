@@ -9,7 +9,7 @@ using namespace std;
 
 FieldCalculatorUPW::FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in, 
     const Constants& constants_in)
-: k(k_in), E0(E0_in), polarization(polarization_in), constants(constants_in) {}
+: k_(k_in), E0_(E0_in), polarization_(polarization_in), constants_(constants_in) {}
 
 
 void FieldCalculatorUPW::computeReflectedFields(
@@ -21,10 +21,10 @@ void FieldCalculatorUPW::computeReflectedFields(
 
     double cosPhi, sinPhi, cosTheta_in, sinTheta_in; // azimuthal angle the same for k_in and k_rot????
 
-    TransformUtils::computeAngles(k, 1.0, cosTheta_in, sinTheta_in,
+    TransformUtils::computeAngles(k_, 1.0, cosTheta_in, sinTheta_in,
         cosPhi, sinPhi);
-    double cosBeta = cos(polarization);
-    double sinBeta = sin(polarization);
+    double cosBeta = cos(polarization_);
+    double sinBeta = sin(polarization_);
 
     auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
@@ -40,7 +40,7 @@ void FieldCalculatorUPW::computeReflectedFields(
         Eigen::Vector3d x_rot = Rz_inv * x;
         // Vector3d x_plane (x_rot[0], 0.0, x_rot[2]);
 
-        complex<double> expk_rot = E0 * exp(-constants.j * constants.k0 * (sinTheta_in * x_rot[0] - cosTheta_in * x_rot[2]));
+        complex<double> expk_rot = E0_ * exp(-constants.j * constants.k0 * (sinTheta_in * x_rot[0] - cosTheta_in * x_rot[2]));
     
         Eigen::Vector3cd E_perp(0.0, Gamma_r_perp * expk_rot, 0.0);
         Eigen::Vector3cd H_perp(cosTheta_in * Gamma_r_perp * expk_rot / constants.eta0, 0.0, sinTheta_in * Gamma_r_perp * expk_rot / constants.eta0);
@@ -59,7 +59,8 @@ void FieldCalculatorUPW::computeReflectedFields(
 void FieldCalculatorUPW::computeFields(
     MatrixX3cd& outE,
     MatrixX3cd& outH,
-    const MatrixX3d& evalPoints
+    const MatrixX3d& evalPoints,
+    int polarization_idx // Only used in total fields
 ) const {
     int N = evalPoints.rows();
     
@@ -72,11 +73,11 @@ void FieldCalculatorUPW::computeFields(
 
     double cosPhi, sinPhi, cosTheta_in, sinTheta_in; // azimuthal angle the same for k_in and k_rot????
 
-    TransformUtils::computeAngles(-k, 1.0, cosTheta_in, sinTheta_in,
+    TransformUtils::computeAngles(-k_, 1.0, cosTheta_in, sinTheta_in,
         cosPhi, sinPhi);
 
-    double cosBeta = cos(polarization);
-    double sinBeta = sin(polarization);
+    double cosBeta = cos(polarization_);
+    double sinBeta = sin(polarization_);
 
     auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
@@ -86,7 +87,7 @@ void FieldCalculatorUPW::computeFields(
 
         Eigen::Vector3d x_rot = Rz_inv * x;
 
-        complex<double> phase1 = E0 * exp(- constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in));
+        complex<double> phase1 = E0_ * exp(- constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in));
         
         Vector3cd E_in_perp (0.0, phase1, 0.0);
         Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);

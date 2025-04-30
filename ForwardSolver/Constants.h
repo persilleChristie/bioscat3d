@@ -6,6 +6,12 @@
 #include <iostream>
 #include <stdio.h>
 
+/**
+    * Struct Constants. Stores all constants used in the models
+    * 
+    * Code based on Nikoline Mai Bøgely Rehn's code from January 2025 
+    * (git: https://github.com/nikombr/bioscat)
+*/
 struct Constants {
 
     // Mathematical constants
