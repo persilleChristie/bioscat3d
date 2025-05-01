@@ -97,14 +97,13 @@ void FieldCalculatorTotal::computeFields(
     Eigen::MatrixX3cd Ei(N, 3), Hi(N, 3);
 
     for (size_t i = 0; i < dipoles_.size(); ++i) {
-        std::cout << i << std::endl;
         dipoles_[i]->computeFields(Ei, Hi, evalPoints);
         outE += amplitudes_.row(polarization_idx)(i) * Ei;
         outH += amplitudes_.row(polarization_idx)(i) * Hi;
     }
 }
 
-Eigen::VectorXd FieldCalculatorTotal::computePower(
+std::pair<Eigen::VectorXd, Eigen::MatrixXd> FieldCalculatorTotal::computePower(
     const Surface& surface
 ){
     Eigen::MatrixX3d points = surface.getPoints();
@@ -122,9 +121,11 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
     double integrand, integral;
     Eigen::Vector3d cross;
 
+    int grid_size = sqrt(N);
+    Eigen::MatrixXd integrand_mat(grid_size, grid_size);
+    int row, col;
+
     for (int j = 0; j < B; ++j){
-        
-        std::cout << j << std::endl;
         outE = Eigen::MatrixX3cd::Zero(N,3);
         outH = Eigen::MatrixX3cd::Zero(N,3);
 
@@ -135,6 +136,13 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
             cross = 0.5 * outE.row(i).cross(outH.row(i).conjugate()).real();
             integrand = cross.dot(normals.row(i));
 
+            if (j == 0){
+                col = i % grid_size;
+                row = i / grid_size;
+
+                integrand_mat(row, col) = integrand; 
+            }
+
             integral += integrand * dA;
         }
 
@@ -142,5 +150,5 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
 
     }
 
-    return integral_vec;    
+    return {integral_vec, integrand_mat};    
 }

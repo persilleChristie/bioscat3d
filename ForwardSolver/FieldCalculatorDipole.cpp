@@ -1,6 +1,7 @@
 #include "FieldCalculatorDipole.h"
 #include "UtilsTransform.h"
 #include <complex>
+#include "Constants.h"
 
 
 FieldCalculatorDipole::FieldCalculatorDipole(const Dipole& dipole, const Constants& constants, const bool interior)

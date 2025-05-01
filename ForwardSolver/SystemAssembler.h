@@ -3,6 +3,7 @@
 
 #include "Surface.h"
 #include "FieldCalculator.h"
+#include "Constants.h"
 #include <Eigen/Dense>
 #include <vector>
 #include <memory>

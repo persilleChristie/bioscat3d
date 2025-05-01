@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include "UtilsTransform.h"
 #include "UtilsFresnel.h"
+#include "Constants.h"
 
 using namespace Eigen;
 using namespace std;

@@ -2,6 +2,7 @@
 #define PLANE_SURFACE_H
 
 #include "Surface.h"
+#include "Constants.h"
 #include <Eigen/Dense>
 
 class SurfacePlane : public Surface {
