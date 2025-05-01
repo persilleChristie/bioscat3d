@@ -12,21 +12,22 @@ with open("SurfaceData/surfaceParams.json", "r") as f:
     surfaceParams = json.load(f)
 
 bump_dict = surfaceParams["bumpData"]
-width = surfaceParams["width"]
+halfWidth_x = surfaceParams["halfWidth_x"]
+halfWidth_y = surfaceParams["halfWidth_y"]
+halfWidth_z = surfaceParams["halfWidth_z"]
 resolution = surfaceParams["resolution"]
 epsilon1 = surfaceParams["epsilon1"]
 omega = surfaceParams["omega"]
 k_vector = np.array(surfaceParams["k"])
-beta = surfaceParams["beta"]
+betas = surfaceParams["betas"]
 alpha = surfaceParams["alpha"]
 
 # --- Simulation parameters ---
 pml_thickness = 2
-dim = width + 2 * pml_thickness
 
-cell_x = dim
-cell_y = dim
-cell_z = dim
+cell_x = halfWidth_x + 2 * pml_thickness
+cell_y = halfWidth_y + 2 * pml_thickness
+cell_z = halfWidth_z + 2 * pml_thickness
 
 frequency = omega  # Frequency already given
 

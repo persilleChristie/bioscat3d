@@ -16,7 +16,7 @@ def generate_surface_params(
     alpha = 0.86,
     omega=1.0,
     k = [50.0, 50.0, -1.0],
-    numBetas = 1 # makes unidistant betas on the interval [0, pi/2]
+    numBetas = 10 # makes unidistant betas on the interval [0, pi/2]
 ):
     np.random.seed(seed)
 
