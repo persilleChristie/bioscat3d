@@ -13,8 +13,7 @@
 Constants constants;
 
 int main() {
-    char path = '../MeepTests/SetupTests/SurfaceData/surfaceParams.json';
-    char* jsonPath = &path;
+    const char* jsonPath = "../MeepTests/SetupTests/SurfaceData/surfaceParams.json";
 
     MASSystem masSystem(jsonPath, "Bump", constants);
 
@@ -25,7 +24,6 @@ int main() {
     Eigen::Vector3d Cornerpoint (-1, -1, 10);
     Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
     SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, 20);
-
     Eigen::VectorXd powers = field.computePower(top);
 
     Export::saveRealVectorCSV("FilesCSV/powers_polarization.csv", powers);

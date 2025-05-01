@@ -32,14 +32,14 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
     Eigen::MatrixX3d points = masSystem.getPoints();
 
     int M      = points.rows();
-    int Nprime = static_cast<int>(aux_int.size());
+    int Nprime = static_cast<int>(aux_int.rows());
     int N      = Nprime * 2;
 
     int test_index;
 
-    for (int i = 0; i < N; ++i){
+    for (int i = 0; i < Nprime; ++i){
         test_index = aux_idx[i];
-            
+
         sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
                                 Dipole(points.row(test_index), t1.row(test_index)), constants_, true));
         sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
@@ -54,7 +54,6 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
     // Save dipoles for calculating total field
     this->dipoles_ = sources_int;
 
-
     // -------- SOLVE SYSTEM ---------
     // Allocate space for system matrix and UPW
     Eigen::MatrixXcd A(4 * M, 2 * N); 
@@ -68,7 +67,7 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
     int B = polarizations.size();
 
     // Allocate space for amplitudes
-    Eigen::MatrixXcd amplitudes(B, Nprime);
+    Eigen::MatrixXcd amplitudes(B, N);
 
     for (int i = 0; i < B; ++i){
         UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i), constants_);
@@ -78,14 +77,10 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
         Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
         Eigen::VectorXcd amps = svd1.solve(b);
 
-        amplitudes.row(i) = amps.head(Nprime);
+        amplitudes.row(i) = amps.head(N);
 
     }
 
-    // // Save to files
-    // Export::saveMatrixCSV("matrix_A_simple.csv", A);
-    // Export::saveVectorCSV("vector_b_simple.csv", b);
-    // Export::saveVectorCSV("solution_y_simple.csv", amps);
 
     this->amplitudes_ = amplitudes;
 }
@@ -102,6 +97,7 @@ void FieldCalculatorTotal::computeFields(
     Eigen::MatrixX3cd Ei(N, 3), Hi(N, 3);
 
     for (size_t i = 0; i < dipoles_.size(); ++i) {
+        std::cout << i << std::endl;
         dipoles_[i]->computeFields(Ei, Hi, evalPoints);
         outE += amplitudes_.row(polarization_idx)(i) * Ei;
         outH += amplitudes_.row(polarization_idx)(i) * Hi;
@@ -127,6 +123,8 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
     Eigen::Vector3d cross;
 
     for (int j = 0; j < B; ++j){
+        
+        std::cout << j << std::endl;
         outE = Eigen::MatrixX3cd::Zero(N,3);
         outH = Eigen::MatrixX3cd::Zero(N,3);
 

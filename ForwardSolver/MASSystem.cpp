@@ -18,6 +18,80 @@ MASSystem::MASSystem(const char* jsonPath, const std::string surfaceType, Consta
 
     }
 
+
+/**
+    * Approximate second derivative in x using central differences (to mimick numpy's gradient)
+    * @param Z: Matrix with z values in grid
+    * @param x: Vector of x values
+    * 
+    * @return Matrix of the second derivative
+    */
+   Eigen::MatrixXd second_derivative_x(const Eigen::MatrixXd& Z, const Eigen::VectorXd& x) {
+    int rows = Z.rows();
+    int cols = Z.cols();
+    Eigen::MatrixXd d2Z_dx2 = Eigen::MatrixXd::Zero(rows, cols);
+
+    for (int j = 1; j < cols - 1; ++j) {
+        double dx_prev = x(j) - x(j - 1);
+        double dx_next = x(j + 1) - x(j);
+        for (int i = 0; i < rows; ++i) {
+            double z_prev = Z(i, j - 1);
+            double z_curr = Z(i, j);
+            double z_next = Z(i, j + 1);
+            double dx = 0.5 * (dx_prev + dx_next);
+            d2Z_dx2(i, j) = (z_next - 2 * z_curr + z_prev) / (dx * dx);
+        }
+    }
+
+    return d2Z_dx2;
+}
+
+/**
+    * Approximate second derivative in y using central differences (to mimick numpy's gradient)
+    * @param Z: Matrix with z values in grid
+    * @param y: Vector of y values
+    * 
+    * @return Matrix of the second derivative
+    */
+Eigen::MatrixXd second_derivative_y(const Eigen::MatrixXd& Z, const Eigen::VectorXd& y) {
+    int rows = Z.rows();
+    int cols = Z.cols();
+    Eigen::MatrixXd d2Z_dy2 = Eigen::MatrixXd::Zero(rows, cols);
+
+    for (int i = 1; i < rows - 1; ++i) {
+        double dy_prev = y(i) - y(i - 1);
+        double dy_next = y(i + 1) - y(i);
+        for (int j = 0; j < cols; ++j) {
+            double z_prev = Z(i - 1, j);
+            double z_curr = Z(i, j);
+            double z_next = Z(i + 1, j);
+            double dy = 0.5 * (dy_prev + dy_next);
+            d2Z_dy2(i, j) = (z_next - 2 * z_curr + z_prev) / (dy * dy);
+        }
+    }
+
+    return d2Z_dy2;
+}
+
+// Main curvature approximation function
+double approx_peak_curvature(const Eigen::MatrixXd& Z, const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+    // Find peak index
+    Eigen::Index maxRow, maxCol;
+    Z.maxCoeff(&maxRow, &maxCol);
+
+    // Compute second derivatives
+    Eigen::MatrixXd dz_dx2 = second_derivative_x(Z, x);
+    Eigen::MatrixXd dz_dy2 = second_derivative_y(Z, y);
+
+    // Evaluate curvature at peak
+    double curv_xx = dz_dx2(maxRow, maxCol);
+    double curv_yy = dz_dy2(maxRow, maxCol);
+
+    double mean_curv = 0.5 * (curv_xx + curv_yy);
+    return mean_curv;
+}
+
+
 void MASSystem::generateBumpSurface(const char* jsonPath) {
     // ------------- Load json file --------------
     // Open the file
@@ -43,26 +117,26 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     int resolution = doc["resolution"].GetInt();
     double xdim = doc["halfWidth_x"].GetDouble();
     double ydim = doc["halfWidth_y"].GetDouble();
-    double zdim = doc["halfWidth_z"].GetDouble();
+    // double zdim = doc["halfWidth_z"].GetDouble();
     const auto& bumpData = doc["bumpData"];
 
     // Read incidence vector
     const auto& kjson = doc["k"];
     Eigen::Vector3d k;
     for (rapidjson::SizeType i = 0; i < kjson.Size(); ++i) {
-        k << kjson[i].GetDouble();
+        k(i) = kjson[i].GetDouble();
     }
 
     this->kinc_ = k;
     
     // Read polarizations
     const auto& betas = doc["betas"];
-    Eigen::VectorXd beta_vec;
-    for (rapidjson::SizeType i = 0; i < betas.Size(); ++i) {
-        beta_vec << betas[i].GetDouble();
+    int B = static_cast<int>(betas.Size());
+    Eigen::VectorXd beta_vec(B);
+    for (int i = 0; i < B; ++i) {
+        beta_vec(i) = betas[i].GetDouble();
     }
     this->polarizations_ = beta_vec;
-
 
     // ------------- Generate grid -------------
     int N = resolution;
@@ -74,8 +148,8 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
         X.row(i) = x.transpose();
         Y.col(i) = y;
     }
-
-    Eigen::MatrixXd Z;
+    
+    Eigen::MatrixXd Z(N,N);
     Z = Eigen::MatrixXd::Zero(N,N);
 
     // Iterate over bumpData array
@@ -93,8 +167,8 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     }
 
     // ------------- Decide number of testpoints --------------
-    double lambda0 = constants_.getWavelength();
-    int N_test = std::ceil(2.0 * testpts_pr_lambda_ * 2 * xdim * testpts_pr_lambda_ * 2 * ydim / (lambda0 * lambda0));
+    // double lambda0 = constants_.getWavelength();
+    // int N_test = std::ceil(2.0 * testpts_pr_lambda_ * 2 * xdim * testpts_pr_lambda_ * 2 * ydim / (lambda0 * lambda0));
 
     // ------------- Flatten grid and remove edge points -------------
     Eigen::VectorXd X_flat = Eigen::Map<const Eigen::VectorXd>(X.data(), X.size());
@@ -202,79 +276,6 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
 
     this->aux_int_ = aux_points_int;
     this->aux_ext_ = aux_points_ext;
-}
-
-
-/**
-    * Approximate second derivative in x using central differences (to mimick numpy's gradient)
-    * @param Z: Matrix with z values in grid
-    * @param x: Vector of x values
-    * 
-    * @return Matrix of the second derivative
-    */
-Eigen::MatrixXd second_derivative_x(const Eigen::MatrixXd& Z, const Eigen::VectorXd& x) {
-    int rows = Z.rows();
-    int cols = Z.cols();
-    Eigen::MatrixXd d2Z_dx2 = Eigen::MatrixXd::Zero(rows, cols);
-
-    for (int j = 1; j < cols - 1; ++j) {
-        double dx_prev = x(j) - x(j - 1);
-        double dx_next = x(j + 1) - x(j);
-        for (int i = 0; i < rows; ++i) {
-            double z_prev = Z(i, j - 1);
-            double z_curr = Z(i, j);
-            double z_next = Z(i, j + 1);
-            double dx = 0.5 * (dx_prev + dx_next);
-            d2Z_dx2(i, j) = (z_next - 2 * z_curr + z_prev) / (dx * dx);
-        }
-    }
-
-    return d2Z_dx2;
-}
-
-/**
-    * Approximate second derivative in y using central differences (to mimick numpy's gradient)
-    * @param Z: Matrix with z values in grid
-    * @param y: Vector of y values
-    * 
-    * @return Matrix of the second derivative
-    */
-Eigen::MatrixXd second_derivative_y(const Eigen::MatrixXd& Z, const Eigen::VectorXd& y) {
-    int rows = Z.rows();
-    int cols = Z.cols();
-    Eigen::MatrixXd d2Z_dy2 = Eigen::MatrixXd::Zero(rows, cols);
-
-    for (int i = 1; i < rows - 1; ++i) {
-        double dy_prev = y(i) - y(i - 1);
-        double dy_next = y(i + 1) - y(i);
-        for (int j = 0; j < cols; ++j) {
-            double z_prev = Z(i - 1, j);
-            double z_curr = Z(i, j);
-            double z_next = Z(i + 1, j);
-            double dy = 0.5 * (dy_prev + dy_next);
-            d2Z_dy2(i, j) = (z_next - 2 * z_curr + z_prev) / (dy * dy);
-        }
-    }
-
-    return d2Z_dy2;
-}
-
-// Main curvature approximation function
-double approx_peak_curvature(const Eigen::MatrixXd& Z, const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
-    // Find peak index
-    Eigen::Index maxRow, maxCol;
-    Z.maxCoeff(&maxRow, &maxCol);
-
-    // Compute second derivatives
-    Eigen::MatrixXd dz_dx2 = second_derivative_x(Z, x);
-    Eigen::MatrixXd dz_dy2 = second_derivative_y(Z, y);
-
-    // Evaluate curvature at peak
-    double curv_xx = dz_dx2(maxRow, maxCol);
-    double curv_yy = dz_dy2(maxRow, maxCol);
-
-    double mean_curv = 0.5 * (curv_xx + curv_yy);
-    return mean_curv;
 }
 
 
