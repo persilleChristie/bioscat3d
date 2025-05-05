@@ -202,6 +202,10 @@ def Construct_solve_MAS_system(Scatter_information, Incident_information, plot=F
     C4 = C_matrix[3*M:]
     print(f"Solution time: {time.time() - sol_start:.3f} s")
 
+    df = pd.DataFrame(C_matrix.astype(str))
+
+    df.to_csv('FilesCSV/Andreas_y_matrix.csv', index=False, header=False)
+
     #-------------------------------------------------------------
     # Optional plotting
     #-------------------------------------------------------------

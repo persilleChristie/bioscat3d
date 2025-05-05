@@ -39,7 +39,7 @@ public:
         int polarization_idx
     ) const override;
 
-    std::pair<Eigen::VectorXd, Eigen::MatrixXd> computePower(
+    Eigen::VectorXd computePower(
         const Surface& surface
     );
 
