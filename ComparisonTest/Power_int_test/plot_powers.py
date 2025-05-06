@@ -29,28 +29,28 @@ fig.tight_layout()
 plt.show()
 
 
-x = np.linspace(-2, 2, 20)
-y = np.linspace(-2, 2, 20)
+# x = np.linspace(-2, 2, 20)
+# y = np.linspace(-2, 2, 20)
 
-X, Y = np.meshgrid(x, y)
+# X, Y = np.meshgrid(x, y)
 
-# Plot the data
-fig, axs = plt.subplots(3, 2, figsize = (12,10))
+# # Plot the data
+# fig, axs = plt.subplots(3, 2, figsize = (12,10))
 
-for i, name in enumerate(filenames):
-    data = pd.read_csv('FilesCSV/integrand_beta0_' + name + '.csv', header=None)
+# for i, name in enumerate(filenames):
+#     data = pd.read_csv('FilesCSV/integrand_beta0_' + name + '.csv', header=None)
 
-    col = i % 2
-    row = i // 2
+#     col = i % 2
+#     row = i // 2
 
-    # im = axs[row, col].imshow(data,cmap='viridis',interpolation='nearest')
-    axs[row, col].contourf(X, Y, data)
-    axs[row, col].set_title("Integrand (beta = 0) " + name)
-    axs[row, col].grid(True)
-    # axs[row, col].invert_yaxis()
-    # plt.colorbar(im, ax = axs[row, col])
+#     # im = axs[row, col].imshow(data,cmap='viridis',interpolation='nearest')
+#     axs[row, col].contourf(X, Y, data)
+#     axs[row, col].set_title("Integrand (beta = 0) " + name)
+#     axs[row, col].grid(True)
+#     # axs[row, col].invert_yaxis()
+#     # plt.colorbar(im, ax = axs[row, col])
 
 
 
-fig.tight_layout()
-plt.show()
+# fig.tight_layout()
+# plt.show()

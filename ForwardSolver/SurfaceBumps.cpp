@@ -3,11 +3,10 @@
 
 SurfaceBumps::SurfaceBumps(const Eigen::VectorXd& x0,  const Eigen::VectorXd& y0, 
                             const Eigen::VectorXd& h, const Eigen::VectorXd& sigma, 
-                            const double xdim, const double ydim, const double zdim, const int resolution,
-                            Constants constants
+                            const double xdim, const double ydim, const double zdim, const int resolution
     ) : x0_(x0), y0_(y0), h_(h), sigma_(sigma), 
         xdim_(xdim), ydim_(ydim), zdim_(zdim), 
-        resolution_(resolution), constants_(constants)
+        resolution_(resolution)
     {
         generateSurface();
     }
@@ -47,7 +46,7 @@ void SurfaceBumps::generateSurface() {
     }
 
     // ------------- Decide number of testpoints --------------
-    double lambda0 = constants_.getWavelength();
+    double lambda0 = constants.getWavelength();
     int N_test = std::ceil(2.0 * testpts_pr_lambda_ * 2 * xdim_ * testpts_pr_lambda_ * 2 * ydim_ / (lambda0 * lambda0));
 
     // ------------- Flatten grid and remove edge points -------------
@@ -131,7 +130,7 @@ void SurfaceBumps::generateSurface() {
     this->tau2_ = tangent2;
 
     // ------------- Auxiliary points -------------
-    double d = 1 - constants_.alpha;  // Distance from surface
+    double d = 1 - constants.alpha;  // Distance from surface
     std::vector<int> aux_test_indices;
     for (int i = 0; i < N_test_actual; i += 2)
         aux_test_indices.push_back(i);

@@ -60,13 +60,13 @@ int main(){
     Eigen::Vector3d Cornerpoint (-cell_x, -cell_y, 0.5*cell_z - pml_thickness - 0.1);
     Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
     SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, resolution);
-    test_planes.insert(std::pair<std::string, SurfacePlane>("top", top));
+    test_planes.insert(std::pair<std::string, SurfacePlane>("mz", top));
     // std::cout << "top" << top.getNormals().row(0) << std::endl;
 
     // Bottom
     Cornerpoint << -cell_x, -cell_y, -0.5*cell_z + pml_thickness + 0.1;
     SurfacePlane bottom(Cornerpoint, basis1, basis2, size1, size2, resolution);
-    test_planes.insert(std::pair<std::string, SurfacePlane>("bottom", bottom));
+    test_planes.insert(std::pair<std::string, SurfacePlane>("pz", bottom));
     // std::cout << "bottom" << bottom.getNormals().row(0) << std::endl;
 
 
@@ -75,14 +75,14 @@ int main(){
     basis1 << 0,1,0;
     basis2 << 0,0,1;
     SurfacePlane left(Cornerpoint, basis1, basis2, size1, size2, resolution);
-    test_planes.insert(std::pair<std::string, SurfacePlane>("left", left));
+    test_planes.insert(std::pair<std::string, SurfacePlane>("mx", left));
     // std::cout << "left" << left.getNormals().row(0) << std::endl;
 
     
     // Right
     Cornerpoint << 0.5*cell_x - pml_thickness - 0.1, -cell_y, -cell_z;
     SurfacePlane right(Cornerpoint, basis1, basis2, size1, size2, resolution);
-    test_planes.insert(std::pair<std::string, SurfacePlane>("right", right));
+    test_planes.insert(std::pair<std::string, SurfacePlane>("px", right));
     // std::cout << "right" << right.getNormals().row(0) << std::endl;
 
 
@@ -91,23 +91,23 @@ int main(){
     basis1 << 1,0,0;
     basis2 << 0,0,1;
     SurfacePlane back(Cornerpoint, basis2, basis1, size1, size2, resolution);
-    test_planes.insert(std::pair<std::string, SurfacePlane>("back", back));
+    test_planes.insert(std::pair<std::string, SurfacePlane>("my", back));
     // std::cout << "back" << back.getNormals().row(0) << std::endl;
 
 
     // Front
     Cornerpoint << -cell_x, 0.5*cell_y - pml_thickness - 0.1, -cell_z;
     SurfacePlane front(Cornerpoint, basis2, basis1, size1, size2, resolution);
-    test_planes.insert(std::pair<std::string, SurfacePlane>("front", front));
+    test_planes.insert(std::pair<std::string, SurfacePlane>("py", front));
     // std::cout << "front" << front.getNormals().row(0) << std::endl;
 
 
 
 
     // -------------- Calculate powers ------------------
-    MASSystem masSystem(jsonPath, "Bump", constants);
+    MASSystem masSystem(jsonPath, "Bump");
 
-    FieldCalculatorTotal field(masSystem, constants);
+    FieldCalculatorTotal field(masSystem);
 
     std::string filename1; // , filename2;
 

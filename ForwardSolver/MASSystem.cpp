@@ -5,8 +5,8 @@
 #include "rapidjson/istreamwrapper.h"
 
 
-MASSystem::MASSystem(const char* jsonPath, const std::string surfaceType, Constants& constants)
-    : constants_(constants)
+MASSystem::MASSystem(const char* jsonPath, const std::string surfaceType)//, Constants& constants)
+    // : constants_(constants)
     {
         if (surfaceType == "Bump"){
             generateBumpSurface(jsonPath);
@@ -73,7 +73,15 @@ Eigen::MatrixXd second_derivative_y(const Eigen::MatrixXd& Z, const Eigen::Vecto
     return d2Z_dy2;
 }
 
-// Main curvature approximation function
+
+/**
+    * Approximate mean curvature at highest peak
+    * @param Z: Eigen-matrix with z values in grid
+    * @param x: Eigen-vector of x values
+    * @param y: Eigen-vector of y values
+    * 
+    * @return Approximate mean curvature
+    */
 double approx_peak_curvature(const Eigen::MatrixXd& Z, const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
     // Find peak index
     Eigen::Index maxRow, maxCol;
@@ -138,8 +146,13 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     }
     this->polarizations_ = beta_vec;
 
+    // ------------- Decide number of testpoints --------------
+    constants.setWavelength(2 * constants.pi / doc["omega"].GetDouble());
+    double lambda0 = constants.getWavelength();
+    int N = std::ceil(2.0 * testpts_pr_lambda_ * 2 * xdim * testpts_pr_lambda_ * 2 * ydim / (lambda0 * lambda0));
+    
+
     // ------------- Generate grid -------------
-    int N = resolution;
     Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(N, -xdim, xdim);
     Eigen::VectorXd y = Eigen::VectorXd::LinSpaced(N, -ydim, ydim);
 
@@ -165,10 +178,6 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
                             + (Y.array() - y0)*(Y.array() - y0)) / (2 * sigma * sigma))).matrix();
         
     }
-
-    // ------------- Decide number of testpoints --------------
-    // double lambda0 = constants_.getWavelength();
-    // int N_test = std::ceil(2.0 * testpts_pr_lambda_ * 2 * xdim * testpts_pr_lambda_ * 2 * ydim / (lambda0 * lambda0));
 
     // ------------- Flatten grid and remove edge points -------------
     Eigen::VectorXd X_flat = Eigen::Map<const Eigen::VectorXd>(X.data(), X.size());
@@ -252,7 +261,7 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     auto mean_curv = approx_peak_curvature(Z, x, y);
     double radius = 1 / abs(mean_curv);
 
-    double d = (1 - constants_.alpha) * radius;  // Distance from surface
+    double d = (1 - constants.alpha) * radius;  // Distance from surface
 
     // Calculate points
     std::vector<int> aux_test_indices;

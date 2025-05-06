@@ -10,9 +10,8 @@
 #include "UtilsExport.h"
 
 FieldCalculatorTotal::FieldCalculatorTotal(
-    const MASSystem masSystem,
-    Constants constants
-) : constants_(constants)
+    const MASSystem masSystem
+) 
 {
     constructor(masSystem);
 }
@@ -41,14 +40,14 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
         test_index = aux_idx[i];
 
         sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(aux_int.row(i), t1.row(test_index)), constants_, true));
+                                Dipole(aux_int.row(i), t1.row(test_index)), true));
         sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(aux_int.row(i), t2.row(test_index)), constants_, true));
+                                Dipole(aux_int.row(i), t2.row(test_index)), true));
  
         sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(aux_ext.row(i), t1.row(test_index)), constants_, false));
+                                Dipole(aux_ext.row(i), t1.row(test_index)), false));
         sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(aux_ext.row(i), t1.row(test_index)), constants_, false));
+                                Dipole(aux_ext.row(i), t1.row(test_index)), false));
     }
 
     // Save dipoles for calculating total field
@@ -72,7 +71,7 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
     std::string filename;
 
     for (int i = 0; i < B; ++i){
-        UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i), constants_);
+        UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i));
 
         SystemAssembler::assembleSystem(A, b, points, t1, t2, sources_int, sources_ext, UPW);
 
@@ -135,7 +134,7 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
 
     int grid_size = sqrt(N);
     Eigen::MatrixXd integrand_mat(grid_size, grid_size);
-    int row, col;
+    // int row, col;
 
     for (int j = 0; j < B; ++j){
         outE = Eigen::MatrixX3cd::Zero(N,3);

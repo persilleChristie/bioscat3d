@@ -9,8 +9,7 @@ class SurfaceBumps : public Surface {
 public:
     SurfaceBumps(const Eigen::VectorXd& x0,  const Eigen::VectorXd& y0, 
                  const Eigen::VectorXd& h, const Eigen::VectorXd& sigma, 
-                 const double xdim, const double ydim, const double zdim, const int resolution,
-                 Constants constants);
+                 const double xdim, const double ydim, const double zdim, const int resolution);
 
     const Eigen::MatrixXd& getPoints() const override  {return points_;};
     const Eigen::MatrixXd& getNormals() const override {return normals_;};
@@ -32,7 +31,6 @@ private:
     double ydim_;
     double zdim_;
     int resolution_;
-    Constants constants_;
     int testpts_pr_lambda_ = 5;
 
     Eigen::MatrixXd points_;
