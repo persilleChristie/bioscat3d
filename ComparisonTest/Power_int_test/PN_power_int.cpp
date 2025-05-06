@@ -39,39 +39,39 @@ int main(){
     
     // Load values
     int resolution = doc["resolution"].GetInt();
-    double halfwidth_x = doc["halfWidth_x"].GetDouble();
-    double halfwidth_y = doc["halfWidth_y"].GetDouble();
-    double halfwidth_z = doc["halfWidth_z"].GetDouble();
-    double pml_thickness = doc["pml_thickness"].GetDouble();
-    double omega = doc["omega"].GetDouble();
+    // double halfwidth_x = doc["halfWidth_x"].GetDouble();
+    // double halfwidth_y = doc["halfWidth_y"].GetDouble();
+    // double halfwidth_z = doc["halfWidth_z"].GetDouble();
+    // double pml_thickness = doc["pml_thickness"].GetDouble();
+    // double omega = doc["omega"].GetDouble();
 
-    double cell_x = 2*halfwidth_x + 2*pml_thickness;
-    double cell_y = 2*halfwidth_y + 2*pml_thickness;
-    double cell_z = 2*halfwidth_z + 2*pml_thickness;
+    double cell_x = 0.5;
+    double cell_y = 0.5;
+    double cell_z = 0.5;
 
-    double size1 = cell_x, size2 = cell_y;
+    double size1 = 1.0, size2 = 1.0;
 
-    constants.setWavelength(2 * constants.pi / omega);
+    // constants.setWavelength(2 * constants.pi / omega);
 
     // ------------ Define planes -------------
     std::map<std::string, SurfacePlane> test_planes;
 
     // Top
-    Eigen::Vector3d Cornerpoint (-cell_x, -cell_y, 0.5*cell_z - pml_thickness - 0.1);
+    Eigen::Vector3d Cornerpoint (-cell_x, -cell_y, 0.5);
     Eigen::Vector3d basis1 (1,0,0), basis2 (0,1,0);
     SurfacePlane top(Cornerpoint, basis1, basis2, size1, size2, resolution);
-    test_planes.insert(std::pair<std::string, SurfacePlane>("mz", top));
+    test_planes.insert(std::pair<std::string, SurfacePlane>("pz", top));
     // std::cout << "top" << top.getNormals().row(0) << std::endl;
 
     // Bottom
-    Cornerpoint << -cell_x, -cell_y, -0.5*cell_z + pml_thickness + 0.1;
+    Cornerpoint << -cell_x, -cell_y, -0.5;
     SurfacePlane bottom(Cornerpoint, basis1, basis2, size1, size2, resolution);
-    test_planes.insert(std::pair<std::string, SurfacePlane>("pz", bottom));
+    test_planes.insert(std::pair<std::string, SurfacePlane>("mz", bottom));
     // std::cout << "bottom" << bottom.getNormals().row(0) << std::endl;
 
 
     // Left
-    Cornerpoint << -0.5*cell_x + pml_thickness + 0.1, -cell_y, -cell_z;
+    Cornerpoint << -0.5, -cell_y, -cell_z;
     basis1 << 0,1,0;
     basis2 << 0,0,1;
     SurfacePlane left(Cornerpoint, basis1, basis2, size1, size2, resolution);
@@ -80,14 +80,14 @@ int main(){
 
     
     // Right
-    Cornerpoint << 0.5*cell_x - pml_thickness - 0.1, -cell_y, -cell_z;
+    Cornerpoint << 0.5, -cell_y, -cell_z;
     SurfacePlane right(Cornerpoint, basis1, basis2, size1, size2, resolution);
     test_planes.insert(std::pair<std::string, SurfacePlane>("px", right));
     // std::cout << "right" << right.getNormals().row(0) << std::endl;
 
 
     // Back
-    Cornerpoint << -cell_x, -0.5*cell_y + pml_thickness + 0.1, -cell_z;
+    Cornerpoint << -cell_x, -0.5, -cell_z;
     basis1 << 1,0,0;
     basis2 << 0,0,1;
     SurfacePlane back(Cornerpoint, basis2, basis1, size1, size2, resolution);
@@ -96,7 +96,7 @@ int main(){
 
 
     // Front
-    Cornerpoint << -cell_x, 0.5*cell_y - pml_thickness - 0.1, -cell_z;
+    Cornerpoint << -cell_x, 0.5, -cell_z;
     SurfacePlane front(Cornerpoint, basis2, basis1, size1, size2, resolution);
     test_planes.insert(std::pair<std::string, SurfacePlane>("py", front));
     // std::cout << "front" << front.getNormals().row(0) << std::endl;

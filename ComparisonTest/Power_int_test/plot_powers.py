@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-filenames = ["top", "bottom", "left", "right", "front", "back"]
+filenames = ["mz", "pz", "mx", "px", "my", "py"]
 
 
 # Plot the data
@@ -11,13 +11,15 @@ fig, axs = plt.subplots(3, 2, figsize = (12,10))
 for i, name in enumerate(filenames):
     data = pd.read_csv('FilesCSV/powers_polarization_' + name + '.csv', header=None)
 
+    sign = "+" if name[0] == "p" else "-"
+
     betas = np.linspace(0, 90, len(data))
 
     col = i % 2
     row = i // 2
 
     axs[row, col].plot(betas, data[0], marker='o', linestyle='-', color='b')
-    axs[row, col].set_title("Power Values " + name)
+    axs[row, col].set_title("Power Values " + sign + name[1])
     axs[row, col].grid(True)
 
 
