@@ -10,9 +10,8 @@
 #include "UtilsExport.h"
 
 FieldCalculatorTotal::FieldCalculatorTotal(
-    const MASSystem masSystem,
-    Constants constants
-) : constants_(constants)
+    const MASSystem masSystem
+) 
 {
     constructor(masSystem);
 }
@@ -41,14 +40,14 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
         test_index = aux_idx[i];
 
         sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(points.row(test_index), t1.row(test_index)), constants_, true));
+                                Dipole(aux_int.row(i), t1.row(test_index)), true));
         sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(points.row(test_index), t2.row(test_index)), constants_, true));
+                                Dipole(aux_int.row(i), t2.row(test_index)), true));
  
         sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(points.row(test_index), t1.row(test_index)), constants_, false));
+                                Dipole(aux_ext.row(i), t1.row(test_index)), false));
         sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(points.row(test_index), t1.row(test_index)), constants_, false));
+                                Dipole(aux_ext.row(i), t1.row(test_index)), false));
     }
 
     // Save dipoles for calculating total field
@@ -69,8 +68,10 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
     // Allocate space for amplitudes
     Eigen::MatrixXcd amplitudes(B, N);
 
+    std::string filename;
+
     for (int i = 0; i < B; ++i){
-        UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i), constants_);
+        UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i));
 
         SystemAssembler::assembleSystem(A, b, points, t1, t2, sources_int, sources_ext, UPW);
 
@@ -78,6 +79,16 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
         Eigen::VectorXcd amps = svd1.solve(b);
 
         amplitudes.row(i) = amps.head(N);
+
+        if (i == 0){
+            Export::saveMatrixCSV("matrix_A_simple.csv", A);
+        }
+
+        filename = "FilesCSV/solution_y_" + std::to_string(i) + ".csv";
+        Export::saveVectorCSV(filename, amps);
+
+        filename = "FilesCSV/vector_b_" + std::to_string(i) + ".csv";
+        Export::saveVectorCSV(filename, b);
 
     }
 
@@ -103,7 +114,7 @@ void FieldCalculatorTotal::computeFields(
     }
 }
 
-std::pair<Eigen::VectorXd, Eigen::MatrixXd> FieldCalculatorTotal::computePower(
+Eigen::VectorXd FieldCalculatorTotal::computePower(
     const Surface& surface
 ){
     Eigen::MatrixX3d points = surface.getPoints();
@@ -118,12 +129,12 @@ std::pair<Eigen::VectorXd, Eigen::MatrixXd> FieldCalculatorTotal::computePower(
     
     Eigen::MatrixX3cd outE, outH;
     Eigen::VectorXd integral_vec(B);
-    double integrand, integral;
-    Eigen::Vector3d cross;
+    std::complex<double> integral, integrand;
+    Eigen::Vector3cd cross;
 
     int grid_size = sqrt(N);
     Eigen::MatrixXd integrand_mat(grid_size, grid_size);
-    int row, col;
+    // int row, col;
 
     for (int j = 0; j < B; ++j){
         outE = Eigen::MatrixX3cd::Zero(N,3);
@@ -133,22 +144,22 @@ std::pair<Eigen::VectorXd, Eigen::MatrixXd> FieldCalculatorTotal::computePower(
         integral = 0.0;  
 
         for (int i = 0; i < N; ++i){
-            cross = 0.5 * outE.row(i).cross(outH.row(i).conjugate()).real();
+            cross = 0.5 * outE.row(i).cross(outH.row(i).conjugate());
             integrand = cross.dot(normals.row(i));
 
-            if (j == 0){
-                col = i % grid_size;
-                row = i / grid_size;
+            // if (j == 0){
+            //     col = i % grid_size;
+            //     row = i / grid_size;
 
-                integrand_mat(row, col) = integrand; 
-            }
+            //     integrand_mat(row, col) = abs(integrand); 
+            // }
 
             integral += integrand * dA;
         }
 
-        integral_vec(j) = integral;
+        integral_vec(j) = integral.real();
 
     }
 
-    return {integral_vec, integrand_mat};    
+    return integral_vec;   
 }

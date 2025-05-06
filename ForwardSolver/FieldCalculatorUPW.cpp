@@ -8,9 +8,8 @@
 using namespace Eigen;
 using namespace std;
 
-FieldCalculatorUPW::FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in, 
-    const Constants& constants_in)
-: k_(k_in), E0_(E0_in), polarization_(polarization_in), constants_(constants_in) {}
+FieldCalculatorUPW::FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in)
+: k_(k_in), E0_(E0_in), polarization_(polarization_in) {}
 
 
 void FieldCalculatorUPW::computeReflectedFields(

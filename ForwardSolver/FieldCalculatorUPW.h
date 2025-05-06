@@ -11,11 +11,9 @@ private:
     Eigen::Vector3d k_;
     double E0_;
     double polarization_;
-    Constants constants_;
 
 public:
-    FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in, 
-                        const Constants& constants);
+    FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in);
 
 
     void computeReflectedFields(

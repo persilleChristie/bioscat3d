@@ -15,9 +15,9 @@ Constants constants;
 int main() {
     const char* jsonPath = "../MeepTests/SetupTests/SurfaceData/surfaceParams.json";
 
-    MASSystem masSystem(jsonPath, "Bump", constants);
+    MASSystem masSystem(jsonPath, "Bump"); 
 
-    FieldCalculatorTotal field(masSystem, constants);
+    FieldCalculatorTotal field(masSystem);
 
     // Top
     double size1 = 2, size2 = 2;

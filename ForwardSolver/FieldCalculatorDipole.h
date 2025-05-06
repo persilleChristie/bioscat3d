@@ -9,7 +9,7 @@
 
 class FieldCalculatorDipole : public FieldCalculator {
 public:
-    FieldCalculatorDipole(const Dipole& dipole, const Constants& constants, const bool interior);
+    FieldCalculatorDipole(const Dipole& dipole, const bool interior);
 
     virtual void computeFields(
         Eigen::MatrixX3cd& outE,
@@ -22,7 +22,6 @@ public:
 
 private:
     Dipole dipole_;
-    Constants constants_;
     bool interiorBool_;
 };
 

@@ -28,8 +28,7 @@
 class FieldCalculatorTotal : public FieldCalculator {
 public:
     FieldCalculatorTotal(
-        const MASSystem masSystem,
-        Constants constants
+        const MASSystem masSystem
     );
 
     void computeFields(
@@ -39,7 +38,7 @@ public:
         int polarization_idx
     ) const override;
 
-    std::pair<Eigen::VectorXd, Eigen::MatrixXd> computePower(
+    Eigen::VectorXd computePower(
         const Surface& surface
     );
 
@@ -48,7 +47,6 @@ public:
 private:
     Eigen::MatrixXcd amplitudes_;
     std::vector<std::shared_ptr<FieldCalculator>> dipoles_;
-    Constants constants_;
 
     void constructor(const MASSystem masSystem);
 };
