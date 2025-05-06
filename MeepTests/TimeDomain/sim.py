@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 
 
-def load_params(path="SurfaceData/surfaceParams.json"):
+def load_params(path="SurfaceData/surfaceParams111.json"):
     with open(path, "r") as f:
         return json.load(f)
 
@@ -80,6 +80,7 @@ for beta in params["betas"]:
     Ex_amp, Ey_amp, Ez_amp = pol_vec
 
     source_offset = 0.5 * (half_x + half_y + half_z)
+    #source_offset = 0.5 * np.dot(np.abs(k_hat), [half_x, half_y, half_z])
     source_center = mp.Vector3(*(-k_hat * source_offset))
     sources = []
     for comp, amp in zip([mp.Ex, mp.Ey, mp.Ez], [Ex_amp, Ey_amp, Ez_amp]):
@@ -120,12 +121,45 @@ for beta in params["betas"]:
     beta_list.append(np.degrees(beta))
 
     # Save frequency-domain fields
+    field_data = {}
     for comp in ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]:
         mp_comp = getattr(mp, comp)
         array_freq = sim.get_dft_array(dft_fields, mp_comp, 0)
-        np.save(f"SimData/{comp}_freq_beta{int(np.degrees(beta))}.npy", array_freq)
+        field_data[comp] = array_freq
 
-    print("📎 Saved frequency-domain field components to SimData/")
+    # Save all fields in a single .npz file
+    beta_deg = int(np.degrees(beta))
+    np.savez(f"SimData/fields_beta{beta_deg}.npz", **field_data)
+    print(f"💾 Saved combined E & H fields for β = {beta_deg}°")
+
+import csv
+
+# Step 1: Compute max flux for each region
+max_fluxes = {
+    region: max(abs(values))
+    for region, values in flux_results.items()
+}
+
+# Step 2: Build combined rows of raw + normalized values
+csv_rows = []
+for i, beta_deg in enumerate(beta_list):
+    row = {"beta_deg": beta_deg}
+    for region, values in flux_results.items():
+        raw = values[i]
+        norm = raw / max_fluxes[region]
+        row[region] = raw
+        row[f"{region}_norm"] = norm
+    csv_rows.append(row)
+
+# Step 3: Save to CSV
+csv_path = "SimData/flux_summary.csv"
+with open(csv_path, "w", newline="") as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=csv_rows[0].keys())
+    writer.writeheader()
+    writer.writerows(csv_rows)
+
+print(f"📄 Saved flux summary (raw + max-normalized) to {csv_path}")
+
 
 # Plot flux vs beta for each monitor
 plt.figure(figsize=(12, 10))
@@ -139,3 +173,21 @@ for i, (name, values) in enumerate(flux_results.items(), 1):
 plt.tight_layout()
 plt.savefig("SimData/flux_vs_beta.png")
 print("📍 Saved flux vs beta plots to SimData/flux_vs_beta.png")
+
+plt.figure(figsize=(12, 10))
+for i, region in enumerate(flux_results.keys(), 1):
+    norm_values = [row[f"{region}_norm"] for row in csv_rows]
+    plt.subplot(3, 2, i)
+    plt.plot(beta_list, norm_values, marker='o')
+    plt.title(f"{region.capitalize()} flux (normalized) vs Beta")
+    plt.xlabel("Beta (degrees)")
+    plt.ylabel("Normalized Flux")
+    plt.grid(True)
+plt.tight_layout()
+plt.savefig("SimData/flux_vs_beta_normalized.png")
+print("📍 Saved normalized flux plot to SimData/flux_vs_beta_normalized.png")
+
+for row in csv_rows:
+    row["total_flux"] = sum(row[region] for region in flux_results.keys())
+
+
