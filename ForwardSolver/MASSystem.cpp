@@ -73,29 +73,72 @@ Eigen::MatrixXd second_derivative_y(const Eigen::MatrixXd& Z, const Eigen::Vecto
     return d2Z_dy2;
 }
 
+std::pair<Eigen::MatrixXd, Eigen::MatrixXd> gradient(const Eigen::MatrixXd& Z, const Eigen::VectorXd& x, const Eigen::VectorXd& y){
+    int Nx = x.size();
+    int Ny = y.size();
+
+    Eigen::MatrixXd dz_dx = Eigen::MatrixXd::Zero(Ny, Nx);
+    Eigen::MatrixXd dz_dy = Eigen::MatrixXd::Zero(Ny, Nx);
+
+    for (int i = 1; i < Ny - 1; ++i) {
+        for (int j = 1; j < Nx - 1; ++j) {
+            dz_dx(i, j) = (Z(i, j + 1) - Z(i, j - 1)) / (x[j + 1] - x[j - 1]);
+            dz_dy(i, j) = (Z(i + 1, j) - Z(i - 1, j)) / (y[i + 1] - y[i - 1]);
+        }
+    }
+
+
+    return {dz_dx, dz_dy};
+}
+
 
 /**
-    * Approximate mean curvature at highest peak
+    * Approximate maximal mean curvature
     * @param Z: Eigen-matrix with z values in grid
     * @param x: Eigen-vector of x values
     * @param y: Eigen-vector of y values
     * 
     * @return Approximate mean curvature
     */
-double approx_peak_curvature(const Eigen::MatrixXd& Z, const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+double approx_peak_curvature(const Eigen::MatrixXd& dz_dx_mat, const Eigen::MatrixXd& dz_dy_mat, const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
     // Find peak index
-    Eigen::Index maxRow, maxCol;
-    Z.maxCoeff(&maxRow, &maxCol);
+    // Eigen::Index maxRow, maxCol;
+    // Z.maxCoeff(&maxRow, &maxCol);
+
+    // // Compute second derivatives
+    // Eigen::MatrixXd dz_dx2 = second_derivative_x(Z, x);
+    // Eigen::MatrixXd dz_dy2 = second_derivative_y(Z, y);
+
+    // // Evaluate curvature at peak
+    // double curv_xx = dz_dx2(maxRow, maxCol);
+    // double curv_yy = dz_dy2(maxRow, maxCol);
+
+    // double mean_curv = 0.5 * (curv_xx + curv_yy);
+    
+    Eigen::Map<const Eigen::Array<double, Eigen::Dynamic, 1>> dz_dx(dz_dx_mat.data(), dz_dx_mat.size());
+    Eigen::Map<const Eigen::Array<double, Eigen::Dynamic, 1>> dz_dy(dz_dy_mat.data(), dz_dy_mat.size());
+
+    // Eigen::ArrayXd dz_dx = Eigen::Map<Eigen::ArrayXd>(dz_dx_mat.data(), dz_dx_mat.size());  
+    // Eigen::ArrayXd dz_dy = Eigen::Map<Eigen::ArrayXd>(dz_dy_mat.data(), dz_dy_mat.size());
 
     // Compute second derivatives
-    Eigen::MatrixXd dz_dx2 = second_derivative_x(Z, x);
-    Eigen::MatrixXd dz_dy2 = second_derivative_y(Z, y);
+    auto [dz_dx_dx_mat, dz_dx_dy_mat] = gradient(dz_dx_mat, x, y);
+    auto [dz_dy_dx_mat, dz_dy_dy_mat] = gradient(dz_dy_mat, x, y);
 
-    // Evaluate curvature at peak
-    double curv_xx = dz_dx2(maxRow, maxCol);
-    double curv_yy = dz_dy2(maxRow, maxCol);
+    Eigen::ArrayXd dz_dx_dx = Eigen::Map<Eigen::ArrayXd>(dz_dx_dx_mat.data(), dz_dx_dx_mat.size());
+    Eigen::ArrayXd dz_dx_dy = Eigen::Map<Eigen::ArrayXd>(dz_dx_dy_mat.data(), dz_dx_dy_mat.size());
+    Eigen::ArrayXd dz_dy_dx = Eigen::Map<Eigen::ArrayXd>(dz_dy_dx_mat.data(), dz_dy_dx_mat.size());
+    Eigen::ArrayXd dz_dy_dy = Eigen::Map<Eigen::ArrayXd>(dz_dy_dy_mat.data(), dz_dy_dy_mat.size());
 
-    double mean_curv = 0.5 * (curv_xx + curv_yy);
+    Eigen::ArrayXd nominator = ((1 + dz_dx * dz_dx) * dz_dy_dy
+                                - 2 * dz_dx * dz_dy * dz_dx_dy 
+                                + (1 + dz_dy * dz_dy) * dz_dx_dx);
+    Eigen::ArrayXd denominator = (sqrt(1 + dz_dx* dz_dx + dz_dy * dz_dy) 
+                                    * (1 + dz_dx * dz_dx + dz_dy * dz_dy));
+    Eigen::ArrayXd mean_curv_arr = 0.5 * nominator / denominator;
+
+    double mean_curv = mean_curv_arr.matrix().maxCoeff();
+
     return mean_curv;
 }
 
@@ -142,28 +185,36 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     int B = static_cast<int>(betas.Size());
     Eigen::VectorXd beta_vec(B);
     for (int i = 0; i < B; ++i) {
-        beta_vec(i) = betas[i].GetDouble();
+        beta_vec(i) = betas[i].GetDouble();   // constants.pi / 2 - 
     }
     this->polarizations_ = beta_vec;
 
     // ------------- Decide number of testpoints --------------
     constants.setWavelength(2 * constants.pi / doc["omega"].GetDouble());
     double lambda0 = constants.getWavelength();
-    int N = std::ceil(2.0 * testpts_pr_lambda_ * 2 * xdim * testpts_pr_lambda_ * 2 * ydim / (lambda0 * lambda0));
+    int Nx = std::ceil(2 * testpts_pr_lambda_ * 2 * xdim / lambda0);
+    int Ny = std::ceil(2 * testpts_pr_lambda_ * 2 * ydim / lambda0);
+
+    std::cout << "Nx: " << Nx << std::endl;
+    std::cout << "Ny: " << Ny << std::endl;
     
 
     // ------------- Generate grid -------------
-    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(N, -xdim, xdim);
-    Eigen::VectorXd y = Eigen::VectorXd::LinSpaced(N, -ydim, ydim);
+    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(Nx, -xdim, xdim);
+    Eigen::VectorXd y = Eigen::VectorXd::LinSpaced(Ny, -ydim, ydim);
 
-    Eigen::MatrixXd X(N, N), Y(N, N);
-    for (int i = 0; i < N; ++i) {  // Works as meshgrid
+    Eigen::MatrixXd X(Ny, Nx), Y(Ny, Nx);
+    for (int i = 0; i < Ny; ++i) {  // Works as meshgrid
         X.row(i) = x.transpose();
+    }
+    
+    for (int i = 0; i < Nx; ++i) {  // Works as meshgrid
         Y.col(i) = y;
     }
     
-    Eigen::MatrixXd Z(N,N);
-    Z = Eigen::MatrixXd::Zero(N,N);
+    Eigen::MatrixXd Z(Ny,Nx);
+    // Z = Eigen::MatrixXd::Zero(N,N);
+    Z = Eigen::MatrixXd::Constant(Ny, Nx, -1.5);
 
     // Iterate over bumpData array
     for (rapidjson::SizeType i = 0; i < bumpData.Size(); ++i) {
@@ -186,8 +237,8 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
 
     std::vector<int> mask_indices;
     for (int i = 0; i < X_flat.size(); ++i) {
-        if (X_flat(i) > x(0) && X_flat(i) < x(N - 1) &&
-            Y_flat(i) > y(0) && Y_flat(i) < y(N - 1)) {
+        if (X_flat(i) > x(0) && X_flat(i) < x(Nx - 1) &&
+            Y_flat(i) > y(0) && Y_flat(i) < y(Ny - 1)) {
             mask_indices.push_back(i);
         }
     }
@@ -212,18 +263,22 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     this->points_ = test_points;
 
     // ------------- Compute gradients (central differences) -------------
-    Eigen::MatrixXd dz_dx = Eigen::MatrixXd::Zero(N, N);
-    Eigen::MatrixXd dz_dy = Eigen::MatrixXd::Zero(N, N);
+    // Eigen::MatrixXd dz_dx = Eigen::MatrixXd::Zero(Ny, Nx);
+    // Eigen::MatrixXd dz_dy = Eigen::MatrixXd::Zero(Ny, Nx);
 
-    for (int i = 1; i < N - 1; ++i) {
-        for (int j = 1; j < N - 1; ++j) {
-            dz_dx(i, j) = (Z(i, j + 1) - Z(i, j - 1)) / (x[j + 1] - x[j - 1]);
-            dz_dy(i, j) = (Z(i + 1, j) - Z(i - 1, j)) / (y[i + 1] - y[i - 1]);
-        }
-    }
+    // for (int i = 1; i < Ny - 1; ++i) {
+    //     for (int j = 1; j < Nx - 1; ++j) {
+    //         dz_dx(i, j) = (Z(i, j + 1) - Z(i, j - 1)) / (x[j + 1] - x[j - 1]);
+    //         dz_dy(i, j) = (Z(i + 1, j) - Z(i - 1, j)) / (y[i + 1] - y[i - 1]);
+    //     }
+    // }
+
+
+    auto [dz_dx, dz_dy] = gradient(Z, x, y);
 
     Eigen::VectorXd dz_dx_flat = Eigen::Map<Eigen::VectorXd>(dz_dx.data(), dz_dx.size());
     Eigen::VectorXd dz_dy_flat = Eigen::Map<Eigen::VectorXd>(dz_dy.data(), dz_dy.size());
+
 
     Eigen::MatrixXd normals(total_pts, 3);
     for (int i = 0; i < total_pts; ++i) {
@@ -258,7 +313,7 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
 
     // ------------- Auxiliary points -------------
     // Approximate mean curvature and calculate distance
-    auto mean_curv = approx_peak_curvature(Z, x, y);
+    auto mean_curv = approx_peak_curvature(dz_dx, dz_dy, x, y);
     double radius = 1 / abs(mean_curv);
 
     double d = (1 - constants.alpha) * radius;  // Distance from surface

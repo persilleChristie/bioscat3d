@@ -16,7 +16,7 @@ Constants constants;
 
 int main(){
 
-    const char* jsonPath = "surfaceParams.json";
+    const char* jsonPath = "surfaceParamsNormal.json";
 
     // Open the file
     std::ifstream ifs(jsonPath);

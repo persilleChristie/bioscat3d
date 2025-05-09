@@ -4,6 +4,9 @@
 #include "../../ForwardSolver/FieldCalculatorUPW.h"
 #include "../../ForwardSolver/Constants.h"
 
+Constants constants; 
+
+
 void saveToCSV(const Eigen::MatrixXcd& E, const Eigen::MatrixXcd& H, const std::string& filename) {
     std::ofstream file(filename);
     
@@ -85,7 +88,7 @@ int main(int argc, char* argv[]){
 
     constants.setWavelength(wavelength);
     
-    std::cout << "Propagation vector = (" << direction(0) << "," << direction(1) << "," << direction(2) << ")" << std::endl;
+    // std::cout << "Propagation vector = (" << direction(0) << "," << direction(1) << "," << direction(2) << ")" << std::endl;
 
     // Read test points into an Eigen matrix
     std::ifstream matrix_file(testpoint_file); // Replace with your test points CSV filename
@@ -135,19 +138,8 @@ int main(int argc, char* argv[]){
     // Eigen::MatrixX3cd refE(test_vec_size, 3);
     // Eigen::MatrixX3cd refH(test_vec_size, 3);
 
-    FieldCalculatorUPW U(direction, E0, polarization, constants);
+    FieldCalculatorUPW U(direction, E0, polarization);
     U.computeFields(E, H, testpoints);
-
-    std::cout << "E-field: " << E << std::endl;
-    
-    Eigen::VectorXd calcImpedance(test_vec_size);
-
-    for (int i = 0; i < test_vec_size; ++i) {
-        calcImpedance(i) = E.row(i).norm()/H.row(i).norm();
-    };
-
-    std::cout << "Calculated impedance: " << calcImpedance << std::endl;
-
 
     // SAVE TO CSV
     saveToCSV(E, H, output_file);

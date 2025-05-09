@@ -13,7 +13,7 @@
 Constants constants;
 
 int main() {
-    const char* jsonPath = "../MeepTests/SetupTests/SurfaceData/surfaceParams.json";
+    const char* jsonPath = "../ComparisonTest/Power_int_test/surfaceParamsNormal.json";
 
     MASSystem masSystem(jsonPath, "Bump"); 
 

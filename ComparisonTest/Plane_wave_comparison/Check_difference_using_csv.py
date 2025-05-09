@@ -17,7 +17,7 @@ def run_cpp_code(executable_path, param_file, testpoints_file, output_file):
     except subprocess.CalledProcessError as e:
         print(f"Error running C++ implementation: {e}")
 
-def compare_csv_files(file1, file2):
+def compare_csv_files(file1, file2, type):
     """
     Compares two CSV files column-wise by computing total absolute differences.
     """
@@ -32,10 +32,13 @@ def compare_csv_files(file1, file2):
     # Compute absolute difference for each column
     differences = {}
     for col in df1.columns:
-        differences[col] = np.mean(np.abs(df1[col] - df2[col]))
+        if type == "max":
+            differences[col] = np.max(np.abs(df1[col] - df2[col]))
+        else:
+            differences[col] = np.mean(np.abs(df1[col] - df2[col]))
 
     # Print differences
-    print("\nTotal differences between", file1, "and", file2,":")
+    print(f"{type} differences between {file1} and {file2}:")
     for key, value in differences.items():
         print(f"{key}: {value}")
 
@@ -43,13 +46,14 @@ def compare_csv_files(file1, file2):
 #                           Data creation simple
 #----------------------------------------------------------------------------
 
-if False:
+if True:
     mu=1
     epsilon=1
     omega=1
-    propagation_vector=[0,-1,0]
+    vector=[10,10,-1]
+    propagation_vector = vector / np.linalg.norm(vector)
     polarization=0
-    testpoints = np.array([[0,1,0],[0,2,0],[0,3,0]])
+    testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist() # np.array([[0,1,0],[0,2,0],[0,3,0]])
     param_data = [
     ["mu", mu],
     ["epsilon", epsilon],
@@ -74,45 +78,26 @@ if False:
 #                           Data creation random
 #----------------------------------------------------------------------------
 
-if True:  
+if False:  
     np.random.seed(42)
 
-    # Variables to fit PN's 
-    epsilon    = 1 # 8.8541878188e-12
-    mu         = 1 # 1.25663706127e-6
-    wavelength = 325e-9
-    omega      = 2*np.pi / wavelength
-    length     = 1*wavelength
-
     # Generate random values
-    # mu = np.random.uniform(0.5, 10)
-    # epsilon = np.random.uniform(0.5, 10)
-    # omega = np.random.uniform(0.5, 10)
-    
-    
-    polarization = 0.2 # np.random.uniform(0,np.pi/2)
-    
-
+    mu = np.random.uniform(0.5, 10)
+    epsilon = np.random.uniform(0.5, 10)
+    omega = np.random.uniform(0.5, 10)
+    polarization = np.random.uniform(0,np.pi/2)
     # Random unit vector for direction
-    # random_vector = np.random.uniform(-1, 1, size=3)
-    # propagation_vector = (random_vector / np.linalg.norm(random_vector)).tolist()
-    propagation_vector = [1, 0.5, -1]/np.sqrt(2.25)
-
+    random_vector = np.random.uniform(-1, 1, size=3)
+    propagation_vector = (random_vector / np.linalg.norm(random_vector)).tolist()
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
-    # testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
-    testpoints = [[2*length, 3*length, 10*length],
-                  [3*length,2*length,4*length],
-                  [-2*length,3*length,1*length],
-                  [-1*length,-1*length,-1*length],
-                  [-1,2,3],
-                  [10,10,10]]
+    testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
 
     param_data = [
     ["mu", mu],
     ["epsilon", epsilon],
     ["omega", omega],
-    ["polarization",polarization],
+    ['polarization',polarization],
     ["propagation_x", propagation_vector[0]],
     ["propagation_y", propagation_vector[1]],
     ["propagation_z", propagation_vector[2]],
@@ -128,12 +113,11 @@ if True:
     param_df.to_csv("PW_params_random.csv", index=False)
     testpoints_df.to_csv("PW_testpoints_random.csv", index=False)
 
-    
 #----------------------------------------------------------------------------
 #                         Simple case for planewave
 #----------------------------------------------------------------------------
  
-if False:
+if True:
     # -----------------------------------------------
     #               A Implementation (Python)
     # -----------------------------------------------
@@ -150,14 +134,15 @@ if False:
     Ex_re,Ex_im,Ey_re,Ey_im,Ez_re,Ez_im,Hx_re,Hx_im,Hy_re,Hy_im,Hz_re,Hz_im
     '''   
     print("Running C++ implementation...")
-    run_cpp_code("./PN_dipole_solver", "PW_params_simple.csv","PW_testpoints_simple.csv","A_simple.csv")
+    run_cpp_code("./PN_plane_wave_solver", "PW_params_simple.csv","PW_testpoints_simple.csv","PN_simple.csv")
 
     # -----------------------------------------------
     #               Compare Results
     # -----------------------------------------------
-    compare_csv_files("A_simple.csv", "PN_simple.csv")
+    compare_csv_files("A_simple.csv", "PN_simple.csv", "max")
+    compare_csv_files("A_simple.csv", "PN_simple.csv", "mean")
 
-if True:
+if False:
     # -----------------------------------------------
     #               A Implementation (Python)
     # -----------------------------------------------
@@ -174,9 +159,43 @@ if True:
     Ex_re,Ex_im,Ey_re,Ey_im,Ez_re,Ez_im,Hx_re,Hx_im,Hy_re,Hy_im,Hz_re,Hz_im
     '''   
     print("Running C++ implementation...")
-    run_cpp_code("./PN_plane_wave_solver", "PW_params_random.csv","PW_testpoints_random.csv", "PN_random.csv")
+    run_cpp_code("./PN_dipole_solver", "PW_params_random.csv","PW_testpoints_random.csv", "PN_random.csv")
 
     # -----------------------------------------------
     #               Compare Results
     # -----------------------------------------------
-    compare_csv_files("A_random.csv", "PN_random.csv")
+    compare_csv_files("A_simple.csv", "PN_simple.csv")
+
+
+#----------------------------------------------------------------------------
+#                               Flux integrals
+#----------------------------------------------------------------------------
+
+import C2_surface_alt as C2
+import plane_wave_comparison as PW
+import matplotlib.pyplot as plt
+
+betas = np.linspace(0, np.pi / 2, 100)  # Polarization angles
+propagation_vector = np.tile([0, 0, -1], (100, 1))  # Fixed direction
+PW1 = PW.Plane_wave(propagation_vector, betas, epsilon=1, mu=1, omega=1)
+
+# Parameters
+normals = ['x', 'y', 'z']
+heights = [1,-0.5] #Height of the plane
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 8), sharex=True, sharey=True)
+fig.suptitle("Flux Integral vs Polarization Angle for Various Plane Orientations", fontsize=16)
+
+for i, axis in enumerate(normals):
+    for j, h in enumerate(heights):
+        ax = axes[j, i]
+        plane = C2.generate_plane(height=h, a=-1, b=1, numpoints=50, normal_axis=axis)
+        integrals = PW.compute_flux_integral(plane, PW1)
+        ax.plot(betas, np.real(integrals))
+        ax.set_title(f"Normal: {axis}, Height: {h}")
+        ax.set_xlabel("β (radians)")
+        if i == 0:
+            ax.set_ylabel("Re(Flux Integral)")
+
+plt.tight_layout(rect=[0, 0, 1, 0.95])
+plt.show()

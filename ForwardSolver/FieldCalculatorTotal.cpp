@@ -82,6 +82,7 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
 
         if (i == 0){
             Export::saveMatrixCSV("matrix_A_simple.csv", A);
+            
         }
 
         filename = "FilesCSV/solution_y_" + std::to_string(i) + ".csv";
