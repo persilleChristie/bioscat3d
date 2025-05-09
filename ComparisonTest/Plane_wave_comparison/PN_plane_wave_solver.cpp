@@ -140,15 +140,15 @@ int main(int argc, char* argv[]){
     FieldCalculatorUPW U(direction, E0, polarization);
     U.computeFields(E, H, testpoints);
 
-    std::cout << "E-field: " << E << std::endl;
+    // std::cout << "E-field: " << E << std::endl;
     
-    Eigen::VectorXd calcImpedance(test_vec_size);
+    // Eigen::VectorXd calcImpedance(test_vec_size);
 
-    for (int i = 0; i < test_vec_size; ++i) {
-        calcImpedance(i) = E.row(i).norm()/H.row(i).norm();
-    };
+    // for (int i = 0; i < test_vec_size; ++i) {
+    //     calcImpedance(i) = E.row(i).norm()/H.row(i).norm();
+    // };
 
-    std::cout << "Calculated impedance: " << calcImpedance << std::endl;
+    // std::cout << "Calculated impedance: " << calcImpedance << std::endl;
 
 
     // SAVE TO CSV
