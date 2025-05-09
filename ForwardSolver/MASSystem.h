@@ -35,7 +35,7 @@ public:
 
 private:
     // Constants constants_;
-    int testpts_pr_lambda_ = 5;
+    int auxpts_pr_lambda_ = 5;
 
     Eigen::Vector3d kinc_;
     Eigen::VectorXd polarizations_;

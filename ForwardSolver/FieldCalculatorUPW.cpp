@@ -5,8 +5,6 @@
 #include "UtilsFresnel.h"
 #include "Constants.h"
 
-using namespace Eigen;
-using namespace std;
 
 FieldCalculatorUPW::FieldCalculatorUPW(const Eigen::Vector3d& k_in, const double E0_in, const double polarization_in)
 : k_(k_in), E0_(E0_in), polarization_(polarization_in) {}
@@ -31,16 +29,16 @@ void FieldCalculatorUPW::computeReflectedFields(
 
     // Vector3d k_rot = Rz * k;
 
-    complex<double> Gamma_r_perp = UtilsFresnel::fresnelTE(cosTheta_in, sinTheta_in, constants.epsilon0, constants.epsilon1).first;
-    complex<double> Gamma_r_par = UtilsFresnel::fresnelTM(cosTheta_in, sinTheta_in, constants.epsilon0, constants.epsilon1).first;
+    std::complex<double> Gamma_r_perp = UtilsFresnel::fresnelTE(cosTheta_in, sinTheta_in, constants.epsilon0, constants.epsilon1).first;
+    std::complex<double> Gamma_r_par = UtilsFresnel::fresnelTM(cosTheta_in, sinTheta_in, constants.epsilon0, constants.epsilon1).first;
 
     for (int i = 0; i < N; ++i) {
-        Vector3d x = evalPoints.row(i);
+        Eigen::Vector3d x = evalPoints.row(i);
         
         Eigen::Vector3d x_rot = Rz_inv * x;
         // Vector3d x_plane (x_rot[0], 0.0, x_rot[2]);
 
-        complex<double> expk_rot = E0_ * exp(-constants.j * constants.k0 * (sinTheta_in * x_rot[0] - cosTheta_in * x_rot[2]));
+        std::complex<double> expk_rot = E0_ * exp(-constants.j * constants.k0 * (sinTheta_in * x_rot[0] - cosTheta_in * x_rot[2]));
     
         Eigen::Vector3cd E_perp(0.0, Gamma_r_perp * expk_rot, 0.0);
         Eigen::Vector3cd H_perp(cosTheta_in * Gamma_r_perp * expk_rot / constants.eta0, 0.0, sinTheta_in * Gamma_r_perp * expk_rot / constants.eta0);
@@ -57,9 +55,9 @@ void FieldCalculatorUPW::computeReflectedFields(
 
 
 void FieldCalculatorUPW::computeFields(
-    MatrixX3cd& outE,
-    MatrixX3cd& outH,
-    const MatrixX3d& evalPoints,
+    Eigen::MatrixX3cd& outE,
+    Eigen::MatrixX3cd& outH,
+    const Eigen::MatrixX3d& evalPoints,
     int polarization_idx // Only used in total fields
 ) const {
     int N = evalPoints.rows();
@@ -94,27 +92,36 @@ void FieldCalculatorUPW::computeFields(
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
 
     for (int i = 0; i < N; ++i) {
-        Vector3d x = evalPoints.row(i);
+        Eigen::Vector3d x = evalPoints.row(i);
 
         Eigen::Vector3d x_rot = Rz_inv * x;
 
         std::cout << "Rotated x (actual point of evaluation): " << x_rot << std::endl;
 
-        complex<double> phase1 = E0_ * exp(- constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in));
+        std::complex<double> phase1 = E0_ * exp(- constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in));
         
+        std::cout << "lambda = " << constants.getWavelength() << std::endl;
+        std::cout << "k0 = " << constants.k0 << std::endl;
         std::cout << "Exponential term: E0 * exp(-j*k0*(sin(theta)*x - cos(theta)*z)) = " << phase1 << std::endl;
+        
 
-        Vector3cd E_in_perp (0.0, phase1, 0.0);
-        Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);
-        Vector3cd E_in = Rz * (cosBeta * E_in_perp + sinBeta * E_in_par);
+        Eigen::Vector3cd E_in_perp (0.0, phase1, 0.0);
+        Eigen::Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);
+        Eigen::Vector3cd E_in = Rz * (cosBeta * E_in_perp + sinBeta * E_in_par);
 
 
-        Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
-        Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);
-        Vector3cd H_in = Rz * (sinBeta * H_in_perp + cosBeta * H_in_par);
+        Eigen::Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
+        Eigen::Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);
+        Eigen::Vector3cd H_in = Rz * (sinBeta * H_in_perp + cosBeta * H_in_par);
 
         if (i==0){
-            std::cout << "Field values for first point: " << std::endl;
+            std::cout << "Values for first point: " << std::endl;
+            std::cout << "Rotated x (actual point of evaluation): " << x_rot << std::endl;
+
+            std::cout << "Exponent -j*k0* ( x*np.sin(theta)-z*np.cos(theta) ): " << - constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in) << std::endl;
+            std::cout << "Exponential term: E0 * exp(-j*k0*(sin(theta)*x - cos(theta)*z)) = " << phase1 << std::endl;
+
+            
             std::cout << "E_perp = " << E_in_perp << std::endl;
             std::cout << "E_par  = " << E_in_par << std::endl;
             std::cout << "E      = " << E_in << std::endl;

@@ -72,7 +72,6 @@ int main(int argc, char* argv[]){
     file.close();
     
     // Initialize Eigen vectors
-    Constants constants;
     double wavelength;
     Eigen::Vector3d direction = Eigen::Vector3d::Zero();
     double polarization;

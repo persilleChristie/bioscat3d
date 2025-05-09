@@ -136,7 +136,7 @@ def Set_dipoles_pr_WL(surface, inneraux, outeraux, lam, points_per_wavelength_su
 
     total_points_aux = int(np.ceil(points_per_wavelength_aux * scale))
     step_aux = max(1, N_side // total_points_aux)
-
+    
     # -------------------------------
     # 4. Reduce with appropriate steps
     # -------------------------------

@@ -192,8 +192,8 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     // ------------- Decide number of testpoints --------------
     constants.setWavelength(2 * constants.pi / doc["omega"].GetDouble());
     double lambda0 = constants.getWavelength();
-    int Nx = std::ceil(2 * testpts_pr_lambda_ * 2 * xdim / lambda0);
-    int Ny = std::ceil(2 * testpts_pr_lambda_ * 2 * ydim / lambda0);
+    int Nx = std::ceil(2 * auxpts_pr_lambda_ * 2 * xdim / lambda0);
+    int Ny = std::ceil(2 * auxpts_pr_lambda_ * 2 * ydim / lambda0);
 
     std::cout << "Nx: " << Nx << std::endl;
     std::cout << "Ny: " << Ny << std::endl;
