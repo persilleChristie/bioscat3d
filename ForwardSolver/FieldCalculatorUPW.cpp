@@ -96,14 +96,7 @@ void FieldCalculatorUPW::computeFields(
 
         Eigen::Vector3d x_rot = Rz_inv * x;
 
-        std::cout << "Rotated x (actual point of evaluation): " << x_rot << std::endl;
-
         std::complex<double> phase1 = E0_ * exp(- constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in));
-        
-        std::cout << "lambda = " << constants.getWavelength() << std::endl;
-        std::cout << "k0 = " << constants.k0 << std::endl;
-        std::cout << "Exponential term: E0 * exp(-j*k0*(sin(theta)*x - cos(theta)*z)) = " << phase1 << std::endl;
-        
 
         Eigen::Vector3cd E_in_perp (0.0, phase1, 0.0);
         Eigen::Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);
