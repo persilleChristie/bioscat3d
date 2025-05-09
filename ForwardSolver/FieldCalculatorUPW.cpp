@@ -49,7 +49,7 @@ void FieldCalculatorUPW::computeReflectedFields(
         Eigen::Vector3cd H_par(0.0, - Gamma_r_perp * expk_rot/constants.eta0, 0);
 
         refE.row(i) = Rz * (cosBeta * E_perp + sinBeta * E_par);
-        refH.row(i) = Rz * (cosBeta * H_perp + sinBeta * H_par);
+        refH.row(i) = Rz * (sinBeta * H_perp + cosBeta * H_par);
 
     }
 }
@@ -76,8 +76,19 @@ void FieldCalculatorUPW::computeFields(
     TransformUtils::computeAngles(-k_, 1.0, cosTheta_in, sinTheta_in,
         cosPhi, sinPhi);
 
+    std::cout << "Polar angle: " << std::endl;
+    std::cout << "cos(theta) = " << cosTheta_in << std::endl;
+    std::cout << "sin(theta) = " << sinTheta_in << std::endl;
+    std::cout << "Azimutal angle: " << std::endl;
+    std::cout << "cos(phi) = " << cosPhi << std::endl;
+    std::cout << "sin(phi) = " << sinPhi << std::endl;
+
     double cosBeta = cos(polarization_);
     double sinBeta = sin(polarization_);
+
+    std::cout << "Polarization angle: " << std::endl;
+    std::cout << "cos(beta) = " << cosBeta << std::endl;
+    std::cout << "sin(beta) = " << sinBeta << std::endl;
 
     auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
@@ -87,8 +98,12 @@ void FieldCalculatorUPW::computeFields(
 
         Eigen::Vector3d x_rot = Rz_inv * x;
 
+        std::cout << "Rotated x (actual point of evaluation): " << x_rot << std::endl;
+
         complex<double> phase1 = E0_ * exp(- constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in));
         
+        std::cout << "Exponential term: E0 * exp(-j*k0*(sin(theta)*x - cos(theta)*z)) = " << phase1 << std::endl;
+
         Vector3cd E_in_perp (0.0, phase1, 0.0);
         Vector3cd E_in_par (cosTheta_in * phase1, 0.0, sinTheta_in * phase1);
         Vector3cd E_in = Rz * (cosBeta * E_in_perp + sinBeta * E_in_par);
@@ -96,7 +111,19 @@ void FieldCalculatorUPW::computeFields(
 
         Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
         Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);
-        Vector3cd H_in = Rz * (cosBeta * H_in_perp + sinBeta * H_in_par);
+        Vector3cd H_in = Rz * (sinBeta * H_in_perp + cosBeta * H_in_par);
+
+        if (i==0){
+            std::cout << "Field values for first point: " << std::endl;
+            std::cout << "E_perp = " << E_in_perp << std::endl;
+            std::cout << "E_par  = " << E_in_par << std::endl;
+            std::cout << "E      = " << E_in << std::endl;
+
+            std::cout << "H_perp = " << H_in_perp << std::endl;
+            std::cout << "H_par  = " << H_in_par << std::endl;
+            std::cout << "H      = " << H_in << std::endl;
+        }
+        
 
         outE.row(i) = E_in.transpose(); // + refE.row(i);
         outH.row(i) = H_in.transpose(); // + refH.row(i);

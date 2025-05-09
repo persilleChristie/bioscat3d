@@ -50,7 +50,7 @@ if True:
     mu=1
     epsilon=1
     omega=1
-    vector=[10,10,-1]
+    vector=[0,0,-1]
     propagation_vector = vector / np.linalg.norm(vector)
     polarization=0
     testpoints = np.random.uniform(-1, 1, size=(100, 3)).tolist() # np.array([[0,1,0],[0,2,0],[0,3,0]])
@@ -65,14 +65,14 @@ if True:
     ]
 
     # Convert testpoints to DataFrame and add column names
-    testpoints_df = pd.DataFrame(testpoints, columns=["testpoint_x", "testpoint_y", "testpoint_z"])
+    # testpoints_df = pd.DataFrame(testpoints, columns=["testpoint_x", "testpoint_y", "testpoint_z"])
 
     # Convert parameters to DataFrame
     param_df = pd.DataFrame(param_data, columns=["Parameter", "Value"])
 
     # Save both to CSV
     param_df.to_csv("PW_params_simple.csv", index=False)
-    testpoints_df.to_csv("PW_testpoints_simple.csv", index=False)
+    # testpoints_df.to_csv("PW_testpoints_simple.csv", index=False)
 
 #----------------------------------------------------------------------------
 #                           Data creation random
