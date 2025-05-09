@@ -53,7 +53,7 @@ if True:
     vector=[10,10,-1]
     propagation_vector = vector / np.linalg.norm(vector)
     polarization=0
-    testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist() # np.array([[0,1,0],[0,2,0],[0,3,0]])
+    testpoints = np.random.uniform(-1, 1, size=(100, 3)).tolist() # np.array([[0,1,0],[0,2,0],[0,3,0]])
     param_data = [
     ["mu", mu],
     ["epsilon", epsilon],
