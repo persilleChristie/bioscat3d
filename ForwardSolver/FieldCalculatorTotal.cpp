@@ -81,7 +81,7 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
         amplitudes.row(i) = amps.head(N);
 
         if (i == 0){
-            Export::saveMatrixCSV("matrix_A_simple.csv", A);
+            Export::saveMatrixCSV("FilesCSV/matrix_A_simple.csv", A);
             
         }
 

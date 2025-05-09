@@ -74,19 +74,8 @@ void FieldCalculatorUPW::computeFields(
     TransformUtils::computeAngles(-k_, 1.0, cosTheta_in, sinTheta_in,
         cosPhi, sinPhi);
 
-    std::cout << "Polar angle: " << std::endl;
-    std::cout << "cos(theta) = " << cosTheta_in << std::endl;
-    std::cout << "sin(theta) = " << sinTheta_in << std::endl;
-    std::cout << "Azimutal angle: " << std::endl;
-    std::cout << "cos(phi) = " << cosPhi << std::endl;
-    std::cout << "sin(phi) = " << sinPhi << std::endl;
-
     double cosBeta = cos(polarization_);
     double sinBeta = sin(polarization_);
-
-    std::cout << "Polarization angle: " << std::endl;
-    std::cout << "cos(beta) = " << cosBeta << std::endl;
-    std::cout << "sin(beta) = " << sinBeta << std::endl;
 
     auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
@@ -106,23 +95,6 @@ void FieldCalculatorUPW::computeFields(
         Eigen::Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
         Eigen::Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);
         Eigen::Vector3cd H_in = Rz * (sinBeta * H_in_perp + cosBeta * H_in_par);
-
-        if (i==0){
-            std::cout << "Values for first point: " << std::endl;
-            std::cout << "Rotated x (actual point of evaluation): " << x_rot << std::endl;
-
-            std::cout << "Exponent -j*k0* ( x*np.sin(theta)-z*np.cos(theta) ): " << - constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in) << std::endl;
-            std::cout << "Exponential term: E0 * exp(-j*k0*(sin(theta)*x - cos(theta)*z)) = " << phase1 << std::endl;
-
-            
-            std::cout << "E_perp = " << E_in_perp << std::endl;
-            std::cout << "E_par  = " << E_in_par << std::endl;
-            std::cout << "E      = " << E_in << std::endl;
-
-            std::cout << "H_perp = " << H_in_perp << std::endl;
-            std::cout << "H_par  = " << H_in_par << std::endl;
-            std::cout << "H      = " << H_in << std::endl;
-        }
         
 
         outE.row(i) = E_in.transpose(); // + refE.row(i);
