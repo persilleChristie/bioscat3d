@@ -146,20 +146,32 @@ double approx_max_curvature(const Eigen::MatrixXd& dz_dx_mat, const Eigen::Matri
     Eigen::ArrayXXd denom = sqrt_grad_sq * grad_sq;    
 
     Eigen::ArrayXXd numerator = (1.0 + fx2) * fyy - 2.0 * fx * fy * fxy + (1.0 + fy2) * fxx;
-    Eigen::ArrayXXd mean_curv = 0.5 * numerator / denom;
+    Eigen::ArrayXXd minus_mean_curv = -0.5 * numerator / denom;
 
+    int maxRow, maxCol;
+
+    std::cout << "mean curvature = " << minus_mean_curv << std::endl;
     std::cout << "fxx = " << fxx << std::endl;
     std::cout << "fyy = " << fyy << std::endl;
     std::cout << "fx2 = " << fx2 << std::endl;
     std::cout << "fy2 = " << fy2 << std::endl;
 
+    double mean_curv_max = minus_mean_curv.maxCoeff(&maxRow, &maxCol);
+
+    std::cout << "X val of max curv: " << x(maxCol) << std::endl;
+    std::cout << "Y val of max curv: " << y(maxRow) << std::endl; // passer med forventet
+    std::cout << "fxx = " << fxx(maxRow, maxCol) << std::endl;
+    std::cout << "fyy = " << fyy(maxRow, maxCol) << std::endl;
+    std::cout << "fx2 = " << fx2(maxRow, maxCol) << std::endl;
+    std::cout << "fy2 = " << fy2(maxRow, maxCol) << std::endl;
+
     
-    std::cout << "denom = " << denom << std::endl;
-    std::cout << "numerator = " << numerator << std::endl;
+    std::cout << "denom = " << denom(maxRow, maxCol) << std::endl;
+    std::cout << "numerator = " << numerator(maxRow, maxCol) << std::endl;
 
-    return mean_curv.maxCoeff();
+
+    return mean_curv_max;
 }
-
 
 void MASSystem::generateBumpSurface(const char* jsonPath) {
     // ------------- Load json file --------------
@@ -251,6 +263,11 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     Eigen::VectorXd X_flat = Eigen::Map<const Eigen::VectorXd>(X.data(), total_pts);
     Eigen::VectorXd Y_flat = Eigen::Map<const Eigen::VectorXd>(Y.data(), total_pts);
     Eigen::VectorXd Z_flat = Eigen::Map<const Eigen::VectorXd>(Z.data(), total_pts);
+
+    int maxRow, maxCol;
+    Z.maxCoeff(&maxRow, &maxCol);
+    std::cout << "X val of peak: " << X(maxRow, maxCol) << std::endl;
+    std::cout << "Y val of peak: " << Y(maxRow, maxCol) << std::endl;
 
     // std::vector<int> mask_indices;
     // for (int i = 0; i < X_flat.size(); ++i) {
@@ -346,7 +363,8 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     auto mean_curv = approx_max_curvature(dz_dx, dz_dy, x, y);
     std::cout << "Max mean curvature: " << mean_curv << std::endl;
     double radius = 1 / abs(mean_curv);
-    std::cout << "Max mean curvature: " << mean_curv << std::endl;
+    // double radius = 1.02;
+
     
     double d = (1 - constants.alpha) * radius;  // Distance from surface
 
