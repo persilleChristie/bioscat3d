@@ -35,7 +35,7 @@ public:
         Eigen::MatrixX3cd& outE,
         Eigen::MatrixX3cd& outH,
         const Eigen::MatrixX3d& evalPoints,
-        int polarization_idx
+        int polarization_idx = 0
     ) const override;
 
     Eigen::VectorXd computePower(

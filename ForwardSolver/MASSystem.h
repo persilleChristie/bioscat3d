@@ -18,7 +18,7 @@
 */
 class MASSystem {
 public:
-    MASSystem(const char* jsonPath, const std::string surfaceType); //, Constants& constants);
+    MASSystem(const std::string surfaceType, const char* jsonPath); 
 
     // const std::vector<std::shared_ptr<FieldCalculatorUPW>>& getIncidentField();
     const Eigen::Vector3d& getKinc() const          {return kinc_;};
@@ -35,8 +35,6 @@ public:
 
 private:
     // Constants constants_;
-    int auxpts_pr_lambda_ = 5;
-
     Eigen::Vector3d kinc_;
     Eigen::VectorXd polarizations_;
 

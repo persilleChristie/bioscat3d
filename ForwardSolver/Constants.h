@@ -35,6 +35,8 @@ struct Constants {
                                                                  // (relative permittivity times relative permeability)
     static constexpr double alpha = 0.86;        // Scaling for placement of auxiliary sources for the nanowires
 
+    static constexpr int auxpts_pr_lambda = 5;
+
     // Computed constants
     double k0;              // Wave number in free space
     double k1;              // Wave number in nanowire/nanostructure
