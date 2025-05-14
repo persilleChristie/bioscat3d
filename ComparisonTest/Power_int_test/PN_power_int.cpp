@@ -105,23 +105,24 @@ int main(){
 
 
     // -------------- Calculate powers ------------------
-    MASSystem masSystem(jsonPath, "Bump");
+    MASSystem masSystem("Bump", jsonPath);
+    std::cout << "Points: " << masSystem.getPoints() << std::endl;
 
-    FieldCalculatorTotal field(masSystem);
+    // FieldCalculatorTotal field(masSystem);
 
-    std::string filename1; // , filename2;
+    // std::string filename1; // , filename2;
 
-    for (auto it : test_planes){
-        auto powers = field.computePower(it.second);
+    // for (auto it : test_planes){
+    //     auto powers = field.computePower(it.second);
 
-        filename1 = "FilesCSV/powers_polarization_" + it.first + ".csv";
-        // filename2 = "FilesCSV/integrand_beta0_" + it.first + ".csv";
+    //     filename1 = "FilesCSV/powers_polarization_" + it.first + ".csv";
+    //     // filename2 = "FilesCSV/integrand_beta0_" + it.first + ".csv";
 
-        Export::saveRealVectorCSV(filename1, powers);
-        // Export::saveRealMatrixCSV(filename2, integrand);
+    //     Export::saveRealVectorCSV(filename1, powers);
+    //     // Export::saveRealMatrixCSV(filename2, integrand);
 
-        std::cout << "Done with " << it.first << std::endl;
-    }
+    //     std::cout << "Done with " << it.first << std::endl;
+    // }
     
 
 

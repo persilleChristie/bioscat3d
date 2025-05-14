@@ -8,7 +8,7 @@ tol = 1e-16
 
 ############# PN ############
 # Load system matrix
-df = pd.read_csv('../ForwardSolver/FilesCSV/matrix_A_simple.csv', sep=",", header=None)
+df = pd.read_csv('../Power_int_test/FilesCSV/matrix_A_simple.csv', sep=",", header=None)
 
 df = df.astype('string')
 
@@ -41,23 +41,23 @@ df1 = df1.astype('string')
 y = df1.applymap(lambda x: complex(x.replace("i", "j").replace("+-","-"))).to_numpy()
 
 ############# ANDREAS #############
-# # Load system matrix
-# df1 = pd.read_csv('../ComparisonTest/System_comparison/A_Andreas.csv', sep=",", header=None, dtype=str)
-# # Convert to complex numbers
-# AA = df1.applymap(lambda x: complex(x.replace(' ', '')) if pd.notnull(x) else np.nan).to_numpy()
+# Load system matrix
+df1 = pd.read_csv('A_Andreas.csv', sep=",", header=None, dtype=str)
+# Convert to complex numbers
+AA = df1.applymap(lambda x: complex(x.replace(' ', '')) if pd.notnull(x) else np.nan).to_numpy()
 
-# # Calculate condition number and number of zeros
-# _, S, _ = np.linalg.svd(AA)
-# print(f"Condition number A:  {S[0]/S[-1]}")
-# print(f"Total zeros: {np.sum(AA<tol)}")
+# Calculate condition number and number of zeros
+_, S, _ = np.linalg.svd(AA)
+print(f"Condition number A:  {S[0]/S[-1]}")
+print(f"Total zeros: {np.sum(AA<tol)}")
 
-# # Load solution
-# df1 = pd.read_csv('../ComparisonTest/System_comparison/y_Andreas.csv', sep=",", header=None, dtype=str)
-# yA = df1.applymap(lambda x: complex(x.replace(' ', '')) if pd.notnull(x) else np.nan).to_numpy()
+# Load solution
+df1 = pd.read_csv('y_Andreas.csv', sep=",", header=None, dtype=str)
+yA = df1.applymap(lambda x: complex(x.replace(' ', '')) if pd.notnull(x) else np.nan).to_numpy()
 
-# # Load RHS
-# df1 = pd.read_csv('../ComparisonTest/System_comparison/b_Andreas.csv', sep=",", header=None, dtype=str)
-# bA = df1.applymap(lambda x: complex(x.replace(' ', '')) if pd.notnull(x) else np.nan).to_numpy()
+# Load RHS
+df1 = pd.read_csv('b_Andreas.csv', sep=",", header=None, dtype=str)
+bA = df1.applymap(lambda x: complex(x.replace(' ', '')) if pd.notnull(x) else np.nan).to_numpy()
 
 # ############# COMPARISONS ##############
 # # How often do we agree on zeros?
@@ -77,22 +77,22 @@ y = df1.applymap(lambda x: complex(x.replace("i", "j").replace("+-","-"))).to_nu
 
 
 # Comparisons of absolute values
-fig, axs = plt.subplots(1, 1, figsize=(15, 5))
+fig, axs = plt.subplots(1, 2, figsize=(15, 5))
 
-# im0 = axs[0].imshow(np.abs(np.abs(A)-np.abs(AA)), cmap='viridis')
-# axs[0].set_title('abs(abs(A)-abs(AA))')
-# plt.colorbar(im0, ax=axs[0])
+im0= axs[0].imshow(np.abs(A), cmap='viridis')
+axs[0].set_title('abs(A) PN')
+plt.colorbar(im0, ax=axs[1])
 
-im1 = axs[0].imshow(np.abs(A), cmap='viridis')
-axs[0].set_title('abs(A)')
+im1=axs[1].imshow(np.abs(AA), cmap='viridis')
+axs[1].set_title('abs(A) Andreas')
 plt.colorbar(im1, ax=axs[1])
-
-# im2=axs[2].imshow(np.abs(AA), cmap='viridis')
-# axs[2].set_title('abs(AA)')
-# plt.colorbar(im2, ax=axs[2])
 # im2.set_clim(0,21)
 
-# plt.show()
+# im2 = axs[2].imshow(np.abs(np.abs(A)-np.abs(AA)), cmap='viridis')
+# axs[2].set_title('abs(abs(A)-abs(AA))')
+# plt.colorbar(im0, ax=axs[2])
+
+plt.show()
 
 
 # fig, axs = plt.subplots(1, 3, figsize=(15, 5))

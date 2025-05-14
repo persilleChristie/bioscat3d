@@ -88,39 +88,37 @@ Eigen::MatrixXd second_derivative_y(const Eigen::MatrixXd& Z, const Eigen::Vecto
     * 
     * @return Matrix of the second derivative
     */
-std::pair<Eigen::VectorXd, Eigen::VectorXd> gradient(const Eigen::MatrixXd& Z, 
+std::pair<Eigen::VectorXd, Eigen::VectorXd> gradient(const Eigen::VectorXd& Z, 
                                                         const Eigen::VectorXd& X, const Eigen::VectorXd& Y, 
                                                         const int Nx, const int Ny){
-
     int N = Nx*Ny;
 
     Eigen::VectorXd dz_dx = Eigen::VectorXd::Zero(N);
     Eigen::VectorXd dz_dy = Eigen::VectorXd::Zero(N);
-
+    
     for (int i = 1; i < Ny - 1; ++i) {
         // Central difference for interior points
         for (int j = 1; j < Nx - 1; ++j) {
             int k = i * Nx + j;
 
-            dz_dx[k] = (Z[k + 1] - Z[k - 1]) / (X[k + 1] - X[k - 1]);
-            dz_dy[k] = (Z[k + Nx] - Z[k - Nx]) / (Y[k + Nx] - Y[k - Nx]);
+            dz_dx(k) = (Z(k + 1) - Z(k - 1)) / (X(k + 1) - X(k - 1));
+            dz_dy(k) = (Z(k + Nx) - Z(k - Nx)) / (Y(k + Nx) - Y(k - Nx));
         }
     }
 
     // Forward/backward difference for exterior points x-direction
     for (int i = 0; i < Ny; ++i){
-        dz_dx[Nx * i] = (Z[Nx * i + 1] - Z[Nx * i]) / (X[Nx * i + 1] - X[Nx * i]);
-        dz_dx[Nx * i + Nx - 1] = (Z[Nx * i + Nx - 1] - Z[Nx * i + Nx - 2]) 
-                                    / (X[Nx * i + Nx - 1] - X[Nx * i + Nx - 2]);
+        dz_dx(Nx * i) = (Z(Nx * i + 1) - Z(Nx * i)) / (X(Nx * i + 1) - X(Nx * i));
+        dz_dx(Nx * i + Nx - 1) = (Z(Nx * i + Nx - 1) - Z(Nx * i + Nx - 2)) 
+                                    / (X(Nx * i + Nx - 1) - X(Nx * i + Nx - 2));
     }
 
     // Forward/backward difference for exterior points y-direction
     for (int j = 0; j < Nx; ++j){
-        dz_dy[j] = (Z[Nx + j] - Z[j]) / (Y[Nx + j] - Y[j]);
-        dz_dy[Nx * (Ny - 1) + j] = (Z[Nx * (Ny - 1) + j] - Z[Nx * (Ny - 2) + j])
-                                    / (Y[Nx * (Ny - 1) + j] - Y[Nx * (Ny - 2) + j]);
+        dz_dy(j) = (Z(Nx + j) - Z(j)) / (Y(Nx + j) - Y(j));
+        dz_dy(Nx * (Ny - 1) + j) = (Z(Nx * (Ny - 1) + j) - Z(Nx * (Ny - 2) + j))
+                                    / (Y(Nx * (Ny - 1) + j) - Y(Nx * (Ny - 2) + j));
     }
-    
 
     return {dz_dx, dz_dy};
 }
@@ -157,24 +155,24 @@ double approx_max_curvature(const Eigen::VectorXd& dz_dx, const Eigen::VectorXd&
 
     int maxRow;
 
-    std::cout << "mean curvature = " << minus_mean_curv << std::endl;
-    std::cout << "fxx = " << fxx << std::endl;
-    std::cout << "fyy = " << fyy << std::endl;
-    std::cout << "fx2 = " << fx2 << std::endl;
-    std::cout << "fy2 = " << fy2 << std::endl;
+    // std::cout << "mean curvature = " << minus_mean_curv << std::endl;
+    // std::cout << "fxx = " << fxx << std::endl;
+    // std::cout << "fyy = " << fyy << std::endl;
+    // std::cout << "fx2 = " << fx2 << std::endl;
+    // std::cout << "fy2 = " << fy2 << std::endl;
 
     double mean_curv_max = minus_mean_curv.maxCoeff(&maxRow);
 
-    std::cout << "X val of max curv: " << X(maxRow) << std::endl;
-    std::cout << "Y val of max curv: " << Y(maxRow) << std::endl; // passer med forventet
-    std::cout << "fxx = " << fxx(maxRow) << std::endl;
-    std::cout << "fyy = " << fyy(maxRow) << std::endl;
-    std::cout << "fx2 = " << fx2(maxRow) << std::endl;
-    std::cout << "fy2 = " << fy2(maxRow) << std::endl;
+    // std::cout << "X val of max curv: " << X(maxRow) << std::endl;
+    // std::cout << "Y val of max curv: " << Y(maxRow) << std::endl; // passer med forventet
+    // std::cout << "fxx = " << fxx(maxRow) << std::endl;
+    // std::cout << "fyy = " << fyy(maxRow) << std::endl;
+    // std::cout << "fx2 = " << fx2(maxRow) << std::endl;
+    // std::cout << "fy2 = " << fy2(maxRow) << std::endl;
 
     
-    std::cout << "denom = " << denom(maxRow) << std::endl;
-    std::cout << "numerator = " << numerator(maxRow) << std::endl;
+    // std::cout << "denom = " << denom(maxRow) << std::endl;
+    // std::cout << "numerator = " << numerator(maxRow) << std::endl;
 
 
     return mean_curv_max;
@@ -270,11 +268,11 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     Eigen::VectorXd X_flat = Eigen::Map<const Eigen::VectorXd>(X.data(), total_pts);
     Eigen::VectorXd Y_flat = Eigen::Map<const Eigen::VectorXd>(Y.data(), total_pts);
     Eigen::VectorXd Z_flat = Eigen::Map<const Eigen::VectorXd>(Z.data(), total_pts);
-
-    int maxRow, maxCol;
-    Z.maxCoeff(&maxRow, &maxCol);
-    std::cout << "X val of peak: " << X(maxRow, maxCol) << std::endl;
-    std::cout << "Y val of peak: " << Y(maxRow, maxCol) << std::endl;
+    
+    // int maxRow, maxCol;
+    // Z.maxCoeff(&maxRow, &maxCol);
+    // std::cout << "X val of peak: " << X(maxRow, maxCol) << std::endl;
+    // std::cout << "Y val of peak: " << Y(maxRow, maxCol) << std::endl;
 
     int N_test_actual = total_pts; // <int>(idx_test.size());
 
@@ -285,20 +283,17 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     // for (int i = 0; i < N_test_actual; ++i)
     //     // test_points.row(i) = interior_points.row(i);
     //     {test_points.row(i) << X_flat(i), Y_flat(i), Z_flat(i);}
-
+   
 
     this->points_ = test_points;
-    
 
     // ------------- Normal vectors -------------
-    auto [dz_dx, dz_dy] = gradient(Z, X, Y, Nx, Ny);
+    auto [dz_dx, dz_dy] = gradient(Z_flat, X_flat, Y_flat, Nx, Ny);
 
     Eigen::MatrixXd normals(total_pts, 3);
-
     normals.col(0) = -dz_dx;
     normals.col(1) = -dz_dy;
     normals.col(2) = Eigen::VectorXd::Constant(total_pts, 1.0);
-
 
     this->normals_ = normals.rowwise().normalized();
 
@@ -321,10 +316,9 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
 
     this->tau1_ = tangent1;
     this->tau2_ = tangent2;
-
     // ------------- Auxiliary points -------------
     // Approximate mean curvature and calculate distance
-    auto mean_curv = approx_max_curvature(dz_dx, dz_dy, X, Y, Nx, Ny);
+    auto mean_curv = approx_max_curvature(dz_dx, dz_dy, X_flat, Y_flat, Nx, Ny);
     std::cout << "Max mean curvature: " << mean_curv << std::endl;
     // double mean_curv = -0.6657612170;
     double radius = 1 / abs(mean_curv);
