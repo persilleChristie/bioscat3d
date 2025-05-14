@@ -129,7 +129,7 @@ int main(int argc, char* argv[]){
     Eigen::MatrixX3cd refE(test_vec_size, 3);
     Eigen::MatrixX3cd refH(test_vec_size, 3);
 
-    FieldCalculatorUPW U(direction, E0, polarization, constants);
+    FieldCalculatorUPW U(direction, E0, polarization);
     U.computeFields(E, H, testpoints);
     U.computeReflectedFields(refE, refH, testpoints);
 

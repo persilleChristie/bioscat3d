@@ -18,6 +18,7 @@ CrankNicolson::CrankNicolson(const Eigen::MatrixX3cd& data,
     gamma_(gamma), iterations_(iterations), mas_("GP",jsonPath) {}
 
 double CrankNicolson::logLikelihood(Eigen::ArrayXXd& points){
+    mas_.setPoints(points.matrix());
     FieldCalculatorTotal field(mas_);
 
     int M = points.rows();
@@ -27,8 +28,8 @@ double CrankNicolson::logLikelihood(Eigen::ArrayXXd& points){
 
     field.computeFields(Eout, Hout, data_points_);
 
-    double loglike = -0.5 * gamma_ * (Eout.rowwise().squaredNorm() 
-                                        - data_.rowwise().squaredNorm()).squaredNorm();
+    double loglike = -0.5 * gamma_ * (abs(Eout.col(2).array()) 
+                                        - abs(data_.col(2).array())).matrix().squaredNorm();
 
     return loglike;
 }

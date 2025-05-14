@@ -17,6 +17,10 @@ MASSystem::MASSystem(const std::string surfaceType, const char* jsonPath)
 
     }
 
+void MASSystem::setPoints(Eigen::MatrixX3d points) {
+    this->points_ = points;
+}
+
 
 /**
     * Approximate second derivative in x using central differences (to mimick numpy's gradient)

@@ -24,6 +24,7 @@ public:
     const Eigen::Vector3d& getKinc() const          {return kinc_;};
     const Eigen::VectorXd& getPolarizations() const {return polarizations_;};
 
+    void setPoints(Eigen::MatrixX3d points);
     const Eigen::MatrixX3d& getPoints() const   {return points_;};
     const Eigen::MatrixX3d& getNormals() const  {return normals_;};
     const Eigen::MatrixX3d& getTau1() const     {return tau1_;};
