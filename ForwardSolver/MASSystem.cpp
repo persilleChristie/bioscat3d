@@ -92,6 +92,7 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> gradient(const Eigen::VectorXd& Z,
                                                         const Eigen::VectorXd& X, const Eigen::VectorXd& Y, 
                                                         const int Nx, const int Ny){
     int N = Nx*Ny;
+    int k;
 
     Eigen::VectorXd dz_dx = Eigen::VectorXd::Zero(N);
     Eigen::VectorXd dz_dy = Eigen::VectorXd::Zero(N);
@@ -99,12 +100,27 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> gradient(const Eigen::VectorXd& Z,
     for (int i = 1; i < Ny - 1; ++i) {
         // Central difference for interior points
         for (int j = 1; j < Nx - 1; ++j) {
-            int k = i * Nx + j;
+            k = i * Nx + j;
 
             dz_dx(k) = (Z(k + 1) - Z(k - 1)) / (X(k + 1) - X(k - 1));
             dz_dy(k) = (Z(k + Nx) - Z(k - Nx)) / (Y(k + Nx) - Y(k - Nx));
         }
     }
+    std::cout << k << std::endl;
+            std::cout << (k + 1) << std::endl;
+            std::cout << (k - 1) << std::endl;
+            std::cout <<(k + Nx) << std::endl;
+            std::cout << (k - Nx) << std::endl;
+
+
+    std::cout << Z(k + 1) << std::endl;
+            std::cout << Z(k - 1) << std::endl;
+            std::cout << X(k + 1) << std::endl;
+            std::cout << X(k - 1) << std::endl;
+            std::cout << Z(k + Nx) << std::endl;
+            std::cout << Z(k - Nx) << std::endl;
+            std::cout << Y(k + Nx) << std::endl;
+            std::cout << Y(k - Nx) << std::endl;
 
     // Forward/backward difference for exterior points x-direction
     for (int i = 0; i < Ny; ++i){
@@ -155,24 +171,24 @@ double approx_max_curvature(const Eigen::VectorXd& dz_dx, const Eigen::VectorXd&
 
     int maxRow;
 
-    // std::cout << "mean curvature = " << minus_mean_curv << std::endl;
-    // std::cout << "fxx = " << fxx << std::endl;
-    // std::cout << "fyy = " << fyy << std::endl;
-    // std::cout << "fx2 = " << fx2 << std::endl;
-    // std::cout << "fy2 = " << fy2 << std::endl;
+    std::cout << "mean curvature = " << minus_mean_curv << std::endl;
+    std::cout << "fxx = " << fxx << std::endl;
+    std::cout << "fyy = " << fyy << std::endl;
+    std::cout << "fx2 = " << fx2 << std::endl;
+    std::cout << "fy2 = " << fy2 << std::endl;
 
     double mean_curv_max = minus_mean_curv.maxCoeff(&maxRow);
 
-    // std::cout << "X val of max curv: " << X(maxRow) << std::endl;
-    // std::cout << "Y val of max curv: " << Y(maxRow) << std::endl; // passer med forventet
-    // std::cout << "fxx = " << fxx(maxRow) << std::endl;
-    // std::cout << "fyy = " << fyy(maxRow) << std::endl;
-    // std::cout << "fx2 = " << fx2(maxRow) << std::endl;
-    // std::cout << "fy2 = " << fy2(maxRow) << std::endl;
+    std::cout << "X val of max curv: " << X(maxRow) << std::endl;
+    std::cout << "Y val of max curv: " << Y(maxRow) << std::endl; // passer med forventet
+    std::cout << "fxx = " << fxx(maxRow) << std::endl;
+    std::cout << "fyy = " << fyy(maxRow) << std::endl;
+    std::cout << "fx2 = " << fx2(maxRow) << std::endl;
+    std::cout << "fy2 = " << fy2(maxRow) << std::endl;
 
     
-    // std::cout << "denom = " << denom(maxRow) << std::endl;
-    // std::cout << "numerator = " << numerator(maxRow) << std::endl;
+    std::cout << "denom = " << denom(maxRow) << std::endl;
+    std::cout << "numerator = " << numerator(maxRow) << std::endl;
 
 
     return mean_curv_max;
@@ -237,16 +253,16 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
 
     Eigen::MatrixXd X(Ny, Nx), Y(Ny, Nx);
     for (int i = 0; i < Ny; ++i) {  // Works as meshgrid
-        X.row(i) = x.transpose();
+        X.col(i) = x;
     }
     
     for (int i = 0; i < Nx; ++i) {  // Works as meshgrid
-        Y.col(i) = y;
+        Y.row(i) = y.transpose();
     }
     
     Eigen::MatrixXd Z(Ny,Nx);
     // Z = Eigen::MatrixXd::Zero(N,N);
-    Z = Eigen::MatrixXd::Constant(Ny, Nx, -1.5);
+    Z = Eigen::MatrixXd::Constant(Ny, Nx, 0);
 
     // Iterate over bumpData array
     for (rapidjson::SizeType i = 0; i < bumpData.Size(); ++i) {
@@ -289,6 +305,7 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
 
     // ------------- Normal vectors -------------
     auto [dz_dx, dz_dy] = gradient(Z_flat, X_flat, Y_flat, Nx, Ny);
+    std::cout << "dz_dx: " << dz_dx << std::endl;
 
     Eigen::MatrixXd normals(total_pts, 3);
     normals.col(0) = -dz_dx;

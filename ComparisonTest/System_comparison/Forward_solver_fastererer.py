@@ -469,7 +469,7 @@ def bump_test(width=0.5,resol=160):
         number=100
         propagation_vector = np.tile([0, 0, -1], (number, 1))
         polarization=np.linspace(0,np.pi/2,number)
-        wavelength=0.25
+        wavelength=2*np.pi
         epsilon_air=1
         #wavelength=1.5
         omega=2*np.pi/wavelength
@@ -497,9 +497,9 @@ def bump_test_2(width=1,resol=160):
         -( (x-x0)**2 + (y-y0)**2 ) / (2*sigma**2)
     )
     f = lambda x,y: (
-                    bump(x,y,-0.20073580984422001,0.7211428902558659,0.31959818254342154,0.49932924209851826)+
-                    bump(x,y,-0.5503701752921016,-0.5504087674620758,0.11742508365045984,0.6330880728874675) +
-                    bump(x,y,0.16178401878913407,0.3329161244736727,0.10617534828874074,0.6849549260809971) 
+                    bump(x,y,-0.250919762305275, 0.9014286128198323, 0.24639878836228102, 0.49932924209851826)+
+                    bump(x,y,-0.687962719115127, -0.6880109593275947, 0.1116167224336399, 0.6330880728874675) +
+                    bump(x,y,0.2022300234864176, 0.416145155592091, 0.10411689885916049,0.6849549260809971) 
                      )
     Z=f(X,Y)
     point_cloud,tau1,tau2,normals,mean_curvature=C2_surface.compute_geometric_data(X,Y,Z,(width-(-width))/resol)
@@ -534,5 +534,4 @@ def bump_test_2(width=1,resol=160):
         construct_RHSs(Surface,propagation_vector,polarization,epsilon_air,mu,omega)
     print(f"RHS construction time: {time.time()-start_time}")
 
-
-bump_test(1,resol=4)
+bump_test(width=1)
