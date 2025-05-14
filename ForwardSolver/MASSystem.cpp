@@ -106,21 +106,6 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> gradient(const Eigen::VectorXd& Z,
             dz_dy(k) = (Z(k + Nx) - Z(k - Nx)) / (Y(k + Nx) - Y(k - Nx));
         }
     }
-    std::cout << k << std::endl;
-            std::cout << (k + 1) << std::endl;
-            std::cout << (k - 1) << std::endl;
-            std::cout <<(k + Nx) << std::endl;
-            std::cout << (k - Nx) << std::endl;
-
-
-    std::cout << Z(k + 1) << std::endl;
-            std::cout << Z(k - 1) << std::endl;
-            std::cout << X(k + 1) << std::endl;
-            std::cout << X(k - 1) << std::endl;
-            std::cout << Z(k + Nx) << std::endl;
-            std::cout << Z(k - Nx) << std::endl;
-            std::cout << Y(k + Nx) << std::endl;
-            std::cout << Y(k - Nx) << std::endl;
 
     // Forward/backward difference for exterior points x-direction
     for (int i = 0; i < Ny; ++i){
@@ -167,28 +152,33 @@ double approx_max_curvature(const Eigen::VectorXd& dz_dx, const Eigen::VectorXd&
     Eigen::ArrayXd denom = sqrt_grad_sq * grad_sq;    
 
     Eigen::ArrayXd numerator = (1.0 + fx2) * fyy - 2.0 * fx * fy * fxy + (1.0 + fy2) * fxx;
-    Eigen::ArrayXd minus_mean_curv = -0.5 * numerator / denom;
+    Eigen::ArrayXd mean_curv = abs(0.5 * numerator / denom);
 
     int maxRow;
 
-    std::cout << "mean curvature = " << minus_mean_curv << std::endl;
-    std::cout << "fxx = " << fxx << std::endl;
-    std::cout << "fyy = " << fyy << std::endl;
-    std::cout << "fx2 = " << fx2 << std::endl;
-    std::cout << "fy2 = " << fy2 << std::endl;
+    // std::cout << "mean curvature = " << minus_mean_curv << std::endl;
+    std::cout << "fx = " << fx << std::endl;
+    std::cout << "fy = " << fy << std::endl;
+    // std::cout << "fxx = " << fxx << std::endl;
+    // std::cout << "fyy = " << fyy << std::endl;
+    // std::cout << "fxy = " << fxy << std::endl;
+    // std::cout << "fx2 = " << fx2 << std::endl;
+    // std::cout << "fy2 = " << fy2 << std::endl;
+    // std::cout << "numerator = " << numerator << std::endl;
+    // std::cout << "denominator = " << denom << std::endl;
 
-    double mean_curv_max = minus_mean_curv.maxCoeff(&maxRow);
+    double mean_curv_max = mean_curv.maxCoeff(&maxRow);
 
-    std::cout << "X val of max curv: " << X(maxRow) << std::endl;
-    std::cout << "Y val of max curv: " << Y(maxRow) << std::endl; // passer med forventet
-    std::cout << "fxx = " << fxx(maxRow) << std::endl;
-    std::cout << "fyy = " << fyy(maxRow) << std::endl;
-    std::cout << "fx2 = " << fx2(maxRow) << std::endl;
-    std::cout << "fy2 = " << fy2(maxRow) << std::endl;
+    // std::cout << "X val of max curv: " << X(maxRow) << std::endl;
+    // std::cout << "Y val of max curv: " << Y(maxRow) << std::endl; // passer med forventet
+    // std::cout << "fxx = " << fxx(maxRow) << std::endl;
+    // std::cout << "fyy = " << fyy(maxRow) << std::endl;
+    // std::cout << "fx2 = " << fx2(maxRow) << std::endl;
+    // std::cout << "fy2 = " << fy2(maxRow) << std::endl;
 
     
-    std::cout << "denom = " << denom(maxRow) << std::endl;
-    std::cout << "numerator = " << numerator(maxRow) << std::endl;
+    // std::cout << "denom = " << denom(maxRow) << std::endl;
+    // std::cout << "numerator = " << numerator(maxRow) << std::endl;
 
 
     return mean_curv_max;
@@ -305,7 +295,6 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
 
     // ------------- Normal vectors -------------
     auto [dz_dx, dz_dy] = gradient(Z_flat, X_flat, Y_flat, Nx, Ny);
-    std::cout << "dz_dx: " << dz_dx << std::endl;
 
     Eigen::MatrixXd normals(total_pts, 3);
     normals.col(0) = -dz_dx;

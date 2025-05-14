@@ -66,6 +66,9 @@ def compute_geometric_data(x,y,z,h):
     denom=(1+f_x**2+f_y**2)**(3/2)
     mean_curvature=np.abs(numerator/denom)
     mean_curvature=mean_curvature.ravel()
+
+    print(f"f_x: {f_x.ravel()}")
+    print(f"f_y: {f_y.ravel()}")
     
     normals=np.cross(tau1,tau2)
     tau2=np.cross(tau1,normals)
@@ -76,6 +79,7 @@ def compute_geometric_data(x,y,z,h):
     return point_cloud,tau1,tau2,normals,mean_curvature
 
 def generate_curvature_scaled_offset(points, normals, mean_curvature,scaling):
+    print(np.max(mean_curvature))
     safe_c = scaling/np.max(mean_curvature)
     offset_points = points + safe_c * normals
     return offset_points

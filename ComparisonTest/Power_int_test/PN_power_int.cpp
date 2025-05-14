@@ -106,9 +106,6 @@ int main(){
 
     // -------------- Calculate powers ------------------
     MASSystem masSystem("Bump", jsonPath);
-    std::cout << "Points: " << masSystem.getPoints() << std::endl;
-    std::cout << "Inner points: " << masSystem.getInterior() << std::endl;
-    std::cout << "Outer points" << masSystem.getExterior() << std::endl;
 
     // FieldCalculatorTotal field(masSystem);
 
