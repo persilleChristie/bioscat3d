@@ -446,6 +446,7 @@ def bump_test(width=0.5,resol=160):
                      )
     Z=f(X,Y)
     point_cloud,tau1,tau2,normals,mean_curvature=C2_surface.compute_geometric_data(X,Y,Z,(width-(-width))/resol)
+    print(point_cloud)
     inner_cloud=C2_surface.generate_curvature_scaled_offset(point_cloud,normals,mean_curvature,-0.86)
     outer_cloud=C2_surface.generate_curvature_scaled_offset(point_cloud,normals,mean_curvature,0.86)
     
@@ -533,4 +534,4 @@ def bump_test_2(width=1,resol=160):
         construct_RHSs(Surface,propagation_vector,polarization,epsilon_air,mu,omega)
     print(f"RHS construction time: {time.time()-start_time}")
 
-bump_test(width=1)
+bump_test(width=1, resol=4)

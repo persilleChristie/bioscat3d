@@ -15,6 +15,7 @@ int main() {
     // Create MASSystem to generate test grid (GP surface)
     MASSystem masSystem("Bump", jsonPath);
 
+    std::cout << "l.18" << std::endl;
     // Generate field calculator (inverse crime)
     FieldCalculatorTotal truefield(masSystem);
 
@@ -35,20 +36,22 @@ int main() {
     Eigen::MatrixX3cd Etrue = Eigen::MatrixX3cd::Zero(n,3);
     Eigen::MatrixX3cd Htrue = Eigen::MatrixX3cd::Zero(n,3); 
 
+    std::cout << "l.39" << std::endl;
     // Calculate measured field
     truefield.computeFields(Etrue, Htrue, measurepts);
 
-    std::cout << "l.23" << std::endl;
     // Parameters
     double delta = 0.01;
     double gamma = 1.0;
-    int iterations = 100;
-    std::cout << "l.28" << std::endl;
+    int iterations = 1000;
+
     // Instantiate and run Crank-Nicolson sampler
+    
+    std::cout << "l.50" << std::endl;
     CrankNicolson crank(Etrue, measurepts, delta, gamma, iterations, jsonPath);
     crank.run();
 
-    std::cout << "\n✅ Crank-Nicolson sampling complete.\n";
+    std::cout << "\nCrank-Nicolson sampling complete.\n";
 
     std::ifstream file("Estimate.csv");
     if (!file.is_open()) {
@@ -87,8 +90,9 @@ int main() {
 
     // Optional: print the vector
     std::cout << "Difference:\n " << (estimate - masSystem.getPoints().col(2)) << std::endl;
-    std::cout << "Mean difference:\n " << (estimate - masSystem.getPoints().col(2)).sum() / N << std::endl;
-    std::cout << "Max difference:\n " << (estimate - masSystem.getPoints().col(2)).maxCoeff() << std::endl;
+    std::cout << "Mean difference: " << (estimate - masSystem.getPoints().col(2)).sum() / N << std::endl;
+    std::cout << "Max difference: " << (estimate - masSystem.getPoints().col(2)).maxCoeff() << std::endl;
+    std::cout << "\n\n Relative difference:\n " << abs((estimate - masSystem.getPoints().col(2)).array())/masSystem.getPoints().col(2).array() << std::endl;
 
 
 

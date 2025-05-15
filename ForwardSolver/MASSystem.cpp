@@ -10,7 +10,6 @@ MASSystem::MASSystem(const std::string surfaceType, const char* jsonPath)
         if (surfaceType == "Bump"){
             generateBumpSurface(jsonPath);
         } else if (surfaceType == "GP"){
-            std::cout << "hello" << std::endl;
             generateGPSurface(jsonPath);
         } else {
             std::cerr << "[Error] Surface type not recognised! Allowed types are 'Bump' and 'GP'\n";
@@ -93,37 +92,72 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> gradient(const Eigen::VectorXd& Z,
                                                         const Eigen::VectorXd& X, const Eigen::VectorXd& Y, 
                                                         const int Nx, const int Ny){
     int N = Nx*Ny;
-    int k;
 
     Eigen::VectorXd dz_dx = Eigen::VectorXd::Zero(N);
     Eigen::VectorXd dz_dy = Eigen::VectorXd::Zero(N);
     
-    for (int i = 1; i < Ny - 1; ++i) {
-        // Central difference for interior points
-        for (int j = 1; j < Nx - 1; ++j) {
-            k = j * Ny + i;
 
-            dz_dx(k) = (Z(k + Ny) - Z(k - Ny)) / (X(k + Ny) - X(k - Ny));
-            dz_dy(k) = (Z(k + 1) - Z(k - 1)) / (Y(k + 1) - Y(k - 1));
+    // Central difference for interior points
+    // for (int i = 1; i < Ny - 1; ++i) {
+    //     for (int j = 1; j < Nx - 1; ++j) {
+    //         int k = j * Ny + i;
+
+    //         dz_dx(k) = (Z(k + Ny) - Z(k - Ny)) / (X(k + Ny) - X(k - Ny));
+    //         dz_dy(k) = (Z(k + 1) - Z(k - 1)) / (Y(k + 1) - Y(k - 1));
+    //     }
+    // }
+
+    //     // Forward/backward difference for exterior points x-direction
+    // for (int i = 0; i < Ny; ++i){
+    //     dz_dx(i) = (Z(i + Ny) - Z(i)) / (X(i + Ny) - X(i));
+    //     dz_dx((Nx - 1) * Ny + i) = (Z((Nx - 1) * Ny + i) - Z((Nx - 2) * Ny + i)) 
+    //                                 / (X((Nx - 1) * Ny + i) - X((Nx - 2) * Ny + i));
+    // }
+
+    // // Forward/backward difference for exterior points y-direction
+    // for (int j = 0; j < Nx; ++j){
+    //     dz_dy(j * Ny) = (Z(Ny * j + 1) - Z(Ny * j)) / (Y(Ny * j + 1) - Y(Ny * j));
+    //     dz_dy((Ny - 1) + Ny * j) = (Z((Ny - 1) + Ny * j) - Z((Ny - 2) + Ny * j))
+    //                                 / (Y((Ny - 1) + Ny * j) - Y((Ny - 2) + Ny * j));
+    // }
+
+    // Assume uniform gid-size
+    double dx = X[Ny] - X[0];
+    double dy = Y[1] - Y[0];
+
+    for (int i = 0; i < Ny; ++i) {
+        for (int j = 0; j < Nx; ++j) {
+            int k = j * Ny + i;
+
+            if (k < Ny){
+                dz_dx(k) = (Z(k + Ny) - Z(k)) / dx;
+            }
+            
+            if (k > Ny * (Nx - 1) - 1){
+                dz_dx(k) = (Z(k) - Z(k - Ny)) / dx;
+            }
+            
+            if (i == 0){
+                dz_dy(k) = (Z(k + 1) - Z(k)) / dy;
+            }
+            
+            if (i == Ny - 1){
+                dz_dy(k) = (Z(k) - Z(k - 1)) / dy;
+            }
+
+            if (0 < j && j < Nx - 1){
+                dz_dx(k) = (Z(k + Ny) - Z(k - Ny)) / (2 * dx);
+            }
+
+            if (0 < i && i < Ny - 1){
+                dz_dy(k) = (Z(k + 1) - Z(k - 1)) / (2 * dy);
+            }
         }
-    }
-
-    // Forward/backward difference for exterior points x-direction
-    for (int i = 0; i < Ny; ++i){
-        dz_dx(i) = (Z(i + Ny) - Z(i)) / (X(i + Ny) - X(i));
-        dz_dx((Nx - 1) * Ny + i) = (Z((Nx - 1) * Ny + i) - Z((Nx - 2) * Ny + i)) 
-                                    / (X((Nx - 1) * Ny + i) - X((Nx - 2) * Ny + i));
-    }
-
-    // Forward/backward difference for exterior points y-direction
-    for (int j = 0; j < Nx; ++j){
-        dz_dy(j * Ny) = (Z(Ny * j + 1) - Z(Ny * j)) / (Y(Ny * j + 1) - Y(Ny * j));
-        dz_dy((Ny - 1) + Ny * j) = (Z((Ny - 1) + Ny * j) - Z((Ny - 2) + Ny * j))
-                                    / (Y((Ny - 1) + Ny * j) - Y((Ny - 2) + Ny * j));
     }
 
     return {dz_dx, dz_dy};
 }
+
 
 
 /**
@@ -158,8 +192,8 @@ double approx_max_curvature(const Eigen::VectorXd& dz_dx, const Eigen::VectorXd&
     int maxRow;
 
     // std::cout << "mean curvature = " << minus_mean_curv << std::endl;
-    std::cout << "fx = " << fx << std::endl;
-    std::cout << "fy = " << fy << std::endl;
+    // std::cout << "fx = " << fx << std::endl;
+    // std::cout << "fy = " << fy << std::endl;
     // std::cout << "fxx = " << fxx << std::endl;
     // std::cout << "fyy = " << fyy << std::endl;
     // std::cout << "fxy = " << fxy << std::endl;
@@ -276,10 +310,6 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     Eigen::VectorXd Y_flat = Eigen::Map<const Eigen::VectorXd>(Y.data(), total_pts);
     Eigen::VectorXd Z_flat = Eigen::Map<const Eigen::VectorXd>(Z.data(), total_pts);
     
-    // int maxRow, maxCol;
-    // Z.maxCoeff(&maxRow, &maxCol);
-    // std::cout << "X val of peak: " << X(maxRow, maxCol) << std::endl;
-    // std::cout << "Y val of peak: " << Y(maxRow, maxCol) << std::endl;
 
     int N_test_actual = total_pts; // <int>(idx_test.size());
 
@@ -287,10 +317,6 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
     test_points.col(0) = X_flat;
     test_points.col(1) = Y_flat;
     test_points.col(2) = Z_flat;
-    // for (int i = 0; i < N_test_actual; ++i)
-    //     // test_points.row(i) = interior_points.row(i);
-    //     {test_points.row(i) << X_flat(i), Y_flat(i), Z_flat(i);}
-   
 
     this->points_ = test_points;
 

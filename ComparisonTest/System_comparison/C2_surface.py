@@ -67,8 +67,8 @@ def compute_geometric_data(x,y,z,h):
     mean_curvature=np.abs(numerator/denom)
     mean_curvature=mean_curvature.ravel()
 
-    print(f"f_x: {f_x.ravel()}")
-    print(f"f_y: {f_y.ravel()}")
+    print(f"f_x: {f_x}")
+    print(f"f_y: {f_y}")
     
     normals=np.cross(tau1,tau2)
     tau2=np.cross(tau1,normals)
