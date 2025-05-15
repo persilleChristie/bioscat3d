@@ -5,7 +5,8 @@ CXXFLAGS = -std=c++17 -Wall -O2 \
   -I/usr/include/eigen3 \
   -I/home/tripleskull/libs/rapidjson/include \
   -I.. \
-  -I../ForwardSolver
+  -I../ForwardSolver \
+  -I/home/pernillechristie/rapidjson/include
 
 TARGET = CrankNicolson
 

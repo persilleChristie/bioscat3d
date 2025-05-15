@@ -25,7 +25,7 @@ class CrankNicolson {
         // const char * jsonPath_;
 
         void constructor();
-        double logLikelihood(Eigen::ArrayXXd& points);
+        double logLikelihood(Eigen::MatrixXd& points);
 
         
 };

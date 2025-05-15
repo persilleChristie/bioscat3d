@@ -5,6 +5,8 @@
 #include "../../ForwardSolver/Constants.h"
 #include "../../ForwardSolver/UtilsDipole.h"
 
+Constants constants;
+
 void saveToCSV(const Eigen::MatrixXcd& E, const Eigen::MatrixXcd& H, const std::string& filename) {
     std::ofstream file(filename);
     
@@ -74,7 +76,7 @@ int main(int argc, char* argv[]){
     Eigen::Vector3d direction = Eigen::Vector3d::Zero();
 
     // Initialize wavelength
-    Constants constants;
+
     double wavelength;
     
     // Assign values to Eigen vectors
@@ -137,7 +139,7 @@ int main(int argc, char* argv[]){
     Eigen::MatrixX3cd H(test_vec_size, 3);
 
     Dipole HD(position, direction);
-    FieldCalculatorDipole EH_HD(HD, constants);
+    FieldCalculatorDipole EH_HD(HD, true);
     EH_HD.computeFields(E, H, testpoints);
 
     Eigen::VectorXd calcImpedance(test_vec_size);

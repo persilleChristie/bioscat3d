@@ -4,6 +4,8 @@
 #include <Eigen/Dense>
 #include <complex>
 #include <iostream>
+#include "FieldCalculatorTotal.h"
+#include "UtilsExport.h"
 
 Constants constants;
 
@@ -12,25 +14,83 @@ int main() {
 
     // Create MASSystem to generate test grid (GP surface)
     MASSystem masSystem("Bump", jsonPath);
-    Eigen::MatrixX3d data_points = masSystem.getPoints();
 
-    // Generate dummy complex data matching surface height
-    Eigen::MatrixX3cd data(data_points.rows(), 3);
-    for (int i = 0; i < data_points.rows(); ++i) {
-        std::complex<double> value = std::complex<double>(data_points(i, 2), 0.0); // Using z as real part
-        data.row(i) = Eigen::RowVector3cd(value, value, value);
-    }
+    // Generate field calculator (inverse crime)
+    FieldCalculatorTotal truefield(masSystem);
 
+    // Generate measure-points
+    Eigen::MatrixX3d measurepts(10,3);
+    measurepts << 10,10,10,
+                  5, 7, 4,
+                  1, 1, 1,
+                  2, 4, 2,
+                  -1, -2, -3,
+                  0, 2, 1,
+                  1.2, 2.3, 3.4,
+                  5.5, 5.5, 5.5,
+                  4, 6, 8,
+                  9, 5, 6;
+
+    int n = measurepts.rows();
+    Eigen::MatrixX3cd Etrue = Eigen::MatrixX3cd::Zero(n,3);
+    Eigen::MatrixX3cd Htrue = Eigen::MatrixX3cd::Zero(n,3); 
+
+    // Calculate measured field
+    truefield.computeFields(Etrue, Htrue, measurepts);
+
+    std::cout << "l.23" << std::endl;
     // Parameters
     double delta = 0.01;
     double gamma = 1.0;
-    int iterations = 10;
-
+    int iterations = 100;
+    std::cout << "l.28" << std::endl;
     // Instantiate and run Crank-Nicolson sampler
-    CrankNicolson crank(data, data_points, delta, gamma, iterations, jsonPath);
+    CrankNicolson crank(Etrue, measurepts, delta, gamma, iterations, jsonPath);
     crank.run();
 
     std::cout << "\n✅ Crank-Nicolson sampling complete.\n";
+
+    std::ifstream file("Estimate.csv");
+    if (!file.is_open()) {
+        std::cerr << "Could not open the file!" << std::endl;
+        return 1;
+    }
+
+    std::vector<double> values;
+    std::string line;
+
+    // If the CSV has a header, uncomment the next line to skip it
+    // std::getline(file, line);
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string cell;
+
+        // Assuming the column you want is the first one
+        if (std::getline(ss, cell, ',')) {
+            try {
+                values.push_back(std::stod(cell));
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "Invalid number: " << cell << std::endl;
+            }
+        }
+    }
+
+    file.close();
+
+    // Convert std::vector to Eigen::VectorXd
+    int N = (values.size());
+    Eigen::VectorXd estimate(N);
+    for (int i = 0; i < N; ++i) {
+        estimate(i) = values[i];
+    }
+
+    // Optional: print the vector
+    std::cout << "Difference:\n " << (estimate - masSystem.getPoints().col(2)) << std::endl;
+    std::cout << "Mean difference:\n " << (estimate - masSystem.getPoints().col(2)).sum() / N << std::endl;
+    std::cout << "Max difference:\n " << (estimate - masSystem.getPoints().col(2)).maxCoeff() << std::endl;
+
+
 
     return 0;
 }

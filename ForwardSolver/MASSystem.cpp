@@ -10,6 +10,7 @@ MASSystem::MASSystem(const std::string surfaceType, const char* jsonPath)
         if (surfaceType == "Bump"){
             generateBumpSurface(jsonPath);
         } else if (surfaceType == "GP"){
+            std::cout << "hello" << std::endl;
             generateGPSurface(jsonPath);
         } else {
             std::cerr << "[Error] Surface type not recognised! Allowed types are 'Bump' and 'GP'\n";
@@ -100,25 +101,25 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> gradient(const Eigen::VectorXd& Z,
     for (int i = 1; i < Ny - 1; ++i) {
         // Central difference for interior points
         for (int j = 1; j < Nx - 1; ++j) {
-            k = i * Nx + j;
+            k = j * Ny + i;
 
-            dz_dx(k) = (Z(k + 1) - Z(k - 1)) / (X(k + 1) - X(k - 1));
-            dz_dy(k) = (Z(k + Nx) - Z(k - Nx)) / (Y(k + Nx) - Y(k - Nx));
+            dz_dx(k) = (Z(k + Ny) - Z(k - Ny)) / (X(k + Ny) - X(k - Ny));
+            dz_dy(k) = (Z(k + 1) - Z(k - 1)) / (Y(k + 1) - Y(k - 1));
         }
     }
 
     // Forward/backward difference for exterior points x-direction
     for (int i = 0; i < Ny; ++i){
-        dz_dx(Nx * i) = (Z(Nx * i + 1) - Z(Nx * i)) / (X(Nx * i + 1) - X(Nx * i));
-        dz_dx(Nx * i + Nx - 1) = (Z(Nx * i + Nx - 1) - Z(Nx * i + Nx - 2)) 
-                                    / (X(Nx * i + Nx - 1) - X(Nx * i + Nx - 2));
+        dz_dx(i) = (Z(i + Ny) - Z(i)) / (X(i + Ny) - X(i));
+        dz_dx((Nx - 1) * Ny + i) = (Z((Nx - 1) * Ny + i) - Z((Nx - 2) * Ny + i)) 
+                                    / (X((Nx - 1) * Ny + i) - X((Nx - 2) * Ny + i));
     }
 
     // Forward/backward difference for exterior points y-direction
     for (int j = 0; j < Nx; ++j){
-        dz_dy(j) = (Z(Nx + j) - Z(j)) / (Y(Nx + j) - Y(j));
-        dz_dy(Nx * (Ny - 1) + j) = (Z(Nx * (Ny - 1) + j) - Z(Nx * (Ny - 2) + j))
-                                    / (Y(Nx * (Ny - 1) + j) - Y(Nx * (Ny - 2) + j));
+        dz_dy(j * Ny) = (Z(Ny * j + 1) - Z(Ny * j)) / (Y(Ny * j + 1) - Y(Ny * j));
+        dz_dy((Ny - 1) + Ny * j) = (Z((Ny - 1) + Ny * j) - Z((Ny - 2) + Ny * j))
+                                    / (Y((Ny - 1) + Ny * j) - Y((Ny - 2) + Ny * j));
     }
 
     return {dz_dx, dz_dy};
@@ -243,11 +244,11 @@ void MASSystem::generateBumpSurface(const char* jsonPath) {
 
     Eigen::MatrixXd X(Ny, Nx), Y(Ny, Nx);
     for (int i = 0; i < Ny; ++i) {  // Works as meshgrid
-        X.col(i) = x;
+        X.row(i) = x.transpose();
     }
     
     for (int i = 0; i < Nx; ++i) {  // Works as meshgrid
-        Y.row(i) = y.transpose();
+        Y.col(i) = y;
     }
     
     Eigen::MatrixXd Z(Ny,Nx);
@@ -378,7 +379,6 @@ void MASSystem::generateGPSurface(const char* jsonPath) {
         std::cerr << "Error parsing JSON.\n";
         return;
     }
-    
 
     // Dimensions
     double xdim = doc["halfWidth_x"].GetDouble();
@@ -392,7 +392,7 @@ void MASSystem::generateGPSurface(const char* jsonPath) {
     }
 
     this->kinc_ = k;
-    
+
     // Read polarizations
     const auto& betas = doc["betas"];
     int B = static_cast<int>(betas.Size());
@@ -415,24 +415,26 @@ void MASSystem::generateGPSurface(const char* jsonPath) {
     Eigen::VectorXd y = Eigen::VectorXd::LinSpaced(Ny, -ydim, ydim);
 
     Eigen::MatrixXd Xmat(Ny, Nx), Ymat(Ny, Nx);
-    for (int i = 0; i < Ny; ++i) {  // Works as meshgrid
+   for (int i = 0; i < Ny; ++i) {  // Works as meshgrid
         Xmat.row(i) = x.transpose();
     }
     
     for (int i = 0; i < Nx; ++i) {  // Works as meshgrid
         Ymat.col(i) = y;
     }
+    
 
     Eigen::VectorXd X = Eigen::Map<const Eigen::VectorXd>(Xmat.data(), N);
     Eigen::VectorXd Y = Eigen::Map<const Eigen::VectorXd>(Ymat.data(), N);
     Eigen::VectorXd Z = Eigen::VectorXd::Zero(N);
 
-
-    this->points_.col(0) = X;
-    this->points_.col(1) = Y;
-    this->points_.col(2) = Z;
-
+    Eigen::MatrixX3d points(N,3);
+    points.col(0) = X;
+    points.col(1) = Y;
+    points.col(2) = Z;
+    this->points_ = points;
     
+
     // ------------- Normal vectors -------------
     auto [dz_dx, dz_dy] = gradient(Z, X, Y, Nx, Nx);
 
@@ -466,9 +468,9 @@ void MASSystem::generateGPSurface(const char* jsonPath) {
 
     // ------------- Auxiliary points -------------
     // Approximate mean curvature and calculate distance
-    auto mean_curv = approx_max_curvature(dz_dx, dz_dy, X, Y, Nx, Nx);
-    std::cout << "Max mean curvature: " << mean_curv << std::endl;
-    // double mean_curv = -0.6657612170;
+    // auto mean_curv = approx_max_curvature(dz_dx, dz_dy, X, Y, Nx, Nx);
+    // std::cout << "Max mean curvature: " << mean_curv << std::endl;
+    double mean_curv = -0.6657612170;
     double radius = 1 / abs(mean_curv);
     // double radius = 1.02;
 

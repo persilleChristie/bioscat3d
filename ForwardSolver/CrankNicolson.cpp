@@ -7,6 +7,7 @@
 #include "MASSystem.h"
 #include "FieldCalculatorTotal.h"
 #include "UtilsGP.h"
+#include "UtilsExport.h"
 
 CrankNicolson::CrankNicolson(const Eigen::MatrixX3cd& data, 
                         const Eigen::MatrixX3d& data_points,
@@ -15,32 +16,28 @@ CrankNicolson::CrankNicolson(const Eigen::MatrixX3cd& data,
                         const int iterations,
                         const char* jsonPath)
     : data_(data), data_points_(data_points), delta_(delta), 
-    gamma_(gamma), iterations_(iterations), mas_("GP",jsonPath) {}
+    gamma_(gamma), iterations_(iterations), mas_("GP", jsonPath) {
+        std::cout << "pCN initialized succesfully" << std::endl;
+    }
 
-double CrankNicolson::logLikelihood(Eigen::ArrayXXd& points){
-    mas_.setPoints(points.matrix());
+double CrankNicolson::logLikelihood(Eigen::MatrixXd& points){
+    mas_.setPoints(points);
     FieldCalculatorTotal field(mas_);
-
-    int M = points.rows();
+    int M = data_points_.rows();
 
     Eigen::MatrixX3cd Eout = Eigen::MatrixX3cd::Zero(M, 3);    
     Eigen::MatrixX3cd Hout = Eigen::MatrixX3cd::Zero(M, 3);
 
     field.computeFields(Eout, Hout, data_points_);
-
-    double loglike = -0.5 * gamma_ * (abs(Eout.col(2).array()) 
-                                        - abs(data_.col(2).array())).matrix().squaredNorm();
-
+    double loglike = -0.5 * gamma_ * (Eout.rowwise().squaredNorm()
+                                        - data_.rowwise().squaredNorm()).squaredNorm();
     return loglike;
 }
 
 void CrankNicolson::run(){
-    int M = data_.rows();
-
-    Eigen::ArrayXXd previous = mas_.getPoints().array();
-    Eigen::ArrayXXd proposal = mas_.getPoints().array();
-    Eigen::MatrixXd gridpoints = previous.leftCols(2).matrix();
-
+    Eigen::MatrixXd previous = mas_.getPoints();
+    Eigen::MatrixXd proposal = mas_.getPoints();
+    Eigen::MatrixXd gridpoints = previous.leftCols(2);
     double logLikelihoodPrev, logLikelihoodProp;
     double alpha;
 
@@ -63,7 +60,7 @@ void CrankNicolson::run(){
         proposal.col(2) = GaussianProcess::sample_gp_2d_fast(gridpoints, l, sigma, genGP);
 
         // Define new proposal
-        proposal.col(2) = sqrt(1 - 2 * delta_) * previous.col(2) + sqrt(2 * delta_) * proposal.col(2);
+        proposal.col(2) = (sqrt(1 - 2 * delta_) * previous.col(2).array() + sqrt(2 * delta_) * proposal.col(2).array()).matrix();
 
         // Compute acceptance probability 
         logLikelihoodProp = logLikelihood(proposal);
@@ -81,4 +78,7 @@ void CrankNicolson::run(){
 
         // ????? TODO: Update delta, gamma ?????
     }
+
+    std::cout << "Surface: " << previous << std::endl;
+    Export::saveRealVectorCSV("Estimate.csv", previous.col(2));
 }

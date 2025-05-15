@@ -80,16 +80,16 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
 
         amplitudes.row(i) = amps.head(N);
 
-        if (i == 0){
-            Export::saveMatrixCSV("FilesCSV/matrix_A_simple.csv", A);
+        // if (i == 0){
+        //     Export::saveMatrixCSV("FilesCSV/matrix_A_simple.csv", A);
             
-        }
+        // }
 
-        filename = "FilesCSV/solution_y_" + std::to_string(i) + ".csv";
-        Export::saveVectorCSV(filename, amps);
+        // filename = "FilesCSV/solution_y_" + std::to_string(i) + ".csv";
+        // Export::saveVectorCSV(filename, amps);
 
-        filename = "FilesCSV/vector_b_" + std::to_string(i) + ".csv";
-        Export::saveVectorCSV(filename, b);
+        // filename = "FilesCSV/vector_b_" + std::to_string(i) + ".csv";
+        // Export::saveVectorCSV(filename, b);
 
     }
 

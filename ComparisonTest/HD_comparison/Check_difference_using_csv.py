@@ -78,7 +78,7 @@ if False:
 #----------------------------------------------------------------------------
 
 if True:  
-    np.random.seed(42)
+    # np.random.seed(4)
 
     # Generate random values
     # mu = np.random.uniform(0.5, 10)
@@ -88,7 +88,7 @@ if True:
     epsilon    = 1 # 8.8541878188e-12
     wavelength = 0.0001
     #wavelength = 0.325e-6
-    omega      = 2 * np.pi / wavelength  # 2.99792458e8
+    omega      = 1.0  # 2.99792458e8
     length = 1
 
     # Random position (assuming within a range, e.g., -10 to 10)
@@ -96,9 +96,9 @@ if True:
     position = [0,0,0]
 
     # Random unit vector for direction
-    # random_vector = np.random.uniform(-1, 1, size=3)
-    # direction = (random_vector / np.linalg.norm(random_vector)).tolist()
-    direction = [2,3,1]/np.sqrt(14)
+    random_vector = np.random.uniform(-1, 1, size=3)
+    direction = (random_vector / np.linalg.norm(random_vector)).tolist()
+    # direction = [0,0,1]
 
     # Generate 100x3 test points within a range (e.g., -10 to 10)
     # testpoints = np.random.uniform(-10, 10, size=(100, 3)).tolist()
