@@ -42,8 +42,8 @@ int main() {
 
     // Parameters
     double delta = 0.01;
-    double gamma = 1.0;
-    int iterations = 1000;
+    double gamma = 10000.0;
+    int iterations = 1500;
 
     // Instantiate and run Crank-Nicolson sampler
     

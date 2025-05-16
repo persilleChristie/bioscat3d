@@ -129,11 +129,11 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> gradient(const Eigen::VectorXd& Z,
         for (int j = 0; j < Nx; ++j) {
             int k = j * Ny + i;
 
-            if (k < Ny){
+            if (j == 0){
                 dz_dx(k) = (Z(k + Ny) - Z(k)) / dx;
             }
             
-            if (k > Ny * (Nx - 1) - 1){
+            if (j == Nx - 1){
                 dz_dx(k) = (Z(k) - Z(k - Ny)) / dx;
             }
             
@@ -192,8 +192,8 @@ double approx_max_curvature(const Eigen::VectorXd& dz_dx, const Eigen::VectorXd&
     int maxRow;
 
     // std::cout << "mean curvature = " << minus_mean_curv << std::endl;
-    // std::cout << "fx = " << fx << std::endl;
-    // std::cout << "fy = " << fy << std::endl;
+    std::cout << "fx = " << fx << std::endl;
+    std::cout << "fy = " << fy << std::endl;
     // std::cout << "fxx = " << fxx << std::endl;
     // std::cout << "fyy = " << fyy << std::endl;
     // std::cout << "fxy = " << fxy << std::endl;

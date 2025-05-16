@@ -26,7 +26,7 @@
     "halfWidth_z": 2.0,
     "resolution": 10,
     "pml_thickness": 2,
-    "omega": 5.0,
+    "omega": 2.0,
     "epsilon1": 2.56,
     "k": [
         0.0,

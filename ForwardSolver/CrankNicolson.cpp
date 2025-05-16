@@ -54,6 +54,10 @@ void CrankNicolson::run(){
     previous.col(2) = GaussianProcess::sample_gp_2d_fast(gridpoints, l, sigma, genGP);
     logLikelihoodPrev = logLikelihood(previous);
 
+    int counter = 0;
+    std::vector<int> accepted = {};
+    std::vector<int> totalcount = {};
+
     // --------- Run update ---------
     for (int i = 0; i < iterations_; ++i){
         // Draw samples
@@ -68,17 +72,36 @@ void CrankNicolson::run(){
 
         // Draw from uniform distribution
         u = distribution(generator);
+        // std::cout << "u: " << u << ", alpha: " << alpha << std::endl;
 
         // Set f(i)
         if (u < alpha){
             previous = proposal;
             logLikelihoodPrev = logLikelihoodProp;
+
+            counter += 1;
+            accepted.push_back(i);
         } // else previous = previous, so nothing is done
 
-
+        totalcount.push_back(counter);
         // ????? TODO: Update delta, gamma ?????
     }
 
-    std::cout << "Surface: " << previous << std::endl;
+    // std::cout << "Surface: " << previous << std::endl;
     Export::saveRealVectorCSV("Estimate.csv", previous.col(2));
+    
+    std::ofstream file("totalcount.csv");
+    if (file.is_open()) {
+        for (size_t i = 0; i < totalcount.size(); ++i) {
+            file << totalcount[i];
+            if (i < totalcount.size() - 1)
+                file << ",";
+        }
+        file << "\n";
+        file.close();
+        std::cout << "CSV file written successfully.\n";
+    } else {
+        std::cerr << "Unable to open file.\n";
+    }
+
 }
