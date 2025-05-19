@@ -88,6 +88,9 @@
         "iomanip": "cpp",
         "condition_variable": "cpp",
         "mutex": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "typeindex": "cpp"
     }
 }
