@@ -25,7 +25,7 @@ int main() {
     py::module::import("sys").attr("path").attr("insert")(1, "./");
 
     // 3. Import your Python module
-    py::module spline = py::module::import("spline_wrapper");
+    py::module_ spline = py::module_::import("spline_wrapper");
 
     // 4. Prepare data in Eigen and convert to NumPy arrays
     Eigen::MatrixXd X = Eigen::MatrixXd::Random(100, 100);
