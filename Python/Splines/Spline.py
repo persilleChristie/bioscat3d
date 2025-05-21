@@ -57,7 +57,32 @@ class Spline:
         tangent2 = np.cross(normals, tangent1)
 
         return test_points, normals, tangent1, tangent2
-    
+
+
+
+class SplineManager:
+    _spline_instance = None
+
+    @staticmethod
+    def initialize(Xfine, Yfine, Zfine):
+        if SplineManager._spline_instance is None:
+            SplineManager._spline_instance = Spline(Xfine, Yfine, Zfine)
+        else:
+            # Update data without rebuilding object
+            spline = SplineManager._spline_instance
+            spline.Xfine = Xfine
+            spline.Yfine = Yfine
+            spline.Zfine = Zfine
+            spline.tcks = bisplrep(Xfine.ravel(), Yfine.ravel(), Zfine.ravel())
+            spline.max_curvature = spline.__compute_max_mean_curvature__()
+
+    @staticmethod
+    def get_max_curvature():
+        return SplineManager._spline_instance.max_curvature
+
+    @staticmethod
+    def calculate(resolution):
+        return SplineManager._spline_instance.calculate_points(resolution) 
     
     
 
