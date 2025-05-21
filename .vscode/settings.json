@@ -91,6 +91,9 @@
         "cinttypes": "cpp",
         "forward_list": "cpp",
         "unordered_set": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "bitset": "cpp",
+        "ranges": "cpp",
+        "valarray": "cpp"
     }
 }

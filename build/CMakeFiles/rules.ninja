@@ -6,7 +6,7 @@
 # It is included in the main 'build.ninja'.
 
 # =============================================================================
-# Project: pybind_cpp_embed
+# Project: bioscat3d
 # Configurations: 
 # =============================================================================
 # =============================================================================
@@ -14,7 +14,7 @@
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__splinetest_unscanned_
+rule CXX_COMPILER__main_unscanned_
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/home/pernillechristie/anaconda3/envs/cpp_pybind/bin/x86_64-conda-linux-gnu-c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -24,7 +24,7 @@ rule CXX_COMPILER__splinetest_unscanned_
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__splinetest_
+rule CXX_EXECUTABLE_LINKER__main_
   command = $PRE_LINK && /home/pernillechristie/anaconda3/envs/cpp_pybind/bin/x86_64-conda-linux-gnu-c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -42,8 +42,17 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /home/pernillechristie/anaconda3/envs/cpp_pybind/bin/cmake --regenerate-during-build -S/home/pernillechristie/DTU/bioscat3d/Python/Splines -B/home/pernillechristie/DTU/bioscat3d/Python/Splines/build
+  command = /home/pernillechristie/anaconda3/envs/cpp_pybind/bin/cmake --regenerate-during-build -S/home/pernillechristie/DTU/bioscat3d -B/home/pernillechristie/DTU/bioscat3d/build
   description = Re-running CMake...
+  generator = 1
+
+
+#############################################
+# Rule for re-checking globbed directories.
+
+rule VERIFY_GLOBS
+  command = /home/pernillechristie/anaconda3/envs/cpp_pybind/bin/cmake -P /home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/VerifyGlobs.cmake
+  description = Re-checking globbed directories...
   generator = 1
 
 
