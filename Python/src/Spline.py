@@ -34,10 +34,19 @@ class Spline:
         x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
         y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)
 
+        x_control = np.linspace(self.Xfine.min() + (x[1]-x[0])/2, self.Xfine.max()- (x[1]-x[0])/2, resolution - 1)
+        y_control = np.linspace(self.Yfine.min() + (y[1]-y[0])/2, self.Yfine.max()- (y[1]-y[0])/2, resolution - 1)
+
         X, Y = np.meshgrid(x, y)
         Z = self.__evaluate_at_points__(x, y)
 
+        X_control, Y_control = np.meshgrid(x_control, y_control)
+        Z_control  = self.__evaluate_at_points__(x_control, y_control)
+
         test_points = np.column_stack((X.ravel(), Y.ravel(), Z.ravel()))
+        control_points = np.column_stack((X_control.ravel(), Y_control.ravel(), Z_control.ravel()))
+
+        # Compute normals
         fx = self.__evaluate_at_points__(x, y, dx = 1).ravel()
         fy = self.__evaluate_at_points__(x, y, dy = 1).ravel()
     
@@ -56,7 +65,7 @@ class Spline:
         # Compute second tangent as cross product
         tangent2 = np.cross(normals, tangent1)
 
-        return test_points, normals, tangent1, tangent2
+        return test_points, normals, tangent1, tangent2, control_points
 
 
 

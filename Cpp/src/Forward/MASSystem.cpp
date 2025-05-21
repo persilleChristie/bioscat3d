@@ -1,5 +1,6 @@
 #include "../../lib/Forward/MASSystem.h"
 #include "../Utils/Constants.h"
+using std::ignore;
 
 
 MASSystem::MASSystem(const py::object spline, const double lambda, const double dimension,
@@ -15,7 +16,7 @@ MASSystem::MASSystem(const py::object spline, const double lambda, const double 
 //     this->points_ = points;
 // }
 
-std::tuple<Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3d> 
+std::tuple<Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3d> 
         call_spline(py::object spline, int resolution){ 
 
     py::tuple result = spline.attr("calculate_points")(resolution);
@@ -24,6 +25,7 @@ std::tuple<Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3
     py::array_t<double> py_normals = result[1].cast<py::array_t<double>>();
     py::array_t<double> py_tangents1 = result[2].cast<py::array_t<double>>();
     py::array_t<double> py_tangents2 = result[3].cast<py::array_t<double>>();
+    py::array_t<double> py_control_points = result[4].cast<py::array_t<double>>();
 
     double rows = py_points.shape(0), cols = py_points.shape(1);
 
@@ -39,7 +41,10 @@ std::tuple<Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3d, Eigen::MatrixX3
     Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> 
     tangents2((double*)py_tangents2.request().ptr, rows, cols);
 
-    return {points, normals, tangents1, tangents2};
+    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+    control_points((double*)py_control_points.request().ptr, rows, cols);
+
+    return {points, normals, tangents1, tangents2, control_points};
 
 }
 
@@ -53,19 +58,20 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     int test_point_res = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
 
     // Calculate points on surface and translate to Eigen
-    auto [points, normals, tangents1, tangents2] = call_spline(spline, test_point_res);
+    auto [points, normals, tangents1, tangents2, control_points] = call_spline(spline, test_point_res);
 
     // Save in class
     this->points_ = points;
     this->tau1_ = tangents1;
     this->tau2_ = tangents2;
+    this->control_points_ = control_points;
 
 
     // --------- Generate auxiliary points -----------
     int aux_points_res = std::ceil(constants.auxpts_pr_lambda * dimension/lambda_);
 
     // Calculate points on surface and translate to Eigen
-    auto [aux_points, aux_normals, aux_tangents1, aux_tangents2] = call_spline(spline, aux_points_res);
+    auto [aux_points, aux_normals, aux_tangents1, aux_tangents2, aux_control_points] = call_spline(spline, aux_points_res);
     
     // Calculate point values and save in class
     this->aux_points_int_ = aux_points - constants.alpha * maxcurvature * aux_normals;   

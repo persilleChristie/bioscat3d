@@ -1,8 +1,6 @@
-# ninja log v6
-1	11	1747833978602630322	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	475a4e872dea9739
-10	5394	1747833739484995686	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	8e346fa1af6e1021
-12	6568	1747833978612630306	CMakeFiles/main.dir/main.cpp.o	65a9a7cf1bfe7c91
-6568	6757	1747833985161476442	main	8cdb0f4da370c5a4
-1	6	1747834077962432637	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	475a4e872dea9739
-8	5081	1747834077972432621	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	8e346fa1af6e1021
-5081	5271	1747834083035913824	main	8cdb0f4da370c5a4
+# ninja log v5
+0	5	0	/home/tripleskull/bioscat3d/build/CMakeFiles/cmake.verify_globs	4e0228459da763ec
+6	9398	1747845041760508523	CMakeFiles/main.dir/main.cpp.o	105dd7c68c4fbdaa
+0	6	0	/home/tripleskull/bioscat3d/build/CMakeFiles/cmake.verify_globs	4e0228459da763ec
+7	5238	1747845288044237515	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	ab8c69ea9c0b8909
+5238	5365	1747845288174203651	main	98fc9934821a35f
