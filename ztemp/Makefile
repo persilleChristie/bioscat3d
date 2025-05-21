@@ -28,18 +28,3 @@ clean:
 # clean:
 # 	rm -f main
 
-# PYTHON := /home/tripleskull/miniconda/envs/mp312/bin/python
-# PYLIB  := $(shell $(PYTHON) -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
-# SITEPKG := $(shell $(PYTHON) -c "import site; print(site.getsitepackages()[0])")
-
-# CXX := c++
-# CXXFLAGS := -O3 -Wall -std=c++17 $(shell $(PYTHON) -m pybind11 --includes) -DSITE_PACKAGES=\"$(SITEPKG)\"
-# LDFLAGS := -L$(PYLIB) -Wl,-rpath,$(PYLIB) -lpython3.12
-
-# main: main.cpp
-# 	$(CXX) $(CXXFLAGS) main.cpp -o main $(LDFLAGS)
-
-# clean:
-# 	rm -f main
-
-

@@ -68,9 +68,10 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 build cmake_object_order_depends_target_run_pybind: phony || CMakeFiles/run_pybind.dir
 
 build CMakeFiles/run_pybind.dir/src/main.cpp.o: CXX_COMPILER__run_pybind_ /home/tripleskull/bioscat3d/ztemp/cpp_pybind_project/src/main.cpp || cmake_object_order_depends_target_run_pybind
+  DEFINES = -DPYTHON_SCRIPT_DIR=\"/home/tripleskull/bioscat3d/ztemp/cpp_pybind_project\"
   DEP_FILE = CMakeFiles/run_pybind.dir/src/main.cpp.o.d
   FLAGS = -fvisibility-inlines-hidden -std=c++17 -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/tripleskull/miniconda/envs/cpp_pybind/include -std=gnu++17
-  INCLUDES = -isystem /home/tripleskull/miniconda/envs/cpp_pybind/include/python3.11
+  INCLUDES = -I/home/tripleskull/bioscat3d/ztemp/cpp_pybind_project/src -isystem /home/tripleskull/miniconda/envs/cpp_pybind/include/python3.11
   OBJECT_DIR = CMakeFiles/run_pybind.dir
   OBJECT_FILE_DIR = CMakeFiles/run_pybind.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/run_pybind.dir/
