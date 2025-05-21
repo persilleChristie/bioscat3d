@@ -1,3 +1,0 @@
-/home/pernillechristie/DTU/bioscat3d/Python/Splines/build/CMakeFiles/splinetest.dir
-/home/pernillechristie/DTU/bioscat3d/Python/Splines/build/CMakeFiles/edit_cache.dir
-/home/pernillechristie/DTU/bioscat3d/Python/Splines/build/CMakeFiles/rebuild_cache.dir
