@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/pernillechristie/DTU/bioscat3d/ztemp/cpp_pybind_project/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

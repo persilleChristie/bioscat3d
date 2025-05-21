@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 # ninja log v5
 1	2592	1747810651382108538	CMakeFiles/modEigen.dir/src/modEigen.cpp.o	ee9d420dce483671
 2593	4493	1747810653293023613	modEigen.cpython-311-x86_64-linux-gnu.so	c95de02adf339a81
 1	4895	1747810653693699355	CMakeFiles/run_pybind.dir/src/main.cpp.o	135e377f69487f3d
 4895	5023	1747810653816956606	run_pybind	ca5a273b41d010dd
+=======
+# ninja log v6
+2	5351	1747807220621640219	CMakeFiles/modEigen.dir/src/modEigen.cpp.o	a7a01bc857938cf
+3	9316	1747807220621640219	CMakeFiles/run_pybind.dir/src/main.cpp.o	5d97e9532486884f
+9317	9636	1747807229941614176	run_pybind	9d1b1eb35878a66f
+5354	9745	1747807225971637948	modEigen.cpython-312-x86_64-linux-gnu.so	33491f94fa87a3d6
+>>>>>>> 1f48bbe (Splinetest virker)
