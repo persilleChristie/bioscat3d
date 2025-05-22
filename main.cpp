@@ -9,6 +9,7 @@
 #include "Cpp/lib/Utils/Constants.h"
 #include "Cpp/lib/Forward/MASSystem.h"
 #include "Cpp/lib/Forward/FieldCalculatorTotal.h"
+#include "Cpp/lib/Utils/UtilsExport.h"
 
 namespace py = pybind11;
 
@@ -66,7 +67,7 @@ int main() {
     
     // Read polarizations
     const auto& betas = doc["betas"];
-    int B = static_cast<int>(betas.Size());
+    int B = 2; // static_cast<int>(betas.Size());
 
     Eigen::VectorXd beta_vec(B);
     for (int i = 0; i < B; ++i) {
@@ -151,20 +152,31 @@ int main() {
         MASSystem mas(spline, lambda, dimension, k, beta_vec);
         FieldCalculatorTotal field(mas);
         
-        auto points = mas.getPoints();
+        auto [error1, error2] = field.computeTangentialError(0);
 
-        Eigen::MatrixX3cd outE = Eigen::MatrixX3cd::Zero(N, 3);
-        Eigen::MatrixX3cd outH = Eigen::MatrixX3cd::Zero(N, 3); 
+        Export::saveRealVectorCSV("../CSV/tangential_error1.csv", error1);
+        Export::saveRealVectorCSV("../CSV/tangential_error2.csv", error2);
 
-        field.computeFields(outE, outH, checkpoints);
 
-        std::cout << "Lambda: " << lambda << std::endl;
-        std::cout << "Size of points: (" << points.rows() << "," << points.cols() << ")" << std::endl;
-        std::cout << "Field in points: " << std::endl;
-        for (int i = 0; i < N; ++i){
-            std::cout << outE.row(i) << std::endl;
-        }
-        std::cout << "----------------------------" << std::endl;
+        // auto points = mas.getPoints();
+        // auto control_points = mas.getControlPoints();
+
+        // Eigen::MatrixX3cd outE = Eigen::MatrixX3cd::Zero(N, 3);
+        // Eigen::MatrixX3cd outH = Eigen::MatrixX3cd::Zero(N, 3); 
+
+        // field.computeFields(outE, outH, checkpoints);
+
+        // std::cout << "Lambda: " << lambda << std::endl;
+        // std::cout << "Size of points: (" << points.rows() << ", " << points.cols() << ")" << std::endl;
+        // std::cout << "Size of control points: (" << control_points.rows() 
+        //           << ", " << control_points.cols() << ")" << std::endl;
+        // std::cout << "Field in points: " << std::endl;
+        // for (int i = 0; i < N; ++i){
+        //     std::cout << outE.row(i) << std::endl;
+        // }
+        // std::cout << "----------------------------" << std::endl;
+
+        
 
 
 

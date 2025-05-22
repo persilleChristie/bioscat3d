@@ -1,13 +1,13 @@
 # ninja log v6
-3	24	1747850370712653298	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	475a4e872dea9739
-23	4321	1747849456497432165	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	7297ad68e76b0be4
-26	9166	1747849456497432165	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	bd7521b3d97d84a4
-25	4432	1747849456497432165	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	6b572f3e67bccb7d
-22	4734	1747849456487095149	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	5153a9110c6143f8
-24	9974	1747849456497432165	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	8e346fa1af6e1021
-33	15968	1747850370743801288	CMakeFiles/main.dir/main.cpp.o	65a9a7cf1bfe7c91
-23	61790	1747849456487095149	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	379847eac2482dd2
-15968	16872	1747850385490056311	main	a8fe112a1608699b
-2	18	1747850522658054291	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	475a4e872dea9739
-54	15460	1747850522720362082	CMakeFiles/main.dir/main.cpp.o	65a9a7cf1bfe7c91
-15460	16441	1747850536945679443	main	a8fe112a1608699b
+1	12	1747897901143934141	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	78e3a1670abdb5ac
+12	3338	1747897146689809506	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	f554c4e5a9be1ede
+12	8605	1747897146689809506	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	e7290da6b42758bb
+12	3213	1747897146689809506	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	8da0ccbc44517893
+11	3610	1747897146689809506	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	1eee51dac8636f0b
+12	9661	1747897146689809506	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	24435910f0ab3efe
+17	7927	1747897901165128730	CMakeFiles/main.dir/main.cpp.o	ab2b999108cc51cc
+17	43127	1747897901165128730	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	3be4a7e1d7b916ed
+43127	43387	1747897942465758168	main	a8fe112a1608699b
+3	28	1747898668799985321	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	78e3a1670abdb5ac
+39	91921	1747898668842417714	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	3be4a7e1d7b916ed
+91921	92832	1747898755166855528	main	a8fe112a1608699b

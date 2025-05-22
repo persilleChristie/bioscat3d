@@ -41,6 +41,9 @@ public:
     const Eigen::MatrixX3d& getAuxTau2() const {return aux_tau2_;};
 
     const Eigen::MatrixX3d& getControlPoints() const {return control_points_;};
+    const Eigen::MatrixX3d& getControlTangents1() const {return control_tangents1_;};
+    const Eigen::MatrixX3d& getControlTangents2() const {return control_tangents2_;};
+    
     // const std::vector<int>& getIndecees() const {return aux_test_indices_;};
 
 private:
@@ -59,6 +62,8 @@ private:
     Eigen::MatrixX3d aux_tau2_;
 
     Eigen::MatrixX3d control_points_;
+    Eigen::MatrixX3d control_tangents1_;
+    Eigen::MatrixX3d control_tangents2_;
     // std::vector<int> aux_test_indices_;
 
     void generateSurface(py::object spline, double dimension);

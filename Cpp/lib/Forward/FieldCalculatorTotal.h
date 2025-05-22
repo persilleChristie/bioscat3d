@@ -37,12 +37,13 @@ public:
 
     Eigen::MatrixXcd getAmplitudes() {return amplitudes_;}
 
-    Eigen::VectorXd computeTangentialError();
+    std::pair<Eigen::VectorXd, Eigen::VectorXd> computeTangentialError(int polarization_index);
 
 private:
     Eigen::MatrixXcd amplitudes_;
-    Eigen::MatrixXcd ampltudes_ext_;
+    Eigen::MatrixXcd amplitudes_ext_;
     std::vector<std::shared_ptr<FieldCalculator>> dipoles_;
+    std::vector<std::shared_ptr<FieldCalculator>> dipoles_ext_;
     std::vector<std::shared_ptr<FieldCalculator>> UPW_;
     MASSystem mas_;
 
