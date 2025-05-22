@@ -1,3 +1,0 @@
-/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/main.dir
-/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/edit_cache.dir
-/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/rebuild_cache.dir
