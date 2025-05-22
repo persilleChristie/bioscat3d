@@ -37,11 +37,16 @@ public:
 
     Eigen::MatrixXcd getAmplitudes() {return amplitudes_;}
 
+    Eigen::VectorXd computeTangentialError();
+
 private:
     Eigen::MatrixXcd amplitudes_;
+    Eigen::MatrixXcd ampltudes_ext_;
     std::vector<std::shared_ptr<FieldCalculator>> dipoles_;
+    std::vector<std::shared_ptr<FieldCalculator>> UPW_;
+    MASSystem mas_;
 
-    void constructor(const MASSystem masSystem);
+    void constructor();
 };
 
 #endif // FIELDCALCULATORTOTAL_H

@@ -8,6 +8,7 @@
 #include "rapidjson/istreamwrapper.h"
 #include "Cpp/lib/Utils/Constants.h"
 #include "Cpp/lib/Forward/MASSystem.h"
+#include "Cpp/lib/Forward/FieldCalculatorTotal.h"
 
 namespace py = pybind11;
 
@@ -73,9 +74,9 @@ int main() {
     }
 
     // Read lambdas
-    double lambda_min = doc["minLambda"].GetDouble();
-    double lambda_max = doc["maxLambda"].GetDouble();
-    int lambda_nr = doc["lambda_n"].GetInt();
+    double lambda_min = 0.7; // doc["minLambda"].GetDouble();
+    double lambda_max = 0.7;  // doc["maxLambda"].GetDouble();
+    int lambda_nr = 1; // doc["lambda_n"].GetInt();
 
     Eigen::VectorXd lambdas = Eigen::VectorXd::LinSpaced(lambda_nr, lambda_min, lambda_max);
 
@@ -138,14 +139,34 @@ int main() {
         return 1;
     }
 
+    Eigen::Matrix3d checkpoints;
+    checkpoints << 2, 2, 2,
+                   3, 7, 4,
+                   10, 9, 7;
+
+    int N = checkpoints.rows();
+
     for (auto lambda : lambdas){
 
         MASSystem mas(spline, lambda, dimension, k, beta_vec);
+        FieldCalculatorTotal field(mas);
+        
         auto points = mas.getPoints();
+
+        Eigen::MatrixX3cd outE = Eigen::MatrixX3cd::Zero(N, 3);
+        Eigen::MatrixX3cd outH = Eigen::MatrixX3cd::Zero(N, 3); 
+
+        field.computeFields(outE, outH, checkpoints);
 
         std::cout << "Lambda: " << lambda << std::endl;
         std::cout << "Size of points: (" << points.rows() << "," << points.cols() << ")" << std::endl;
+        std::cout << "Field in points: " << std::endl;
+        for (int i = 0; i < N; ++i){
+            std::cout << outE.row(i) << std::endl;
+        }
         std::cout << "----------------------------" << std::endl;
+
+
 
     }
     

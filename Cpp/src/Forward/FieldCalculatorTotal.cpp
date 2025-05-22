@@ -9,25 +9,25 @@
 
 FieldCalculatorTotal::FieldCalculatorTotal(
     const MASSystem masSystem
-) 
+) : mas_(masSystem)
 {
-    constructor(masSystem);
+    constructor();
 }
 
-void FieldCalculatorTotal::constructor(const MASSystem masSystem)
+void FieldCalculatorTotal::constructor()
 {
     // ----------- CREATE DIPOLES --------------
     std::vector<std::shared_ptr<FieldCalculator>> sources_int;
     std::vector<std::shared_ptr<FieldCalculator>> sources_ext;
 
-    Eigen::MatrixXd aux_int = masSystem.getIntPoints();
-    Eigen::MatrixXd aux_ext = masSystem.getExtPoints();
-    Eigen::MatrixX3d aux_t1 = masSystem.getAuxTau1();
-    Eigen::MatrixX3d aux_t2 = masSystem.getAuxTau2();
+    Eigen::MatrixXd aux_int = mas_.getIntPoints();
+    Eigen::MatrixXd aux_ext = mas_.getExtPoints();
+    Eigen::MatrixX3d aux_t1 = mas_.getAuxTau1();
+    Eigen::MatrixX3d aux_t2 = mas_.getAuxTau2();
 
-    Eigen::MatrixX3d t1 = masSystem.getTau1();
-    Eigen::MatrixX3d t2 = masSystem.getTau2();
-    Eigen::MatrixX3d points = masSystem.getPoints();
+    Eigen::MatrixX3d t1 = mas_.getTau1();
+    Eigen::MatrixX3d t2 = mas_.getTau2();
+    Eigen::MatrixX3d points = mas_.getPoints();
 
     int M      = points.rows();
     int Nprime = aux_int.rows();
@@ -53,20 +53,25 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
     Eigen::MatrixXcd A(4 * M, 2 * N); 
     Eigen::VectorXcd b(4 * M);
     std::shared_ptr<FieldCalculatorUPW> UPW;
+    std::vector<std::shared_ptr<FieldCalculator>> UPW_list;
 
     // Load polarizations and incidence vector
-    auto [kinc, lambda] = masSystem.getInc();
-    Eigen::VectorXd polarizations = masSystem.getPolarizations();
+    auto [kinc, lambda] = mas_.getInc();
+    Eigen::VectorXd polarizations = mas_.getPolarizations();
 
     int B = polarizations.size();
 
     // Allocate space for amplitudes
     Eigen::MatrixXcd amplitudes(B, N);
+    Eigen::MatrixXcd amplitudes_ext(B, N);
 
     std::string filename;
 
+    
+
     for (int i = 0; i < B; ++i){
         UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i));
+        UPW_list.emplace_back(UPW);
 
         SystemAssembler::assembleSystem(A, b, points, t1, t2, sources_int, sources_ext, UPW);
 
@@ -74,6 +79,7 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
         Eigen::VectorXcd amps = svd1.solve(b);
 
         amplitudes.row(i) = amps.head(N);
+        amplitudes_ext.row(i) = amps.tail(N);
 
         // if (i == 0){
         //     Export::saveMatrixCSV("FilesCSV/matrix_A_simple.csv", A);
@@ -88,7 +94,8 @@ void FieldCalculatorTotal::constructor(const MASSystem masSystem)
 
     }
 
-
+    this->UPW_ = UPW_list;
+    this->ampltudes_ext_ = amplitudes_ext;
     this->amplitudes_ = amplitudes;
 }
 
@@ -159,4 +166,39 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
     }
 
     return integral_vec;   
+}
+
+
+Eigen::VectorXd FieldCalculatorTotal::computeTangentialError(){
+    auto control_points = mas_.getControlPoints();
+
+    int N = control_points.rows();
+
+    // Compute field from interior points
+    Eigen::MatrixX3cd intE = Eigen::MatrixX3cd::Zero(N, 3);
+    Eigen::MatrixX3cd intH = Eigen::MatrixX3cd::Zero(N, 3); 
+
+    computeFields(intE, intH, control_points);
+
+    // Compute field from exterior points and add UPW
+    Eigen::MatrixX3cd extE = Eigen::MatrixX3cd::Zero(N, 3);
+    Eigen::MatrixX3cd extH = Eigen::MatrixX3cd::Zero(N, 3); 
+    Eigen::MatrixX3cd Ei(N, 3), Hi(N, 3);
+
+    for (size_t i = 0; i < dipoles_.size(); ++i) {
+        dipoles_[i]->computeFields(Ei, Hi, control_points);
+
+        extE += amplitudes_.row(0)(i) * Ei;  // NOTE: needs implementation allowing different polarizations
+        extH += amplitudes_.row(0)(i) * Hi;
+    }
+
+    UPW_[0]->computeFields(Ei, Hi, control_points);
+    extE += Ei;
+    extH += Hi;
+
+
+    // Check tangentiel elements
+    Eigen::VectorXd tangential_error(N);
+
+
 }
