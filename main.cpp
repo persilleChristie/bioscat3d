@@ -92,7 +92,7 @@ int main() {
     for (int i = 0; i < N_fine; ++i) {  // Works as meshgrid
         X_fine.row(i) = x.transpose();
         Y_fine.col(i) = y;
-    }
+    } // check this
 
     Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
 

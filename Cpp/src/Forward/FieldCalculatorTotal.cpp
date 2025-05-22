@@ -181,7 +181,7 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangent
     Eigen::MatrixX3cd intE = Eigen::MatrixX3cd::Zero(N, 3);
     Eigen::MatrixX3cd intH = Eigen::MatrixX3cd::Zero(N, 3); 
 
-    computeFields(intE, intH, control_points);
+    computeFields(intE, intH, control_points, polarization_index);
 
     // Compute field from exterior points and add UPW
     Eigen::MatrixX3cd extE = Eigen::MatrixX3cd::Zero(N, 3);
@@ -195,16 +195,17 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangent
         extH += amplitudes_ext_.row(polarization_index)(i) * Hi;
     }
 
-    UPW_[polarization_index]->computeFields(Ei, Hi, control_points);
-    extE += Ei;
-    extH += Hi;
+    Eigen::MatrixX3cd incE(N, 3), incH(N, 3);
+    UPW_[polarization_index]->computeFields(incE, incH, control_points);
+    // extE += Ei;
+    // extH += Hi;
 
 
     // Check tangentiel elements
     Eigen::ArrayXd tangential_error1(N), tangential_error2(N);
 
-    tangential_error1 = ((extE - intE).array() * control_tangents1.array()).rowwise().sum().abs();
-    tangential_error2 = ((extE - intE).array() * control_tangents2.array()).rowwise().sum().abs();
+    tangential_error1 = ((intE - extE + incE).array() * control_tangents1.array()).rowwise().sum().abs();
+    tangential_error2 = ((intE - extE + incE).array() * control_tangents2.array()).rowwise().sum().abs();
 
     return {tangential_error1.matrix(), tangential_error2.matrix()};
 
