@@ -47,6 +47,7 @@ void FieldCalculatorTotal::constructor()
 
     // Save dipoles for calculating total field
     this->dipoles_ = sources_int;
+    this->dipoles_ext_ = sources_ext;
 
     // -------- SOLVE SYSTEM ---------
     // Allocate space for system matrix and UPW
@@ -95,7 +96,7 @@ void FieldCalculatorTotal::constructor()
     }
 
     this->UPW_ = UPW_list;
-    this->ampltudes_ext_ = amplitudes_ext;
+    this->amplitudes_ext_ = amplitudes_ext;
     this->amplitudes_ = amplitudes;
 }
 
@@ -169,8 +170,10 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
 }
 
 
-Eigen::VectorXd FieldCalculatorTotal::computeTangentialError(){
+std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangentialError(int polarization_index){
     auto control_points = mas_.getControlPoints();
+    auto control_tangents1 = mas_.getControlTangents1();
+    auto control_tangents2 = mas_.getControlTangents2();
 
     int N = control_points.rows();
 
@@ -185,20 +188,24 @@ Eigen::VectorXd FieldCalculatorTotal::computeTangentialError(){
     Eigen::MatrixX3cd extH = Eigen::MatrixX3cd::Zero(N, 3); 
     Eigen::MatrixX3cd Ei(N, 3), Hi(N, 3);
 
-    for (size_t i = 0; i < dipoles_.size(); ++i) {
-        dipoles_[i]->computeFields(Ei, Hi, control_points);
+    for (size_t i = 0; i < dipoles_ext_.size(); ++i) {
+        dipoles_ext_[i]->computeFields(Ei, Hi, control_points);
 
-        extE += amplitudes_.row(0)(i) * Ei;  // NOTE: needs implementation allowing different polarizations
-        extH += amplitudes_.row(0)(i) * Hi;
+        extE += amplitudes_ext_.row(polarization_index)(i) * Ei; 
+        extH += amplitudes_ext_.row(polarization_index)(i) * Hi;
     }
 
-    UPW_[0]->computeFields(Ei, Hi, control_points);
+    UPW_[polarization_index]->computeFields(Ei, Hi, control_points);
     extE += Ei;
     extH += Hi;
 
 
     // Check tangentiel elements
-    Eigen::VectorXd tangential_error(N);
+    Eigen::ArrayXd tangential_error1(N), tangential_error2(N);
 
+    tangential_error1 = ((extE - intE).array() * control_tangents1.array()).rowwise().sum().abs();
+    tangential_error2 = ((extE - intE).array() * control_tangents2.array()).rowwise().sum().abs();
+
+    return {tangential_error1.matrix(), tangential_error2.matrix()};
 
 }

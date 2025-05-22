@@ -65,8 +65,9 @@ class Spline:
         Z = self.__evaluate_at_points__(x, y)
         test_points = np.column_stack((X.ravel(), Y.ravel(), Z.ravel()))
 
-
         normals, tangent1, tangent2 = self.__calculate_normals_tangents__(x, y)
+
+
         if control_points_flag:
             control_x = np.linspace(self.Xfine.min() + (x[1]-x[0])/2, self.Xfine.max()- (x[1]-x[0])/2, resolution - 1)
             control_y = np.linspace(self.Yfine.min() + (y[1]-y[0])/2, self.Yfine.max()- (y[1]-y[0])/2, resolution - 1)
@@ -76,8 +77,10 @@ class Spline:
             control_points = np.column_stack((X_control.ravel(), Y_control.ravel(), Z_control.ravel()))
 
             _, control_tangent1, control_tangent2 = self.__calculate_normals_tangents__(control_x, control_y)
+
             return test_points, normals, tangent1, tangent2, control_points, control_tangent1, control_tangent2
 
+    
         return test_points, normals, tangent1, tangent2
 
 
