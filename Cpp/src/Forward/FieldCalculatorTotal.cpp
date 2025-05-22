@@ -208,5 +208,4 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangent
     tangential_error2 = ((intE - extE + incE).array() * control_tangents2.array()).rowwise().sum().abs();
 
     return {tangential_error1.matrix(), tangential_error2.matrix()};
-
 }

@@ -8,5 +8,15 @@
 
 *.csv
 
-# ignore build folder
+# Build system
 build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.ninja
+.ninja_deps
+.ninja_log
+
+# Python
+__pycache__/
+*.pyc
