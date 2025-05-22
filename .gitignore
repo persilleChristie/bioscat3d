@@ -1,0 +1,12 @@
+# # Ignore JSON files
+# *.json
+
+# # Ignore executable files
+# *.exe
+
+# *.gitignore
+
+# *.csv
+
+# ignore build folder
+build/
