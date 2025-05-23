@@ -118,19 +118,19 @@ int main() {
 
     Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
 
-    // Iterate over bumpData array
-    for (rapidjson::SizeType i = 0; i < bumpData.Size(); ++i) {
-        const auto& bump = bumpData[i];
-        double x0 = bump["x0"].GetDouble();
-        double y0 = bump["y0"].GetDouble();
-        double height = bump["height"].GetDouble();
-        double sigma = bump["sigma"].GetDouble();
+    // // Iterate over bumpData array
+    // for (rapidjson::SizeType i = 0; i < bumpData.Size(); ++i) {
+    //     const auto& bump = bumpData[i];
+    //     double x0 = bump["x0"].GetDouble();
+    //     double y0 = bump["y0"].GetDouble();
+    //     double height = bump["height"].GetDouble();
+    //     double sigma = bump["sigma"].GetDouble();
         
-        // Add bumps to data
-        Z_fine += (height * exp(-((X_fine.array() - x0)*(X_fine.array() - x0) 
-                            + (Y_fine.array() - y0)*(Y_fine.array() - y0)) / (2 * sigma * sigma))).matrix();
+    //     // Add bumps to data
+    //     Z_fine += (height * exp(-((X_fine.array() - x0)*(X_fine.array() - x0) 
+    //                         + (Y_fine.array() - y0)*(Y_fine.array() - y0)) / (2 * sigma * sigma))).matrix();
         
-    }
+    // }
 
     // ------------ Run python code ---------------
     py::scoped_interpreter guard{}; // Start Python interpreter
@@ -164,14 +164,14 @@ int main() {
 
     int count = 0;
 
-    MASSystem mas(spline, lambdas[0], dimension, k, beta_vec);
+    // MASSystem mas(spline, lambdas[0], dimension, k, beta_vec);
 
-    Export::saveSurfaceDataCSV("../CSV/surface_data_PN.csv", 
-                                        mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
-    Export::saveSurfaceDataCSV("../CSV/surface_data_inneraux_PN.csv",
-                                        mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
-    Export::saveSurfaceDataCSV("../CSV/surface_data_outeraux_PN.csv",
-                                        mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
+    // Export::saveSurfaceDataCSV("../CSV/surface_data_PN.csv", 
+    //                                     mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
+    // Export::saveSurfaceDataCSV("../CSV/surface_data_inneraux_PN.csv",
+    //                                     mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
+    // Export::saveSurfaceDataCSV("../CSV/surface_data_outeraux_PN.csv",
+    //                                     mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
 
 
     for (auto lambda : lambdas){
