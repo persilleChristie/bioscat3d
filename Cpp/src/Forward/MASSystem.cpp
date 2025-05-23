@@ -48,7 +48,11 @@ std::vector<Eigen::MatrixX3d> call_spline(py::object spline, int resolution){
 
 void MASSystem::generateSurface(py::object spline, double dimension){
 
+    std::cout << "Generating surface" << std::endl;
+
     double maxcurvature = spline.attr("max_curvature").cast<double>();
+
+    std::cout << "maxCurvature" << maxcurvature << std::endl;
 
     // --------- Generate test points -----------
     int test_point_res = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
@@ -62,7 +66,7 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     this->tau2_ = result[3];
 
     // Calculate control points on surface and translate to Eigen
-    auto control_result = call_spline(spline, 10*test_point_res);
+    auto control_result = call_spline(spline, 3*test_point_res);
 
     this->control_points_ = control_result[0];
     this->control_tangents1_ = control_result[2];
@@ -75,8 +79,13 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     auto result_aux = call_spline(spline, aux_points_res);
     
     // Calculate point values and save in class
-    this->aux_points_int_ = result_aux[0] - constants.alpha * maxcurvature * result_aux[1];   
-    this->aux_points_ext_ = result_aux[0] + constants.alpha * maxcurvature * result_aux[1];
+    //radius = 1/max(maxcurvature, 1.0)
+    double radius = 1.0 / std::max(maxcurvature, 3.0);
+
+    std::cout << "radius" << radius << std::endl;
+
+    this->aux_points_int_ = result_aux[0] - (1.0-constants.alpha) * radius * result_aux[1];   
+    this->aux_points_ext_ = result_aux[0] + (1.0-constants.alpha) * radius * result_aux[1];
 
     this->aux_tau1_ = result_aux[2];
     this->aux_tau2_ = result_aux[3];

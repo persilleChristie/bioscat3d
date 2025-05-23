@@ -56,18 +56,30 @@ int main() {
     double half_dim = doc["halfWidth_x"].GetDouble();
     double dimension = 2 * half_dim;
 
+    //print dimension
+    std::cout << "Dimension: " << dimension << std::endl;
+
     const auto& bumpData = doc["bumpData"];
 
     // Read incidence vector
     const auto& kjson = doc["k"];
+
     Eigen::Vector3d k;
     for (rapidjson::SizeType i = 0; i < kjson.Size(); ++i) {
         k(i) = kjson[i].GetDouble();
     }
+    //print k vector
+    std::cout << "k vector: " << k.transpose() << std::endl;
     
     // Read polarizations
     const auto& betas = doc["betas"];
-    int B = 2; // static_cast<int>(betas.Size());
+    // B is the number of polarizations
+    int B = betas.Size();
+    std::cout << "Number of polarizations: " << B << std::endl;
+
+    for (rapidjson::SizeType i = 0; i < betas.Size(); ++i) {
+        std::cout << betas[i].GetDouble() << " ";
+    }
 
     Eigen::VectorXd beta_vec(B);
     for (int i = 0; i < B; ++i) {
@@ -75,14 +87,20 @@ int main() {
     }
 
     // Read lambdas
-    double lambda_min = 0.7; // doc["minLambda"].GetDouble();
-    double lambda_max = 0.7;  // doc["maxLambda"].GetDouble();
-    int lambda_nr = 1; // doc["lambda_n"].GetInt();
+    double lambda_min = doc["minLambda"].GetDouble();
+    double lambda_max = doc["maxLambda"].GetDouble();
+    int lambda_nr = doc["lambda_n"].GetInt();
+    //print lambda_min, lambda_max and lambda_nr
+    std::cout << "Lambda min: " << lambda_min << std::endl;
+    std::cout << "Lambda max: " << lambda_max << std::endl;
+    std::cout << "Lambda nr: " << lambda_nr << std::endl;
 
     Eigen::VectorXd lambdas = Eigen::VectorXd::LinSpaced(lambda_nr, lambda_min, lambda_max);
 
     // ------------- Decide highest number of auxilliary points --------------
     int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / lambda_min));
+    std::cout << "Number of fine points: " << N_fine << std::endl;
+
 
     // ------------- Generate grid -------------
     Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(N_fine, -half_dim, half_dim);
@@ -92,7 +110,11 @@ int main() {
     for (int i = 0; i < N_fine; ++i) {  // Works as meshgrid
         X_fine.row(i) = x.transpose();
         Y_fine.col(i) = y;
-    } // check this
+    }
+
+    // suggestion:
+    // X_fine = x.transpose().replicate(N_fine, 1); // rows = N_fine, cols = N_fine
+    // Y_fine = y.replicate(1, N_fine);             // rows = N_f
 
     Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
 
@@ -147,15 +169,34 @@ int main() {
 
     int N = checkpoints.rows();
 
+    int i = 0;
     for (auto lambda : lambdas){
-
         MASSystem mas(spline, lambda, dimension, k, beta_vec);
-        FieldCalculatorTotal field(mas);
-        
-        auto [error1, error2] = field.computeTangentialError(0);
+        // print variables from MASSystem - for points and tangents only print a few
+        std::cout << "Running MASSystem with lambda: " << lambda << std::endl;
+        std::cout << "Points: " << mas.getPoints().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Tangents1: " << mas.getTau1().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Tangents2: " << mas.getTau2().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Control points: " << mas.getControlPoints().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Control tangents1: " << mas.getControlTangents1().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Control tangents2: " << mas.getControlTangents2().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Auxiliary points (interior): " << mas.getIntPoints().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Auxiliary points (exterior): " << mas.getExtPoints().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Auxiliary tangents1: " << mas.getAuxTau1().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Auxiliary tangents2: " << mas.getAuxTau2().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Incidence vector: " << mas.getInc().first.transpose() << std::endl;
+        std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
+        std::cout << "----------------------------------------" << std::endl;
 
-        Export::saveRealVectorCSV("../CSV/tangential_error1.csv", error1);
-        Export::saveRealVectorCSV("../CSV/tangential_error2.csv", error2);
+        FieldCalculatorTotal field(mas);
+        std::cout << "Running FieldCalculatorTotal" <<  std::endl;
+
+
+        auto [error1, error2] = field.computeTangentialError(i);
+        Export::saveRealVectorCSV("../CSV/tangential_error1_" + std::to_string(i) + ".csv", error1);
+        Export::saveRealVectorCSV("../CSV/tangential_error2_" + std::to_string(i) + ".csv", error2);
+        i ++;
+
 
 
         // auto points = mas.getPoints();
@@ -175,14 +216,7 @@ int main() {
         //     std::cout << outE.row(i) << std::endl;
         // }
         // std::cout << "----------------------------" << std::endl;
-
-        
-
-
-
     }
-    
-
     return 0;
 }
 

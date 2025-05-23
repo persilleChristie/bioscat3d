@@ -5,24 +5,24 @@ import os
 
 def generate_surface_params(
     keyword = "NormalNewGeom", # postfix to name JSON file
-    halfWidth_x=1.50,
-    halfWidth_y=1.50,
+    halfWidth_x=1.0, # 1.50
+    halfWidth_y=1.0, # 1.50
     halfWidth_z=2.0,
     resolution=10, # Meep parameter  
     pml_thickness = 2, # Meep parameter
     seed=42, # For surface bump creation
     monitor_size = 1, # monitors are placed with center at +/- monitor_size/2 in all directions
-    num_bumps=100,
+    num_bumps=0,
     hights_bumps = [0.02, 0.15], #should be in [20, 150] nm
     sigmas_bumps = [0.02, 0.075], #should correspond to lambde < width bumps, sigme < lambda/4
     epsilon1 = 2.56, # substrate epsilon value ???
     alpha = 0.86, # disctance scale for source points in MAS
     omega = 1.0, # What does this represent
     k = [0 ,0 , -1.0],
-    numBetas = 7, # makes unidistant betas on the interval [0, pi/2]
-    lambda_n = 7, # number of wavelengths to be used in the simulation
-    minLambda = 0.3, # minimum wavelength
-    maxLambda = 0.6, # maximum wavelength
+    numBetas = 1, # makes unidistant betas on the interval [0, pi/2]
+    lambda_n = 1, # number of wavelengths to be used in the simulation
+    minLambda = 0.7, # minimum wavelength 0.25
+    maxLambda = 0.7, # maximum wavelength 0.8
 ):
     
     filename = "surfaceParams" + keyword + ".json"
