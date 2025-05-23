@@ -1,13 +1,19 @@
 # ninja log v6
-1	21	0	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	78e3a1670abdb5ac
+0	19	0	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	78e3a1670abdb5ac
 13	5164	1747995164768293392	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	c2ad08c9c3f347ab
 15	14843	1747995174420414590	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	37a832f8e7673bf9
 14	5247	1747995164851266988	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	5d388367a7a74043
 12	5755	1747995165359480250	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	31c6ecd531711dc3
 5	7933	1748000997424719656	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	be7e72ad5d3539fd
-10	14771	1748003787567473511	CMakeFiles/main.dir/main.cpp.o	44d68e397e010539
-7	69358	1748002554151882083	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	2c4754d064082690
-14771	15172	1748003787989825956	main	8834057f0c605623
-0	19	0	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	78e3a1670abdb5ac
 5	14945	1748003865876027314	CMakeFiles/main.dir/main.cpp.o	44d68e397e010539
+7	69358	1748002554151882083	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	2c4754d064082690
 14945	15331	1748003866296028785	main	8834057f0c605623
+2	19	1748005160016804718	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	475a4e872dea9739
+27	6473	1748005160048032840	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	29f694748aebcfd3
+29	6785	1748005160048032840	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	95a051c148bc29a8
+26	7160	1748005160048032840	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	7b07f39df024e9c7
+30	13974	1748005160048032840	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	1f4c5d532724c2e0
+28	16568	1748005160048032840	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	278398d3ee7bc1f5
+31	19621	1748005160048032840	CMakeFiles/main.dir/main.cpp.o	171fedb0d037c0fc
+27	77605	1748005160048032840	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	448aff71f96e92b3
+77605	78080	1748005234929297937	main	8834057f0c605623

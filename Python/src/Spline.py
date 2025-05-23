@@ -31,10 +31,10 @@ class Spline:
         return np.max(abs(H))
     
     def __calculate_normals_tangents__(self, x, y):
-        X, Y = np.meshgrid(x, y)
-        Z = self.__evaluate_at_points__(x, y)
+        # X, Y = np.meshgrid(x, y)
+        # Z = self.__evaluate_at_points__(x, y)
 
-        points = np.column_stack((X.ravel(), Y.ravel(), Z.ravel()))
+        # points = np.column_stack((X.ravel(), Y.ravel(), Z.ravel()))
 
         # Compute normals
         fx = self.__evaluate_at_points__(x, y, dx = 1).ravel()
@@ -68,7 +68,7 @@ class Spline:
 
         return normals, tangent1, tangent2
     
-    def calculate_points(self, resolution, control_points_flag = False):
+    def calculate_points(self, resolution):
         x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
         y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)
 
@@ -79,46 +79,17 @@ class Spline:
         normals, tangent1, tangent2 = self.__calculate_normals_tangents__(x, y)
 
 
-        if control_points_flag:
-            control_x = np.linspace(self.Xfine.min() + (x[1]-x[0])/2, self.Xfine.max()- (x[1]-x[0])/2, resolution - 1)
-            control_y = np.linspace(self.Yfine.min() + (y[1]-y[0])/2, self.Yfine.max()- (y[1]-y[0])/2, resolution - 1)
+        # if control_points_flag:
+        #     control_x = np.linspace(self.Xfine.min() + (x[1]-x[0])/2, self.Xfine.max()- (x[1]-x[0])/2, resolution - 1)
+        #     control_y = np.linspace(self.Yfine.min() + (y[1]-y[0])/2, self.Yfine.max()- (y[1]-y[0])/2, resolution - 1)
             
-            X_control, Y_control = np.meshgrid(control_y, control_y)
-            Z_control  = self.__evaluate_at_points__(control_x, control_y)
-            control_points = np.column_stack((X_control.ravel(), Y_control.ravel(), Z_control.ravel()))
+        #     X_control, Y_control = np.meshgrid(control_y, control_y)
+        #     Z_control  = self.__evaluate_at_points__(control_x, control_y)
+        #     control_points = np.column_stack((X_control.ravel(), Y_control.ravel(), Z_control.ravel()))
 
-            _, control_tangent1, control_tangent2 = self.__calculate_normals_tangents__(control_x, control_y)
+        #     _, control_tangent1, control_tangent2 = self.__calculate_normals_tangents__(control_x, control_y)
 
-            return test_points, normals, tangent1, tangent2, control_points, control_tangent1, control_tangent2
+        #     return test_points, normals, tangent1, tangent2, control_points, control_tangent1, control_tangent2
 
     
         return test_points, normals, tangent1, tangent2
-
-
-
-# class SplineManager:
-#     _spline_instance = None
-
-#     @staticmethod
-#     def initialize(Xfine, Yfine, Zfine):
-#         if SplineManager._spline_instance is None:
-#             SplineManager._spline_instance = Spline(Xfine, Yfine, Zfine)
-#         else:
-#             # Update data without rebuilding object
-#             spline = SplineManager._spline_instance
-#             spline.Xfine = Xfine
-#             spline.Yfine = Yfine
-#             spline.Zfine = Zfine
-#             spline.tcks = bisplrep(Xfine.ravel(), Yfine.ravel(), Zfine.ravel())
-#             spline.max_curvature = spline.__compute_max_mean_curvature__()
-
-#     @staticmethod
-#     def get_max_curvature():
-#         return SplineManager._spline_instance.max_curvature
-
-#     @staticmethod
-#     def calculate(resolution):
-#         return SplineManager._spline_instance.calculate_points(resolution) 
-    
-    
-
