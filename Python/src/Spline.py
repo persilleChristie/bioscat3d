@@ -7,7 +7,7 @@ class Spline:
         self.Yfine = Yfine
         self.Zfine = Zfine
         
-        self.tcks = bisplrep(Xfine.ravel(), Yfine.ravel(), Zfine.ravel(), s=0)
+        self.tcks = bisplrep(Xfine.ravel(), Yfine.ravel(), Zfine.ravel(), s=0.5)
         self.max_curvature = self.__compute_max_mean_curvature__()
 
     def __evaluate_at_points__(self, x, y, dx = 0, dy = 0):

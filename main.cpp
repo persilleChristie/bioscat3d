@@ -31,7 +31,7 @@ py::array_t<double> wrap_eigen(Eigen::MatrixXd& mat) {
 
 int main() {
     // ------------- Load json file --------------
-    const char* jsonPath = "../json/surfaceParamsNormalNewGeom.json";
+    const char* jsonPath = "../json/surfaceParamsNormalNewGeom_A.json";
 
     // Open the file
     std::ifstream ifs(jsonPath);
@@ -95,7 +95,7 @@ int main() {
     std::cout << "Lambda max: " << lambda_max << std::endl;
     std::cout << "Lambda nr: " << lambda_nr << std::endl;
 
-    Eigen::VectorXd lambdas = Eigen::VectorXd::LinSpaced(lambda_nr, lambda_min, lambda_max);
+    Eigen::VectorXd lambdas = Eigen::VectorXd::LinSpaced(lambda_nr, lambda_max, lambda_max);
 
     // ------------- Decide highest number of auxilliary points --------------
     int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / lambda_min));
@@ -170,53 +170,50 @@ int main() {
     int N = checkpoints.rows();
 
     int i = 0;
-    for (auto lambda : lambdas){
-        MASSystem mas(spline, lambda, dimension, k, beta_vec);
-        // print variables from MASSystem - for points and tangents only print a few
-        std::cout << "Running MASSystem with lambda: " << lambda << std::endl;
-        std::cout << "Points: " << mas.getPoints().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Tangents1: " << mas.getTau1().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Tangents2: " << mas.getTau2().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Control points: " << mas.getControlPoints().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Control tangents1: " << mas.getControlTangents1().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Control tangents2: " << mas.getControlTangents2().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Auxiliary points (interior): " << mas.getIntPoints().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Auxiliary points (exterior): " << mas.getExtPoints().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Auxiliary tangents1: " << mas.getAuxTau1().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Auxiliary tangents2: " << mas.getAuxTau2().block(0, 0, 5, 3) << std::endl;
-        std::cout << "Incidence vector: " << mas.getInc().first.transpose() << std::endl;
-        std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
-        std::cout << "----------------------------------------" << std::endl;
 
-        FieldCalculatorTotal field(mas);
-        std::cout << "Running FieldCalculatorTotal" <<  std::endl;
+    MASSystem mas(spline, lambdas[lambda_nr - 1], dimension, k, beta_vec);
+
+    Export::saveSurfaceDataCSV("../CSV/surface_data_PN.csv", 
+                                        mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
+    Export::saveSurfaceDataCSV("../CSV/surface_data_inneraux_PN.csv",
+                                        mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
+    Export::saveSurfaceDataCSV("../CSV/surface_data_outeraux_PN.csv",
+                                        mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
 
 
-        auto [error1, error2] = field.computeTangentialError(i);
-        Export::saveRealVectorCSV("../CSV/tangential_error1_" + std::to_string(i) + ".csv", error1);
-        Export::saveRealVectorCSV("../CSV/tangential_error2_" + std::to_string(i) + ".csv", error2);
-        i ++;
+    // for (auto lambda : lambdas){
+    //     std::cout << "Running MASSystem with lambda: " << lambda << std::endl;
+
+    //     MASSystem mas(spline, lambda, dimension, k, beta_vec);
+    //     // print variables from MASSystem - for points and tangents only print a few
+    //     std::cout << "Points: " << mas.getPoints().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Tangents1: " << mas.getTau1().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Tangents2: " << mas.getTau2().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Control points: " << mas.getControlPoints().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Control tangents1: " << mas.getControlTangents1().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Control tangents2: " << mas.getControlTangents2().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Auxiliary points (interior): " << mas.getIntPoints().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Auxiliary points (exterior): " << mas.getExtPoints().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Auxiliary tangents1: " << mas.getAuxTau1().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Auxiliary tangents2: " << mas.getAuxTau2().block(0, 0, 5, 3) << std::endl;
+    //     std::cout << "Incidence vector: " << mas.getInc().first.transpose() << std::endl;
+    //     std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
+    //     std::cout << "----------------------------------------" << std::endl;
+
+    //     std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
+    //     FieldCalculatorTotal field(mas);
+
+    //     auto [error1, error2] = field.computeTangentialError(i);
+
+    //     Export::saveRealVectorCSV("../CSV/tangential_error1_" + std::to_string(i) + ".csv", error1);
+    //     Export::saveRealVectorCSV("../CSV/tangential_error2_" + std::to_string(i) + ".csv", error2);
+        
+        
+        
+    //     i ++;
 
 
-
-        // auto points = mas.getPoints();
-        // auto control_points = mas.getControlPoints();
-
-        // Eigen::MatrixX3cd outE = Eigen::MatrixX3cd::Zero(N, 3);
-        // Eigen::MatrixX3cd outH = Eigen::MatrixX3cd::Zero(N, 3); 
-
-        // field.computeFields(outE, outH, checkpoints);
-
-        // std::cout << "Lambda: " << lambda << std::endl;
-        // std::cout << "Size of points: (" << points.rows() << ", " << points.cols() << ")" << std::endl;
-        // std::cout << "Size of control points: (" << control_points.rows() 
-        //           << ", " << control_points.cols() << ")" << std::endl;
-        // std::cout << "Field in points: " << std::endl;
-        // for (int i = 0; i < N; ++i){
-        //     std::cout << outE.row(i) << std::endl;
-        // }
-        // std::cout << "----------------------------" << std::endl;
-    }
+    // }
     return 0;
 }
 

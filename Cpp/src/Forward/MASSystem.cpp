@@ -52,7 +52,7 @@ void MASSystem::generateSurface(py::object spline, double dimension){
 
     double maxcurvature = spline.attr("max_curvature").cast<double>();
 
-    std::cout << "maxCurvature" << maxcurvature << std::endl;
+    std::cout << "Max curvature: " << maxcurvature << std::endl;
 
     // --------- Generate test points -----------
     int test_point_res = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
@@ -62,6 +62,7 @@ void MASSystem::generateSurface(py::object spline, double dimension){
 
     // Save in class
     this->points_ = result[0];
+    this->normals_ = result[1];
     this->tau1_ = result[2];
     this->tau2_ = result[3];
 
@@ -82,11 +83,12 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     //radius = 1/max(maxcurvature, 1.0)
     double radius = 1.0 / std::max(maxcurvature, 3.0);
 
-    std::cout << "radius" << radius << std::endl;
+    std::cout << "Radius: " << radius << std::endl;
 
-    this->aux_points_int_ = result_aux[0] - (1.0-constants.alpha) * radius * result_aux[1];   
-    this->aux_points_ext_ = result_aux[0] + (1.0-constants.alpha) * radius * result_aux[1];
+    this->aux_points_int_ = result_aux[0] - (1.0 - constants.alpha) * radius * result_aux[1];   
+    this->aux_points_ext_ = result_aux[0] + (1.0 - constants.alpha) * radius * result_aux[1];
 
+    this->aux_normals_ = result_aux[1];
     this->aux_tau1_ = result_aux[2];
     this->aux_tau2_ = result_aux[3];
 

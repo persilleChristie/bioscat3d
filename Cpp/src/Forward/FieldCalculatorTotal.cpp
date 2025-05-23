@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include <chrono>
 #include "../../lib/Forward/SystemAssembler.h"
 #include "../../lib/Forward/FieldCalculator.h"
 #include "../../lib/Forward/FieldCalculatorTotal.h"
@@ -71,17 +72,28 @@ void FieldCalculatorTotal::constructor()
     
 
     for (int i = 0; i < B; ++i){
+        std::cout << "----------------- Beta nr. " << i + 1 << "/" << B << " -----------------" << std::endl;
         UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i));
         UPW_list.emplace_back(UPW);
 
         SystemAssembler::assembleSystem(A, b, points, t1, t2, sources_int, sources_ext, UPW);
 
+        std::cout << "Solving system..." << std::endl;
+        
+        auto start = std::chrono::high_resolution_clock::now();
+        
         Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
         Eigen::VectorXcd amps = svd1.solve(b);
+        auto stop = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+
+        std::cout << "System solved in " << duration.count() << " seconds" << std::endl;
 
         amplitudes.row(i) = amps.head(N);
         amplitudes_ext.row(i) = amps.tail(N);
 
+        
         // if (i == 0){
         //     Export::saveMatrixCSV("FilesCSV/matrix_A_simple.csv", A);
             
@@ -98,6 +110,8 @@ void FieldCalculatorTotal::constructor()
     this->UPW_ = UPW_list;
     this->amplitudes_ext_ = amplitudes_ext;
     this->amplitudes_ = amplitudes;
+
+    std::cout << "Field Calculator initialized successfully!" << std::endl;
 }
 
 
@@ -197,8 +211,6 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangent
 
     Eigen::MatrixX3cd incE(N, 3), incH(N, 3);
     UPW_[polarization_index]->computeFields(incE, incH, control_points);
-    // extE += Ei;
-    // extH += Hi;
 
 
     // Check tangentiel elements

@@ -31,12 +31,13 @@ public:
 
     // void setPoints(Eigen::MatrixX3d points);
     const Eigen::MatrixX3d& getPoints() const   {return points_;};
-    // const Eigen::MatrixX3d& getNormals() const  {return normals_;};
+    const Eigen::MatrixX3d& getNormals() const  {return normals_;};
     const Eigen::MatrixX3d& getTau1() const     {return tau1_;};
     const Eigen::MatrixX3d& getTau2() const     {return tau2_;};
 
     const Eigen::MatrixX3d& getIntPoints() const {return aux_points_int_;};
     const Eigen::MatrixX3d& getExtPoints() const {return aux_points_ext_;};
+    const Eigen::MatrixX3d& getAuxNormals() const {return aux_normals_;};
     const Eigen::MatrixX3d& getAuxTau1() const {return aux_tau1_;};
     const Eigen::MatrixX3d& getAuxTau2() const {return aux_tau2_;};
 
@@ -52,12 +53,13 @@ private:
     Eigen::VectorXd polarizations_;
 
     Eigen::MatrixX3d points_;
-    // Eigen::MatrixX3d normals_;
+    Eigen::MatrixX3d normals_;
     Eigen::MatrixX3d tau1_;
     Eigen::MatrixX3d tau2_;
 
     Eigen::MatrixX3d aux_points_int_;
     Eigen::MatrixX3d aux_points_ext_;
+    Eigen::MatrixX3d aux_normals_;
     Eigen::MatrixX3d aux_tau1_;
     Eigen::MatrixX3d aux_tau2_;
 
