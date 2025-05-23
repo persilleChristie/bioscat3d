@@ -38,56 +38,25 @@ for i, df in enumerate(dfs2):
     plt.savefig(f"tangent2_error_plot_{i+1}.png")
     plt.show()
 
-# Concatenate all tangent 1 and tangent 2 DataFrames
-df1 = pd.concat(dfs1, ignore_index=True)
-df2 = pd.concat(dfs2, ignore_index=True)
-
-# Extract error arrays for plotting
-error1 = df1[0].values
-error2 = df2[0].values
-
-# Plot all tangential errors together
-plt.figure()
-plt.plot(error1, label="Tangent 1")
-plt.plot(error2, label="Tangent 2")
-plt.xlabel("Sample Index")
-plt.ylabel("Error")
-plt.title("Tangential Errors")
-plt.legend()
-plt.tight_layout()
-plt.savefig("tangential_error_plot.png")
-plt.show()
-
-# Plot and save individually for each tangent
-plt.figure()
-plt.plot(error1)
-plt.xlabel("Sample Index")
-plt.ylabel("Error")
-plt.title("Tangent 1 Error")
-plt.tight_layout()
-plt.savefig("tangent1_error_plot.png")
-plt.show()
-
-plt.figure()
-plt.plot(error2)
-plt.xlabel("Sample Index")
-plt.ylabel("Error")
-plt.title("Tangent 2 Error")
-plt.tight_layout()
-plt.savefig("tangent2_error_plot.png")
-plt.show()
-
 # Histogram of the errors
-plt.figure()
-plt.hist(error1, bins=50, alpha=0.5, label="Tangent 1")
-plt.hist(error2, bins=50, alpha=0.5, label="Tangent 2")
-plt.xlabel("Error")
-plt.ylabel("Frequency")
-plt.title("Histogram of Tangential Errors")
-plt.legend()
-plt.tight_layout()
-plt.savefig("tangential_error_histogram.png")
-plt.show()
+error1 = np.concatenate([df[0].values for df in dfs1]) if dfs1 else np.array([])
+error2 = np.concatenate([df[0].values for df in dfs2]) if dfs2 else np.array([])
+
+# Plot histogram for each pair of tangent 1 and tangent 2 files
+num_pairs = min(len(dfs1), len(dfs2))
+for i in range(num_pairs):
+    error1 = dfs1[i][0].values
+    error2 = dfs2[i][0].values
+    plt.figure()
+    plt.hist(error1, bins=50, alpha=0.5, label="Tangent 1")
+    plt.hist(error2, bins=50, alpha=0.5, label="Tangent 2")
+    plt.xlabel("Error")
+    plt.ylabel("Frequency")
+    plt.title(f"Histogram of Tangential Errors (File Pair {i+1})")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"tangential_error_histogram_pair_{i+1}.png")
+    plt.show()
 
 
 

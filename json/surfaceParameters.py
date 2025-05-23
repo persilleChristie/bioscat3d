@@ -12,7 +12,7 @@ def generate_surface_params(
     pml_thickness = 2, # Meep parameter
     seed=42, # For surface bump creation
     monitor_size = 1, # monitors are placed with center at +/- monitor_size/2 in all directions
-    num_bumps=0,
+    num_bumps=100,
     hights_bumps = [0.02, 0.15], #should be in [20, 150] nm
     sigmas_bumps = [0.02, 0.075], #should correspond to lambde < width bumps, sigme < lambda/4
     epsilon1 = 2.56, # substrate epsilon value ???
