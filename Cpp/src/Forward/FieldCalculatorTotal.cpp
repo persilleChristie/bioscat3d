@@ -76,19 +76,32 @@ void FieldCalculatorTotal::constructor()
         UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i));
         UPW_list.emplace_back(UPW);
 
+        // ----------------- Assemble system and time --------------------
+        std::cout << "Assembling system..." << std::endl;
+        
+        auto start_assemble = std::chrono::high_resolution_clock::now();
+
         SystemAssembler::assembleSystem(A, b, points, t1, t2, sources_int, sources_ext, UPW);
 
+        auto stop_assemble = std::chrono::high_resolution_clock::now();
+
+        auto duration_assemble = std::chrono::duration_cast<std::chrono::seconds>(stop_assemble - start_assemble);
+
+        std::cout << "System assembled in " << duration_assemble.count() << " seconds" << std::endl;
+
+
+        // ----------------- Solve system and time --------------------
         std::cout << "Solving system..." << std::endl;
         
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start_solve = std::chrono::high_resolution_clock::now();
         
         Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
         Eigen::VectorXcd amps = svd1.solve(b);
-        auto stop = std::chrono::high_resolution_clock::now();
+        auto stop_solve = std::chrono::high_resolution_clock::now();
 
-        auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+        auto duration_solve = std::chrono::duration_cast<std::chrono::seconds>(stop_solve - start_solve);
 
-        std::cout << "System solved in " << duration.count() << " seconds" << std::endl;
+        std::cout << "System solved in " << duration_solve.count() << " seconds" << std::endl;
 
         amplitudes.row(i) = amps.head(N);
         amplitudes_ext.row(i) = amps.tail(N);

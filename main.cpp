@@ -74,7 +74,7 @@ int main() {
     // Read polarizations
     const auto& betas = doc["betas"];
     // B is the number of polarizations
-    int B = betas.Size();
+    int B = 1; // betas.Size();
     std::cout << "Number of polarizations: " << B << std::endl;
 
     for (rapidjson::SizeType i = 0; i < betas.Size(); ++i) {
@@ -89,7 +89,7 @@ int main() {
     // Read lambdas
     double lambda_min = doc["minLambda"].GetDouble();
     double lambda_max = doc["maxLambda"].GetDouble();
-    int lambda_nr = doc["lambda_n"].GetInt();
+    int lambda_nr = 1; // doc["lambda_n"].GetInt();
     //print lambda_min, lambda_max and lambda_nr
     std::cout << "Lambda min: " << lambda_min << std::endl;
     std::cout << "Lambda max: " << lambda_max << std::endl;
@@ -118,19 +118,19 @@ int main() {
 
     Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
 
-    // Iterate over bumpData array
-    for (rapidjson::SizeType i = 0; i < bumpData.Size(); ++i) {
-        const auto& bump = bumpData[i];
-        double x0 = bump["x0"].GetDouble();
-        double y0 = bump["y0"].GetDouble();
-        double height = bump["height"].GetDouble();
-        double sigma = bump["sigma"].GetDouble();
+    // // Iterate over bumpData array
+    // for (rapidjson::SizeType i = 0; i < bumpData.Size(); ++i) {
+    //     const auto& bump = bumpData[i];
+    //     double x0 = bump["x0"].GetDouble();
+    //     double y0 = bump["y0"].GetDouble();
+    //     double height = bump["height"].GetDouble();
+    //     double sigma = bump["sigma"].GetDouble();
         
-        // Add bumps to data
-        Z_fine += (height * exp(-((X_fine.array() - x0)*(X_fine.array() - x0) 
-                            + (Y_fine.array() - y0)*(Y_fine.array() - y0)) / (2 * sigma * sigma))).matrix();
+    //     // Add bumps to data
+    //     Z_fine += (height * exp(-((X_fine.array() - x0)*(X_fine.array() - x0) 
+    //                         + (Y_fine.array() - y0)*(Y_fine.array() - y0)) / (2 * sigma * sigma))).matrix();
         
-    }
+    // }
 
     // ------------ Run python code ---------------
     py::scoped_interpreter guard{}; // Start Python interpreter
@@ -162,58 +162,52 @@ int main() {
         return 1;
     }
 
-    Eigen::Matrix3d checkpoints;
-    checkpoints << 2, 2, 2,
-                   3, 7, 4,
-                   10, 9, 7;
+    int count = 0;
 
-    int N = checkpoints.rows();
+    // MASSystem mas(spline, lambdas[0], dimension, k, beta_vec);
 
-    int i = 0;
-
-    MASSystem mas(spline, lambdas[lambda_nr - 1], dimension, k, beta_vec);
-
-    Export::saveSurfaceDataCSV("../CSV/surface_data_PN.csv", 
-                                        mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
-    Export::saveSurfaceDataCSV("../CSV/surface_data_inneraux_PN.csv",
-                                        mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
-    Export::saveSurfaceDataCSV("../CSV/surface_data_outeraux_PN.csv",
-                                        mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
+    // Export::saveSurfaceDataCSV("../CSV/surface_data_PN.csv", 
+    //                                     mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
+    // Export::saveSurfaceDataCSV("../CSV/surface_data_inneraux_PN.csv",
+    //                                     mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
+    // Export::saveSurfaceDataCSV("../CSV/surface_data_outeraux_PN.csv",
+    //                                     mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
 
 
-    // for (auto lambda : lambdas){
-    //     std::cout << "Running MASSystem with lambda: " << lambda << std::endl;
+    for (auto lambda : lambdas){
+        std::cout << "Running MASSystem with lambda: " << lambda << std::endl;
 
-    //     MASSystem mas(spline, lambda, dimension, k, beta_vec);
-    //     // print variables from MASSystem - for points and tangents only print a few
-    //     std::cout << "Points: " << mas.getPoints().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Tangents1: " << mas.getTau1().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Tangents2: " << mas.getTau2().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Control points: " << mas.getControlPoints().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Control tangents1: " << mas.getControlTangents1().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Control tangents2: " << mas.getControlTangents2().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Auxiliary points (interior): " << mas.getIntPoints().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Auxiliary points (exterior): " << mas.getExtPoints().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Auxiliary tangents1: " << mas.getAuxTau1().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Auxiliary tangents2: " << mas.getAuxTau2().block(0, 0, 5, 3) << std::endl;
-    //     std::cout << "Incidence vector: " << mas.getInc().first.transpose() << std::endl;
-    //     std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
-    //     std::cout << "----------------------------------------" << std::endl;
+        MASSystem mas(spline, lambda, dimension, k, beta_vec);
+        // print variables from MASSystem - for points and tangents only print a few
+        std::cout << "Points: " << mas.getPoints().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Tangents1: " << mas.getTau1().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Tangents2: " << mas.getTau2().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Control points: " << mas.getControlPoints().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Control tangents1: " << mas.getControlTangents1().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Control tangents2: " << mas.getControlTangents2().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Auxiliary points (interior): " << mas.getIntPoints().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Auxiliary points (exterior): " << mas.getExtPoints().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Auxiliary tangents1: " << mas.getAuxTau1().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Auxiliary tangents2: " << mas.getAuxTau2().block(0, 0, 5, 3) << std::endl;
+        std::cout << "Incidence vector: " << mas.getInc().first.transpose() << std::endl;
+        std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
+        std::cout << "----------------------------------------" << std::endl;
 
-    //     std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
-    //     FieldCalculatorTotal field(mas);
+        std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
+        FieldCalculatorTotal field(mas);
 
-    //     auto [error1, error2] = field.computeTangentialError(i);
+        auto [error1, error2] = field.computeTangentialError(count);
 
-    //     Export::saveRealVectorCSV("../CSV/tangential_error1_" + std::to_string(i) + ".csv", error1);
-    //     Export::saveRealVectorCSV("../CSV/tangential_error2_" + std::to_string(i) + ".csv", error2);
+        Export::saveRealVectorCSV("../CSV/tangential_error1_" + std::to_string(count) + ".csv", error1);
+        Export::saveRealVectorCSV("../CSV/tangential_error2_" + std::to_string(count) + ".csv", error2);
         
         
         
-    //     i ++;
+        count++;
 
 
-    // }
+    }
+
     return 0;
 }
 
