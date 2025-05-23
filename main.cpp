@@ -30,10 +30,26 @@ py::array_t<double> wrap_eigen(Eigen::MatrixXd& mat) {
 
 
 int main() {
-    // Flags for tests
+    // Flags for tests (max one true)
     bool SurfacePointsTest = false;
     bool PlaneTest = false;
     bool FullSurfaceTest = false;
+    
+    if (SurfacePointsTest){
+        std::cout << std::endl;
+        std::cout << "TESTING SURFACE POINTS" << std::endl << std::endl;
+    } else if (PlaneTest){
+        std::cout << std::endl;
+        std::cout << "TESTING TANGENTIAL COMPONENTS FOR PLANE" << std::endl;
+        std::cout << "  (only one lambda, one polarization)" << std::endl << std::endl;
+    }  else if (FullSurfaceTest){
+        std::cout << std::endl;
+        std::cout << "TESTING TANGENTIAL COMPONENTS FOR BUMP SURFACE" << std::endl;
+        std::cout << "     (only one lambda, one polarization)" << std::endl << std::endl;
+    } else {    
+        std::cout << std::endl;
+        std::cout << "RUNNING TANGENTIAL COMPONENTS FOR FULL EXAMPLE BUMP SURFACE" << std::endl << std::endl;
+    }
 
     // ------------- Load json file --------------
     const char* jsonPath = "../json/surfaceParamsNormalNewGeom_A.json";
@@ -104,6 +120,7 @@ int main() {
     if (PlaneTest || FullSurfaceTest){
         lambda_min = lambda_max;
         lambda_nr = 1;
+        B = 1;
     }
 
     // Print lambda_min, lambda_max and lambda_nr
