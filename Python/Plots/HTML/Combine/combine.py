@@ -14,17 +14,20 @@ def angular_diff(v1, v2):
     cos_theta = np.clip(dot / norms, -1.0, 1.0)
     return np.arccos(cos_theta) * (180 / np.pi)
 
-# --- Match CSV Files ---
-csv_files = glob("*.csv")
+# --- Match CSV Files from Two Directories ---
+andreas_files = glob("../Andreas/*.csv")
+pn_files = glob("../PN/*_PN.csv")
 file_map = {}
 
-for f in csv_files:
-    name = os.path.splitext(f)[0]
+for f in andreas_files:
+    name = os.path.splitext(os.path.basename(f))[0]
+    file_map.setdefault(name, {})['original'] = f
+
+for f in pn_files:
+    name = os.path.splitext(os.path.basename(f))[0]
     if name.endswith("_PN"):
         base = name[:-3]
         file_map.setdefault(base, {})['PN'] = f
-    else:
-        file_map.setdefault(name, {})['original'] = f
 
 # --- Process Matching Pairs ---
 results = []
@@ -83,3 +86,24 @@ for base, group in file_map.items():
 results_df = pd.DataFrame(results)
 results_df.to_csv("comparison_summary.csv", index=False)
 print("✅ Done! Saved to comparison_summary.csv and comparison_*.png")
+
+import plotly.express as px
+import plotly.io as pio
+
+# Load CSV from current folder
+df = pd.read_csv("comparison_summary.csv")
+
+# Create interactive bar chart
+fig = px.bar(
+    df.melt(id_vars="pair", var_name="Metric", value_name="Value"),
+    x="pair", y="Value", color="Metric",
+    barmode="group",
+    title="Comparison Summary Metrics by Pair"
+)
+
+# Save as interactive HTML file
+output_file = "comparison_summary_plot.html"
+pio.write_html(fig, file=output_file, auto_open=True)
+
+print(f"✅ Saved interactive plot to {output_file}")
+
