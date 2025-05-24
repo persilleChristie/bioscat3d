@@ -81,12 +81,12 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     
     // Calculate point values and save in class
     //radius = 1/max(maxcurvature, 1.0)
-    double radius = 1.0 / std::max(maxcurvature, 1.0);
+    double radius = 1.0 / std::max(maxcurvature, 10.0);
 
     std::cout << "Radius: " << radius << std::endl;
 
-    this->aux_points_int_ = result_aux[0] - (1.0 - constants.alpha) * radius * result_aux[1];   
-    this->aux_points_ext_ = result_aux[0] + (1.0 - constants.alpha) * radius * result_aux[1];
+    this->aux_points_int_ = result_aux[0] - ((1.0 - constants.alpha) * radius) * result_aux[1]; 
+    this->aux_points_ext_ = result_aux[0] + ((1.0 - constants.alpha) * radius) * result_aux[1];
 
     this->aux_normals_ = result_aux[1];
     this->aux_tau1_ = result_aux[2];

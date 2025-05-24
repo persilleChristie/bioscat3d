@@ -32,7 +32,7 @@ py::array_t<double> wrap_eigen(Eigen::MatrixXd& mat) {
 int main() {
     // Flags for tests (max one true)
     bool SurfacePointsTest = false;
-    bool PlaneTest = false;
+    bool PlaneTest = true;
     bool FullSurfaceTest = false;
     
     if (SurfacePointsTest){
