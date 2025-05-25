@@ -1,14 +1,11 @@
 # ninja log v5
-5798	6021	1748086303306930635	main	f12ca8ca46edb70d
-16	54141	1748079411433308426	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	5748e62aef84fe63
-11	9315	1748084651314233343	CMakeFiles/main.dir/main.cpp.o	5738aa27754ff8ae
-60	5798	1748086303079385703	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	95297c3e89cde227
-16	6240	1748079363552808694	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	5c49150096393123
-17	13831	1748079371116688969	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	3f50a6b6b9a65e1c
-16	5638	1748079362950413379	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	b5f84d6b192da40
-17	5415	1748079362718214641	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	b2370c663e8c4433
-22	86	0	/home/tripleskull/bioscat3d/build/CMakeFiles/cmake.verify_globs	4e0228459da763ec
-86	236	1748088343669217705	build.ninja	1e4efd2befa499e9
-0	6	0	/home/tripleskull/bioscat3d/build/CMakeFiles/cmake.verify_globs	4e0228459da763ec
-57	6294	1748088349964060991	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	95297c3e89cde227
-6294	6488	1748088350167459100	main	f12ca8ca46edb70d
+3	56	0	/home/tripleskull/bioscat3d/build/CMakeFiles/cmake.verify_globs	4e0228459da763ec
+271	87405	1748103155898725443	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	b5f84d6b192da40
+286	142121	1748103210788038320	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	3f50a6b6b9a65e1c
+265	87513	1748103156050380029	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	5c49150096393123
+284	89457	1748103157956894854	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	b2370c663e8c4433
+282	135944	1748103204600657725	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	95297c3e89cde227
+78	13028	1748106492872472855	CMakeFiles/main.dir/main.cpp.o	5738aa27754ff8ae
+271	270588	1748103338917352663	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	5748e62aef84fe63
+13028	13412	1748106493269891194	main	f12ca8ca46edb70d
+6	58	0	/home/tripleskull/bioscat3d/build/CMakeFiles/cmake.verify_globs	4e0228459da763ec

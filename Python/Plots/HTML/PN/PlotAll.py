@@ -31,7 +31,7 @@ def make_arrows(origin, vecs, color, name):
 combined_full_traces = []
 combined_patch_traces = []
 
-csv_files = sorted(glob("*.csv"))
+csv_files = sorted(glob("../../../../CSV/PN/*_PN.csv"))
 individual_html_files = []
 
 for file in csv_files:

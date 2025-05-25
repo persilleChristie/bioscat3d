@@ -31,8 +31,8 @@ py::array_t<double> wrap_eigen(Eigen::MatrixXd& mat) {
 
 int main() {
     // Flags for tests (max one true)
-    bool SurfacePointsTest = false;
-    bool PlaneTest = true;
+    bool SurfacePointsTest = true;
+    bool PlaneTest = false; // This should run with a flat surface, no surface bumps
     bool FullSurfaceTest = false;
     
     if (SurfacePointsTest){
@@ -52,7 +52,7 @@ int main() {
     }
 
     // ------------- Load json file --------------
-    const char* jsonPath = "../json/surfaceParamsNormalNewGeom_A.json";
+    const char* jsonPath = "../json/surfaceParamsNormalNewGeom.json";
 
     // Open the file
     std::ifstream ifs(jsonPath);
@@ -202,11 +202,11 @@ int main() {
     if (SurfacePointsTest){
         MASSystem mas(spline, lambdas[0], dimension, k, beta_vec);
 
-        Export::saveSurfaceDataCSV("../CSV/surface_data_PN.csv", 
+        Export::saveSurfaceDataCSV("../CSV/PN/surface_data_PN.csv", 
                                             mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
-        Export::saveSurfaceDataCSV("../CSV/surface_data_inneraux_PN.csv",
+        Export::saveSurfaceDataCSV("../CSV/PN/surface_data_inneraux_PN.csv",
                                             mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
-        Export::saveSurfaceDataCSV("../CSV/surface_data_outeraux_PN.csv",
+        Export::saveSurfaceDataCSV("../CSV/PN/surface_data_outeraux_PN.csv",
                                             mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
     }
     else {
