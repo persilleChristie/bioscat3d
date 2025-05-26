@@ -10,6 +10,7 @@ center_x = 0.0
 center_y = 0.0
 arrow_length = 0.01     # consistent vector length
 z_aspect = 0.1          # visual compression of z-axis
+name = "One"
 
 # --- Arrow helper ---
 def make_arrows(origin, vecs, color, name):
@@ -33,8 +34,8 @@ def make_arrows(origin, vecs, color, name):
     )
 
 # --- Main plotting loop ---
-csv_files = sorted(glob("../../../../CSV/PN/*_PN.csv"))
-csv_files = sorted(glob("../../../../CSV/Surface_Andreas/*.csv"))
+csv_files = sorted(glob("../../../../CSV/PN/*" + name + ".csv"))
+# csv_files = sorted(glob("../../../../CSV/Surface_Andreas/*.csv"))
 individual_html_files = []
 
 for file in csv_files:

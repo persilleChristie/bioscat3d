@@ -200,4 +200,4 @@ def surface_from_json(json_path, output_prefix='surface_data'):
     save_surface_to_csv(inneraux, f'{output_prefix}_inneraux.csv')
     save_surface_to_csv(outeraux, f'{output_prefix}_outeraux.csv')
 
-surface_from_json('surfaceParamsNormalNewGeom.json')
+surface_from_json('../../json/surfaceParamsOne.json')

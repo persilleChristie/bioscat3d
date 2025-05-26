@@ -67,7 +67,7 @@ void FieldCalculatorTotal::constructor()
     Eigen::MatrixXcd amplitudes(B, N);
     Eigen::MatrixXcd amplitudes_ext(B, N);
 
-    std::string filename;
+    // std::string filename;
 
     
 
@@ -88,6 +88,21 @@ void FieldCalculatorTotal::constructor()
         auto duration_assemble = std::chrono::duration_cast<std::chrono::seconds>(stop_assemble - start_assemble);
 
         std::cout << "System assembled in " << duration_assemble.count() << " seconds" << std::endl;
+
+        Eigen::JacobiSVD<Eigen::MatrixXcd> svd(A);
+        const auto& singularValues = svd.singularValues();
+        double maxSV = singularValues(0);
+        double minSV = singularValues(singularValues.size() - 1);
+
+        double condnr;
+    
+        if (minSV == 0) {
+            condnr = std::numeric_limits<double>::infinity(); // Matrix is singular
+        } else {
+            condnr = maxSV / minSV;
+        }
+    
+        std::cout << "Condition number system matrix: " << condnr << std::endl << std::endl;
 
 
         // ----------------- Solve system and time --------------------

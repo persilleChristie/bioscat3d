@@ -2,12 +2,12 @@ import numpy as np
 from scipy.interpolate import bisplev, bisplrep
 
 class Spline:
-    def __init__(self, Xfine, Yfine, Zfine):
+    def __init__(self, Xfine, Yfine, Zfine, S = 0.5):
         self.Xfine = Xfine
         self.Yfine = Yfine
         self.Zfine = Zfine
         
-        self.tcks = bisplrep(Xfine.ravel(), Yfine.ravel(), Zfine.ravel(), s=5)
+        self.tcks = bisplrep(Xfine.ravel(), Yfine.ravel(), Zfine.ravel(), s=S)
         self.max_curvature = self.__compute_max_mean_curvature__()
 
     def __evaluate_at_points__(self, x, y, dx = 0, dy = 0):
@@ -70,21 +70,44 @@ class Spline:
         return normals, tangent1, tangent2
     
     def calculate_points(self, resolution):
-        x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
-        y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)
+        # x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
+        # y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)
 
-        X, Y = np.meshgrid(x, y)
-        Z = self.__evaluate_at_points__(x, y)
-        test_points = np.column_stack((X.ravel(), Y.ravel(), Z.ravel()))
+        # X, Y = np.meshgrid(x, y)
+        # Z = self.__evaluate_at_points__(x, y)
+        # test_points = np.column_stack((X.ravel(), Y.ravel(), Z.ravel()))
 
-        normals, tangent1, tangent2 = self.__calculate_normals_tangents__(x, y)
+        # normals, tangent1, tangent2 = self.__calculate_normals_tangents__(x, y)
 
-        dot_12 = np.einsum('ij,ij->i', tangent1, tangent2)
-        dot_1n = np.einsum('ij,ij->i', tangent1, normals)
-        dot_2n = np.einsum('ij,ij->i', tangent2, normals)
+        # dot_12 = np.einsum('ij,ij->i', tangent1, tangent2)
+        # dot_1n = np.einsum('ij,ij->i', tangent1, normals)
+        # dot_2n = np.einsum('ij,ij->i', tangent2, normals)
 
-        print("Max deviation from orthogonality:", np.max(np.abs([dot_12, dot_1n, dot_2n])))
+        # print("Max deviation from orthogonality:", np.max(np.abs([dot_12, dot_1n, dot_2n])))
+        # print("Minimum value of normal z-value: ", np.min(normals[:,2]))
 
 
     
-        return test_points, normals, tangent1, tangent2
+        # return test_points, normals, tangent1, tangent2
+        x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
+        y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)
+        X, Y = np.meshgrid(x, y, indexing='ij')
+        Z = self.__evaluate_at_points__(x, y)
+
+        fx = self.__evaluate_at_points__(x, y, dx=1, dy=0)
+        fy = self.__evaluate_at_points__(x, y, dx=0, dy=1)
+
+        tau_x = np.stack([np.ones_like(fx), np.zeros_like(fx), fx], axis=-1)
+        tau_y = np.stack([np.zeros_like(fy), np.ones_like(fy), fy], axis=-1)
+
+        normals = np.cross(tau_x, tau_y)
+        tau_y = np.cross(normals, tau_x)  # Ensure right-handed orthonormal basis
+
+        # Normalize
+        tau_x /= np.linalg.norm(tau_x, axis=-1, keepdims=True)
+        tau_y /= np.linalg.norm(tau_y, axis=-1, keepdims=True)
+        normals /= np.linalg.norm(normals, axis=-1, keepdims=True)
+
+        points = np.stack([X, Y, Z], axis=-1).reshape(-1, 3)
+
+        return points, normals.reshape(-1, 3), tau_x.reshape(-1, 3), tau_y.reshape(-1, 3)

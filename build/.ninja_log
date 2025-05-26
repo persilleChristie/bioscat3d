@@ -1,18 +1,13 @@
-# ninja log v5
-0	7	0	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	78e3a1670abdb5ac
-1	2849	1748174691305745774	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	b39a5217c5e51fee
-2	7032	1748174695488281675	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	7f64aa9b0ad9a577
-1	2783	1748174691244634855	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	e23e92628cbe5c9e
-0	3106	1748174691560374600	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	f2edcc3c6c023f2d
-1	6370	1748174694819623587	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	7a5963f64cbe6653
-1	37979	1748174726432796467	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	f867ed3b7b45d51a
-37979	38134	1748174726585564767	main	a963fded9335f4cd
-0	8	0	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	78e3a1670abdb5ac
-14	3369	1748245283144000719	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	7554d665b62fb5f7
-14	3815	1748245283591321564	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	22c2812cd33c8bc9
-13	4431	1748245284205087374	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	cd3437a9f97d0217
-14	8141	1748245287908487859	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	99ade35369f69295
-15	7944	1748245287721420333	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	e32a84318d8c39b9
-15	9042	1748245288813658068	CMakeFiles/main.dir/surfaceTester.cpp.o	6e0d0de731c0a562
-14	50739	1748245330445021968	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	81efec8a353adee3
-50739	51861	1748245331631183979	main	ed981e49c65481a9
+# ninja log v6
+1	8	1748257860692722605	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	475a4e872dea9739
+8	3186	1748256486439967328	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	29f694748aebcfd3
+9	7133	1748256486439967328	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	1f4c5d532724c2e0
+9	2998	1748256486439967328	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	95a051c148bc29a8
+9	9346	1748256486439967328	CMakeFiles/main.dir/surfaceTester.cpp.o	9982576e8ecf754e
+7	3347	1748256486439967328	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	7b07f39df024e9c7
+8	7829	1748256486439967328	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	278398d3ee7bc1f5
+8	37383	1748256486439967328	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	448aff71f96e92b3
+37384	37514	1748256522055426602	main	68d90c4962ba98e2
+1	8	1748257935043485806	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	475a4e872dea9739
+9	33435	1748257935054053653	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	448aff71f96e92b3
+33435	33594	1748257967106287882	main	68d90c4962ba98e2

@@ -7,11 +7,12 @@ import os
 # Repeat the process to also generate individual plots while keeping the combined traces
 
 # Parameters
-patch_size = 0.4
+patch_size = 1.0
 center_x = 0.0
 center_y = 0.0
 arrow_length = 0.03
 z_aspect = 2.0
+name = "One"
 
 def make_arrows(origin, vecs, color, name):
     lines_x, lines_y, lines_z = [], [], []
@@ -31,7 +32,7 @@ def make_arrows(origin, vecs, color, name):
 combined_full_traces = []
 combined_patch_traces = []
 
-csv_files = sorted(glob("*.csv"))
+csv_files = sorted(glob("../../../../CSV/Andreas/*.csv"))
 individual_html_files = []
 
 for file in csv_files:

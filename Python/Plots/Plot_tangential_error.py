@@ -3,8 +3,10 @@ import numpy as np
 import glob
 import matplotlib.pyplot as plt
 
+name = "Zero"
+
 # Find all CSV files starting with 'tangential_error' in the ../../CSV directory
-csv_files = sorted(glob.glob("../../CSV/tangential_error*.csv"))
+csv_files = sorted(glob.glob("../../CSV/tangential_error*_" + name + ".csv"))
 
 # Separate files for tangent 1 and tangent 2
 tangent1_files = [f for f in csv_files if "tangential_error1" in f]
@@ -21,9 +23,9 @@ for i, df in enumerate(dfs1):
     plt.plot(error)
     plt.xlabel("Sample Index")
     plt.ylabel("Error")
-    plt.title(f"Tangent 1 Error (File {i+1})")
+    plt.title(f"Tangent 1 Error (Surface {name})")
     plt.tight_layout()
-    plt.savefig(f"tangent1_error_plot_{i+1}.png")
+    plt.savefig(f"tangent1_error_plot_{name}.png")
     plt.show()
 
 # Plot each tangent 2 file separately
@@ -33,9 +35,9 @@ for i, df in enumerate(dfs2):
     plt.plot(error)
     plt.xlabel("Sample Index")
     plt.ylabel("Error")
-    plt.title(f"Tangent 2 Error (File {i+1})")
+    plt.title(f"Tangent 2 Error (Surface {name})")
     plt.tight_layout()
-    plt.savefig(f"tangent2_error_plot_{i+1}.png")
+    plt.savefig(f"tangent2_error_plot_{name}.png")
     plt.show()
 
 # Histogram of the errors
@@ -52,10 +54,10 @@ for i in range(num_pairs):
     plt.hist(error2, bins=50, alpha=0.5, label="Tangent 2")
     plt.xlabel("Error")
     plt.ylabel("Frequency")
-    plt.title(f"Histogram of Tangential Errors (File Pair {i+1})")
+    plt.title(f"Histogram of Tangential Errors (Surface {name})")
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"tangential_error_histogram_pair_{i+1}.png")
+    plt.savefig(f"tangential_error_histogram_pair_{name}.png")
     plt.show()
 
 

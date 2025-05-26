@@ -12,6 +12,7 @@
 #include "Cpp/lib/Utils/UtilsExport.h"
 
 namespace py = pybind11;
+using MatrixRM = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>; // Define RowMajer matrix in Eigen
 
 Constants constants;
 
@@ -19,12 +20,21 @@ Constants constants;
 /// @brief Translate Eigen matrix into numpy array without letting python own memory
 /// @param mat Eigen matrix 
 /// @return pybind11 array_t<double>
-py::array_t<double> wrap_eigen(Eigen::MatrixXd& mat) {
+// py::array_t<double> wrap_eigen(Eigen::MatrixXd& mat) {
+//     return py::array_t<double>(
+//         {mat.rows(), mat.cols()},
+//         {sizeof(double) * mat.cols(), sizeof(double)},
+//         mat.data(),
+//         py::none() // Do not let Python own the matrix 
+//     );
+// }
+
+py::array_t<double> wrap_eigen(const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& mat) {
     return py::array_t<double>(
         {mat.rows(), mat.cols()},
-        {sizeof(double) * mat.cols(), sizeof(double)},
+        {sizeof(double) * mat.cols(), sizeof(double)},  // row-major
         mat.data(),
-        py::none() // Do not let Python own the matrix 
+        py::none()
     );
 }
 
@@ -107,9 +117,11 @@ int main() {
     int B = betas.Size();
     std::cout << "Number of polarizations: " << B << std::endl;
 
+    std::cout << "Beta vector: ";
     for (rapidjson::SizeType i = 0; i < betas.Size(); ++i) {
         std::cout << betas[i].GetDouble() << " ";
     }
+    std::cout << std::endl;
 
     Eigen::VectorXd beta_vec(B);
     for (int i = 0; i < B; ++i) {
@@ -118,10 +130,11 @@ int main() {
 
     // Read lambdas
     double lambda = doc["maxLambda"].GetDouble();
+    double lambda_fine = 0.3 * lambda;
 
 
     // ------------- Decide highest number of auxilliary points --------------
-    int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / lambda));
+    int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / lambda_fine));
     std::cout << "Number of fine points: " << N_fine << std::endl;
 
 
@@ -129,13 +142,13 @@ int main() {
     Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(N_fine, -half_dim, half_dim);
     Eigen::VectorXd y = Eigen::VectorXd::LinSpaced(N_fine, -half_dim, half_dim);
 
-    Eigen::MatrixXd X_fine(N_fine, N_fine), Y_fine(N_fine, N_fine);
+    MatrixRM X_fine(N_fine, N_fine), Y_fine(N_fine, N_fine);
     for (int i = 0; i < N_fine; ++i) {  // Works as meshgrid
         X_fine.row(i) = x.transpose();
         Y_fine.col(i) = y;
     }
 
-    Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
+    MatrixRM Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
 
     if (Surface1|| Surface10){
         // Read bump data
@@ -157,9 +170,9 @@ int main() {
     }
 
     // Save grid to CSV
-    Export::saveRealMatrixCSV("../CSV/PN/xfine_" + fileex + ".csv", X_fine);
-    Export::saveRealMatrixCSV("../CSV/PN/yfine_" + fileex + ".csv", Y_fine);
-    Export::saveRealMatrixCSV("../CSV/PN/zfine_" + fileex + ".csv", Z_fine);
+    // Export::saveRealMatrixCSV("../CSV/PN/xfine_" + fileex + ".csv", X_fine);
+    // Export::saveRealMatrixCSV("../CSV/PN/yfine_" + fileex + ".csv", Y_fine);
+    // Export::saveRealMatrixCSV("../CSV/PN/zfine_" + fileex + ".csv", Z_fine);
 
     
     // ------------ Run python code ---------------
@@ -192,8 +205,10 @@ int main() {
         return 1;
     }
 
+
     // ------------ Create MAS sytem ---------------
     MASSystem mas(spline, lambda, dimension, k, beta_vec);
+
 
     Export::saveSurfaceDataCSV("../CSV/PN/surface_data" + fileex + ".csv", 
                                     mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
@@ -202,6 +217,13 @@ int main() {
     Export::saveSurfaceDataCSV("../CSV/PN/surface_data_outeraux" + fileex + ".csv",
                                     mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
     
+    std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
+    FieldCalculatorTotal field(mas);
+
+    auto [error1, error2] = field.computeTangentialError(0);
+
+    Export::saveRealVectorCSV("../CSV/tangential_error1_" + fileex + ".csv", error1);
+    Export::saveRealVectorCSV("../CSV/tangential_error2_" + fileex + ".csv", error2);
 
 
 
