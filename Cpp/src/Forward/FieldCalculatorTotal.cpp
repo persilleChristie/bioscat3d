@@ -7,6 +7,7 @@
 #include "../../lib/Forward/FieldCalculatorUPW.h"
 #include "../../lib/Utils/Constants.h"
 #include "../../lib/Utils/UtilsDipole.h"
+#include "../../lib/Utils/UtilsSolvers.h"
 
 FieldCalculatorTotal::FieldCalculatorTotal(
     const MASSystem masSystem
@@ -110,8 +111,11 @@ void FieldCalculatorTotal::constructor()
         
         auto start_solve = std::chrono::high_resolution_clock::now();
         
-        Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
-        Eigen::VectorXcd amps = svd1.solve(b);
+        // Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+        // Eigen::VectorXcd amps = svd1.solve(b);
+
+        auto amps = UtilsSolvers::solveQR(A, b);
+
         auto stop_solve = std::chrono::high_resolution_clock::now();
 
         auto duration_solve = std::chrono::duration_cast<std::chrono::seconds>(stop_solve - start_solve);
@@ -120,6 +124,7 @@ void FieldCalculatorTotal::constructor()
 
         amplitudes.row(i) = amps.head(N);
         amplitudes_ext.row(i) = amps.tail(N);
+
 
         
         // if (i == 0){
@@ -143,22 +148,34 @@ void FieldCalculatorTotal::constructor()
 }
 
 
+void computeLinearCombinations(Eigen::MatrixX3cd& outE,
+    Eigen::MatrixX3cd& outH,
+    const Eigen::MatrixX3d& evalPoints,
+    int polarization_idx,
+    std::vector<std::shared_ptr<FieldCalculator>> dipoles,
+    Eigen::MatrixXcd amplitudes
+    ){
+
+    int N = evalPoints.rows();
+
+    Eigen::MatrixX3cd Ei(N, 3), Hi(N, 3);
+
+    for (size_t i = 0; i < dipoles.size(); ++i) {
+        dipoles[i]->computeFields(Ei, Hi, evalPoints);
+
+        outE += amplitudes.row(polarization_idx)(i) * Ei;
+        outH += amplitudes.row(polarization_idx)(i) * Hi;
+    }
+}
+
+
 void FieldCalculatorTotal::computeFields(
     Eigen::MatrixX3cd& outE,
     Eigen::MatrixX3cd& outH,
     const Eigen::MatrixX3d& evalPoints,
     int polarization_idx
 ) const {
-    int N = evalPoints.rows();
-
-    Eigen::MatrixX3cd Ei(N, 3), Hi(N, 3);
-
-    for (size_t i = 0; i < dipoles_.size(); ++i) {
-        dipoles_[i]->computeFields(Ei, Hi, evalPoints);
-
-        outE += amplitudes_.row(polarization_idx)(i) * Ei;
-        outH += amplitudes_.row(polarization_idx)(i) * Hi;
-    }
+    computeLinearCombinations(outE, outH, evalPoints, polarization_idx, dipoles_, amplitudes_);
 }
 
 Eigen::VectorXd FieldCalculatorTotal::computePower(
@@ -223,19 +240,13 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangent
     Eigen::MatrixX3cd intE = Eigen::MatrixX3cd::Zero(N, 3);
     Eigen::MatrixX3cd intH = Eigen::MatrixX3cd::Zero(N, 3); 
 
-    computeFields(intE, intH, control_points, polarization_index);
+    computeLinearCombinations(intE, intH, control_points, polarization_index, dipoles_, amplitudes_);
 
     // Compute field from exterior points and add UPW
     Eigen::MatrixX3cd extE = Eigen::MatrixX3cd::Zero(N, 3);
     Eigen::MatrixX3cd extH = Eigen::MatrixX3cd::Zero(N, 3); 
-    Eigen::MatrixX3cd Ei(N, 3), Hi(N, 3);
 
-    for (size_t i = 0; i < dipoles_ext_.size(); ++i) {
-        dipoles_ext_[i]->computeFields(Ei, Hi, control_points);
-
-        extE += amplitudes_ext_.row(polarization_index)(i) * Ei; 
-        extH += amplitudes_ext_.row(polarization_index)(i) * Hi;
-    }
+    computeLinearCombinations(extE, extH, control_points, polarization_index, dipoles_ext_, amplitudes_ext_);
 
     Eigen::MatrixX3cd incE(N, 3), incH(N, 3);
     UPW_[polarization_index]->computeFields(incE, incH, control_points);

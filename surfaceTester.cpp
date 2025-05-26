@@ -196,7 +196,7 @@ int main() {
         auto Z_np = wrap_eigen(Z_fine);
 
         // Instantiate Python class
-        spline = SplineClass(X_np, Y_np, Z_np);
+        spline = SplineClass(X_np, Y_np, Z_np, 1.0);
 
 
     } catch (const py::error_already_set &e) {

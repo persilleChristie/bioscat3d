@@ -55,7 +55,7 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     std::cout << "Max curvature: " << maxcurvature << std::endl;
 
     // --------- Generate test points -----------
-    int test_point_res = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
+    int test_point_res = static_cast<int>(std::ceil(constants.auxpts_pr_lambda * dimension/lambda_)); // static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
 
     // Calculate points on surface and translate to Eigen
     auto result = call_spline(spline, test_point_res);
@@ -69,9 +69,9 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     // Calculate control points on surface and translate to Eigen
     auto control_result = call_spline(spline, 3*test_point_res);
 
-    this->control_points_ = control_result[0];
-    this->control_tangents1_ = control_result[2];
-    this->control_tangents2_ = control_result[3];
+    this->control_points_ = result[0]; // control_result[0];
+    this->control_tangents1_ = result[2]; // control_result[2];
+    this->control_tangents2_ = result[3]; // control_result[3];
 
     // --------- Generate auxiliary points -----------
     int aux_points_res = std::ceil(constants.auxpts_pr_lambda * dimension/lambda_);
@@ -81,7 +81,7 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     
     // Calculate point values and save in class
     //radius = 1/max(maxcurvature, 1.0)
-    double radius = 1.0 / std::max(maxcurvature, 10.0);
+    double radius = 1.0 / std::max(maxcurvature, 1.0);
 
     std::cout << "Radius: " << radius << std::endl;
 

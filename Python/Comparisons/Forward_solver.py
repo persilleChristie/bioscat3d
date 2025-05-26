@@ -409,7 +409,7 @@ def create_surface_and_scattering_info_from_json(json_path):
         )
 
     Z = surface_function(X, Y)
-    Z = np.zeros_like(X)
+    # Z = np.zeros_like(X)
     for s in np.linspace(10,0.5,10):
         Surface=SP.SplineSurface(X,Y,Z,smoothness=s)
         if False:

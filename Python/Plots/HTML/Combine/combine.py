@@ -96,6 +96,6 @@ fig = px.bar(
 )
 
 output_file = "comparison_summary_plot.html"
-pio.write_html(fig, file=output_file, auto_open=True)
+pio.write_html(fig, file=output_file, auto_open=False)
 
 print(f"✅ Saved interactive plot to {output_file}")
