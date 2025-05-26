@@ -208,7 +208,8 @@ int main() {
                                             mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
         Export::saveSurfaceDataCSV("../CSV/PN/surface_data_outeraux_PN.csv",
                                             mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
-    }
+    
+    } 
     else {
         for (auto lambda : lambdas){
             std::cout << "Running MASSystem with lambda: " << lambda << std::endl;

@@ -1,0 +1,209 @@
+#include <pybind11/embed.h>
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+#include <Eigen/Dense>
+#include <iostream>
+#include <fstream>
+#include "rapidjson/document.h" 
+#include "rapidjson/istreamwrapper.h"
+#include "Cpp/lib/Utils/Constants.h"
+#include "Cpp/lib/Forward/MASSystem.h"
+#include "Cpp/lib/Forward/FieldCalculatorTotal.h"
+#include "Cpp/lib/Utils/UtilsExport.h"
+
+namespace py = pybind11;
+
+Constants constants;
+
+
+/// @brief Translate Eigen matrix into numpy array without letting python own memory
+/// @param mat Eigen matrix 
+/// @return pybind11 array_t<double>
+py::array_t<double> wrap_eigen(Eigen::MatrixXd& mat) {
+    return py::array_t<double>(
+        {mat.rows(), mat.cols()},
+        {sizeof(double) * mat.cols(), sizeof(double)},
+        mat.data(),
+        py::none() // Do not let Python own the matrix 
+    );
+}
+
+
+int main() {
+    bool Surface0 = true;
+    bool Surface1 = false; 
+    bool Surface10 = false;
+
+    const char* jsonPath = "...";
+    std::string fileex = "...";
+    
+    if (Surface0){
+        std::cout << std::endl;
+        std::cout << "TESTING PLANE (ZERO BUMPS)" << std::endl << std::endl;
+        
+        jsonPath = "../json/surfaceParamsZero.json";
+        fileex = "Zero";
+
+    } else if (Surface1){
+        std::cout << std::endl;
+        std::cout << "TESTING FOR ONE BUMP SURFACE" << std::endl;
+
+        jsonPath = "../json/surfaceParamsOne.json";
+        fileex = "One";
+        
+    }  else if (Surface10){
+        std::cout << std::endl;
+        std::cout << "TESTING FOR TEN BUMP SURFACE" << std::endl;
+
+        jsonPath = "../json/surfaceParamsTen.json";
+        fileex = "Ten";
+
+    } else {    
+        std::cout << std::endl;
+        std::cout << "RUNNING NO TESTS, CHANGE TRUE/FALSE VALUES" << std::endl << std::endl;
+        return 1;
+    }
+
+
+    // ------------- Load json file --------------
+    // Open the file
+    std::ifstream ifs(jsonPath);
+    if (!ifs.is_open()) {
+        std::cerr << "Could not open JSON file.\n";
+        return 1;
+    }
+    
+    // Wrap the input stream
+    rapidjson::IStreamWrapper isw(ifs);
+    
+    // Parse the JSON
+    rapidjson::Document doc;
+    doc.ParseStream(isw);
+    
+    if (doc.HasParseError()) {
+        std::cerr << "Error parsing JSON.\n";
+        return 1;
+    }
+    
+    // Load dimension
+    double half_dim = doc["halfWidth_x"].GetDouble();
+    double dimension = 2 * half_dim;
+
+    // Print dimension
+    std::cout << "Dimension: " << dimension << std::endl;
+
+    // Read incidence vector
+    const auto& kjson = doc["k"];
+
+    Eigen::Vector3d k;
+    for (rapidjson::SizeType i = 0; i < kjson.Size(); ++i) {
+        k(i) = kjson[i].GetDouble();
+    }
+    //print k vector
+    std::cout << "k vector: " << k.transpose() << std::endl;
+    
+    // Read polarizations
+    const auto& betas = doc["betas"];
+    int B = betas.Size();
+    std::cout << "Number of polarizations: " << B << std::endl;
+
+    for (rapidjson::SizeType i = 0; i < betas.Size(); ++i) {
+        std::cout << betas[i].GetDouble() << " ";
+    }
+
+    Eigen::VectorXd beta_vec(B);
+    for (int i = 0; i < B; ++i) {
+        beta_vec(i) = betas[i].GetDouble();   
+    }
+
+    // Read lambdas
+    double lambda = doc["maxLambda"].GetDouble();
+
+
+    // ------------- Decide highest number of auxilliary points --------------
+    int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / lambda));
+    std::cout << "Number of fine points: " << N_fine << std::endl;
+
+
+    // ------------- Generate grid -------------
+    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(N_fine, -half_dim, half_dim);
+    Eigen::VectorXd y = Eigen::VectorXd::LinSpaced(N_fine, -half_dim, half_dim);
+
+    Eigen::MatrixXd X_fine(N_fine, N_fine), Y_fine(N_fine, N_fine);
+    for (int i = 0; i < N_fine; ++i) {  // Works as meshgrid
+        X_fine.row(i) = x.transpose();
+        Y_fine.col(i) = y;
+    }
+
+    Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
+
+    if (Surface1|| Surface10){
+        // Read bump data
+        const auto& bumpData = doc["bumpData"];
+
+        // Iterate over bumpData array
+        for (rapidjson::SizeType i = 0; i < bumpData.Size(); ++i) {
+            const auto& bump = bumpData[i];
+            double x0 = bump["x0"].GetDouble();
+            double y0 = bump["y0"].GetDouble();
+            double height = bump["height"].GetDouble();
+            double sigma = bump["sigma"].GetDouble();
+            
+            // Add bumps to data
+            Z_fine += (height * exp(-((X_fine.array() - x0)*(X_fine.array() - x0) 
+                                + (Y_fine.array() - y0)*(Y_fine.array() - y0)) / (2 * sigma * sigma))).matrix();
+            
+        }
+    }
+
+    // Save grid to CSV
+    Export::saveRealMatrixCSV("../CSV/PN/xfine_" + fileex + ".csv", X_fine);
+    Export::saveRealMatrixCSV("../CSV/PN/yfine_" + fileex + ".csv", Y_fine);
+    Export::saveRealMatrixCSV("../CSV/PN/zfine_" + fileex + ".csv", Z_fine);
+
+    
+    // ------------ Run python code ---------------
+    py::scoped_interpreter guard{}; // Start Python interpreter
+    py::module sys = py::module::import("sys");
+    sys.attr("path").attr("insert")(1, ".");  // Add local dir to Python path
+
+    // Declare variables needed outside the try-statement
+    py::object spline;
+
+    try {
+        // Import the Python module
+        py::module spline_module = py::module::import("Spline");
+
+        // Get the class
+        py::object SplineClass = spline_module.attr("Spline");
+
+        // Wrap Eigen matrices as NumPy arrays (shared memory, no copy)
+        auto X_np = wrap_eigen(X_fine);
+        auto Y_np = wrap_eigen(Y_fine);
+        auto Z_np = wrap_eigen(Z_fine);
+
+        // Instantiate Python class
+        spline = SplineClass(X_np, Y_np, Z_np);
+
+
+    } catch (const py::error_already_set &e) {
+        std::cerr << "Python error: " << e.what() << "\n";
+
+        return 1;
+    }
+
+    // ------------ Create MAS sytem ---------------
+    MASSystem mas(spline, lambda, dimension, k, beta_vec);
+
+    Export::saveSurfaceDataCSV("../CSV/PN/surface_data" + fileex + ".csv", 
+                                    mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
+    Export::saveSurfaceDataCSV("../CSV/PN/surface_data_inneraux" + fileex + ".csv",
+                                    mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
+    Export::saveSurfaceDataCSV("../CSV/PN/surface_data_outeraux" + fileex + ".csv",
+                                    mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
+    
+
+
+
+    return 0;
+}

@@ -79,19 +79,6 @@ class Spline:
 
         normals, tangent1, tangent2 = self.__calculate_normals_tangents__(x, y)
 
-
-        # if control_points_flag:
-        #     control_x = np.linspace(self.Xfine.min() + (x[1]-x[0])/2, self.Xfine.max()- (x[1]-x[0])/2, resolution - 1)
-        #     control_y = np.linspace(self.Yfine.min() + (y[1]-y[0])/2, self.Yfine.max()- (y[1]-y[0])/2, resolution - 1)
-            
-        #     X_control, Y_control = np.meshgrid(control_y, control_y)
-        #     Z_control  = self.__evaluate_at_points__(control_x, control_y)
-        #     control_points = np.column_stack((X_control.ravel(), Y_control.ravel(), Z_control.ravel()))
-
-        #     _, control_tangent1, control_tangent2 = self.__calculate_normals_tangents__(control_x, control_y)
-
-        #     return test_points, normals, tangent1, tangent2, control_points, control_tangent1, control_tangent2
-
         dot_12 = np.einsum('ij,ij->i', tangent1, tangent2)
         dot_1n = np.einsum('ij,ij->i', tangent1, normals)
         dot_2n = np.einsum('ij,ij->i', tangent2, normals)
