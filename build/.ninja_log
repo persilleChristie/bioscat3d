@@ -1,11 +1,10 @@
 # ninja log v5
-3	56	0	/home/tripleskull/bioscat3d/build/CMakeFiles/cmake.verify_globs	4e0228459da763ec
-271	87405	1748103155898725443	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	b5f84d6b192da40
-286	142121	1748103210788038320	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	3f50a6b6b9a65e1c
-265	87513	1748103156050380029	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	5c49150096393123
-284	89457	1748103157956894854	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	b2370c663e8c4433
-282	135944	1748103204600657725	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	95297c3e89cde227
-78	13028	1748106492872472855	CMakeFiles/main.dir/main.cpp.o	5738aa27754ff8ae
-271	270588	1748103338917352663	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	5748e62aef84fe63
-13028	13412	1748106493269891194	main	f12ca8ca46edb70d
-6	58	0	/home/tripleskull/bioscat3d/build/CMakeFiles/cmake.verify_globs	4e0228459da763ec
+0	7	0	/home/pernillechristie/DTU/bioscat3d/build/CMakeFiles/cmake.verify_globs	78e3a1670abdb5ac
+1	2783	1748174691244634855	CMakeFiles/main.dir/Cpp/src/Forward/SurfacePlane.cpp.o	e23e92628cbe5c9e
+1	2849	1748174691305745774	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorUPW.cpp.o	b39a5217c5e51fee
+0	3106	1748174691560374600	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorDipole.cpp.o	f2edcc3c6c023f2d
+1	6370	1748174694819623587	CMakeFiles/main.dir/Cpp/src/Forward/MASSystem.cpp.o	7a5963f64cbe6653
+2	7032	1748174695488281675	CMakeFiles/main.dir/Cpp/src/Forward/SystemAssembler.cpp.o	7f64aa9b0ad9a577
+2	7256	1748174695712355044	CMakeFiles/main.dir/main.cpp.o	9b1dc0cfdea904ec
+1	37979	1748174726432796467	CMakeFiles/main.dir/Cpp/src/Forward/FieldCalculatorTotal.cpp.o	f867ed3b7b45d51a
+37979	38134	1748174726585564767	main	a963fded9335f4cd
