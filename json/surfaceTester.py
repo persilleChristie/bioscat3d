@@ -4,7 +4,9 @@ import json
 import os
 
 def generate_surface_params(
-    keyword = "NormalNewGeom", # postfix to name JSON file
+    keyword = "Zero", # postfix to name JSON file
+    #keyword = "One", # postfix to name JSON file
+    #keyword = "Ten", # postfix to name JSON file
     halfWidth_x=1.0, # 1.0
     halfWidth_y=1.0, # 1.0
     halfWidth_z=2.0,
@@ -12,9 +14,10 @@ def generate_surface_params(
     pml_thickness = 2, # Meep parameter
     seed=42, # For surface bump creation
     monitor_size = 1, # monitors are placed with center at +/- monitor_size/2 in all directions
-    num_bumps=1,
+    num_bumps=10,
     hights_bumps = [0.150, 0.150], #should be in [20, 150] nm
     sigmas_bumps = [0.075, 0.075], #should correspond to lambde < width bumps, sigme < lambda/4
+    center_bump = [0.0, 0.0], # center of the bump
     epsilon1 = 2.56, # substrate epsilon value ???
     alpha = 0.86, # disctance scale for source points in MAS
     omega = 1.0, # What does this representcd
@@ -31,7 +34,14 @@ def generate_surface_params(
     k = np.array(k, dtype=float)
     k = (k / np.linalg.norm(k)).tolist()  # Convert to plain Python list after normalization
 
-
+        # if keyword == "One": ad a single bump at the center
+    if keyword == "One":
+        bumpData = [{"x0": center_bump[0], "y0": center_bump[1], "height": hights_bumps[1], "sigma": sigmas_bumps[0]}] # Flat surface with a single point
+    elif keyword == "Zero":
+        bumpData = []
+    elif keyword == "Ten":
+        num_bumps=10
+        
     bumpData = []
     np.random.seed(seed)
     for _ in range(num_bumps):
@@ -41,7 +51,7 @@ def generate_surface_params(
         sigma = np.random.uniform(sigmas_bumps[0], sigmas_bumps[1])
         bumpData.append({"x0": x0, "y0": y0, "height": height, "sigma": sigma})
 
-    betas = np.linspace(0, np.pi/2, numBetas).tolist() 
+    betas = np.linspace(0, np.pi/2, numBetas).tolist()
 
     surfaceParams = {
         "bumpData": bumpData,
