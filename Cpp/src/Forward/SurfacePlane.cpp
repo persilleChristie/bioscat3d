@@ -19,15 +19,6 @@ const Eigen::MatrixXd& SurfacePlane::getNormals() const { return normals_;  }
 const Eigen::MatrixXd& SurfacePlane::getTau1()    const { return tau1_;    }
 const Eigen::MatrixXd& SurfacePlane::getTau2()    const { return tau2_;    }
 
-std::unique_ptr<Surface> SurfacePlane::mirrored(const Eigen::Vector3d& normal) const {
-    auto mirroredSurface = std::make_unique<SurfacePlane>(*this);
-    mirroredSurface->points_.col(2) *= -1;
-    mirroredSurface->normals_.col(2) *= -1;
-    mirroredSurface->tau1_.col(2) *= -1;
-    mirroredSurface->tau2_.col(2) *= -1;
-    return mirroredSurface;
-}
-
 
 
 void SurfacePlane::generateSurface() {
