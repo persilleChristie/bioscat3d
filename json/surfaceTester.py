@@ -13,11 +13,11 @@ def generate_surface_params(
     seed=42, # For surface bump creation
     monitor_size = 1, # monitors are placed with center at +/- monitor_size/2 in all directions
     num_bumps=1,
-    hights_bumps = [0.02, 0.15], #should be in [20, 150] nm
-    sigmas_bumps = [0.05, 0.075], #should correspond to lambde < width bumps, sigme < lambda/4
+    hights_bumps = [0.150, 0.150], #should be in [20, 150] nm
+    sigmas_bumps = [0.075, 0.075], #should correspond to lambde < width bumps, sigme < lambda/4
     epsilon1 = 2.56, # substrate epsilon value ???
     alpha = 0.86, # disctance scale for source points in MAS
-    omega = 1.0, # What does this represent
+    omega = 1.0, # What does this representcd
     k = [0 ,0 , -1.0],
     numBetas = 1, # makes unidistant betas on the interval [0, pi/2]
     lambda_n = 1, # number of wavelengths to be used in the simulation
