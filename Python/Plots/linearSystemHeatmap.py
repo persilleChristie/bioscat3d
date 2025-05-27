@@ -7,7 +7,7 @@ matplotlib.use('Qt5Agg')
 # Set tolerance for 0 values
 tol = 1e-16
 
-name = 'Zero'
+name = 'One'
 
 ############# PN ############
 # Load system matrix
@@ -23,7 +23,7 @@ df1 = pd.read_csv('../../CSV/PN/rhs' + name + '.csv', sep=",", header=None)
 df1 = df1.astype('string')
 
 b = df1.map(lambda x: complex(x.replace("i", "j").replace("+-","-"))).to_numpy()
-
+b_plot = np.tile(b, (1,100))
 
 # Load solution
 df2 = pd.read_csv('../../CSV/PN/solution' + name + '.csv', sep=",", header=None)
@@ -31,18 +31,18 @@ df2 = pd.read_csv('../../CSV/PN/solution' + name + '.csv', sep=",", header=None)
 df2 = df2.astype('string')
 
 y = df2.map(lambda x: complex(x.replace("i", "j").replace("+-","-"))).to_numpy()
-
+y_plot = np.tile(y, (1,100))
 # Plot
-fig, axs = plt.subplots(3, 1, figsize=(10, 5))
+fig, axs = plt.subplots(1, 3, figsize=(10, 5))
 im0 = axs[0].imshow(abs(A), cmap='viridis')
 axs[0].set_title("PN systemmatrix")
 plt.colorbar(im0, ax=axs[0])
 
-im1 = axs[1].imshow(abs(b), cmap='viridis')
+im1 = axs[1].imshow(abs(b_plot), cmap='viridis')
 axs[1].set_title("PN rhs")
 plt.colorbar(im1, ax=axs[1])
 
-im2 = axs[2].imshow(abs(y), cmap='viridis')
+im2 = axs[2].imshow(abs(y_plot), cmap='viridis')
 axs[2].set_title("PN solution")
 plt.colorbar(im2, ax=axs[2])
 

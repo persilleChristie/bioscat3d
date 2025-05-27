@@ -55,7 +55,7 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     std::cout << "Max curvature: " << maxcurvature << std::endl;
 
     // --------- Generate test points -----------
-    int test_point_res = static_cast<int>(std::ceil(constants.auxpts_pr_lambda * dimension/lambda_)); // static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
+    int test_point_res = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
 
     // Calculate points on surface and translate to Eigen
     auto result = call_spline(spline, test_point_res);

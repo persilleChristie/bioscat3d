@@ -40,9 +40,9 @@ py::array_t<double> wrap_eigen(const Eigen::Matrix<double, Eigen::Dynamic, Eigen
 
 
 int main() {
-    bool Surface0 = true;
+    bool Surface0 = false;
     bool Surface1 = false; 
-    bool Surface10 = false;
+    bool Surface10 = true;
 
     const char* jsonPath = "...";
     std::string fileex = "...";

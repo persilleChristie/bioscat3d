@@ -71,9 +71,9 @@ void FieldCalculatorTotal::constructor()
 
     // For tests
     std::string fileex;
-    bool Surface0 = true;
+    bool Surface0 = false;
     bool Surface1 = false; 
-    bool Surface10 = false;
+    bool Surface10 = true;
 
     
 
