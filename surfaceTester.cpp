@@ -56,14 +56,14 @@ int main() {
 
     } else if (Surface1){
         std::cout << std::endl;
-        std::cout << "TESTING FOR ONE BUMP SURFACE" << std::endl;
+        std::cout << "TESTING FOR ONE BUMP SURFACE" << std::endl << std::endl;
 
         jsonPath = "../json/surfaceParamsOne.json";
         fileex = "One";
         
     }  else if (Surface10){
         std::cout << std::endl;
-        std::cout << "TESTING FOR TEN BUMP SURFACE" << std::endl;
+        std::cout << "TESTING FOR TEN BUMP SURFACE" << std::endl << std::endl;
 
         jsonPath = "../json/surfaceParamsTen.json";
         fileex = "Ten";
@@ -196,7 +196,7 @@ int main() {
         auto Z_np = wrap_eigen(Z_fine);
 
         // Instantiate Python class
-        spline = SplineClass(X_np, Y_np, Z_np, 1.0);
+        spline = SplineClass(X_np, Y_np, Z_np, 0.5);
 
 
     } catch (const py::error_already_set &e) {
@@ -217,7 +217,7 @@ int main() {
     Export::saveSurfaceDataCSV("../CSV/PN/surface_data_outeraux" + fileex + ".csv",
                                     mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
     
-    std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
+    std::cout << std::endl << "Running FieldCalculatorTotal..." << std::endl << std::endl;
     FieldCalculatorTotal field(mas);
 
     auto [error1, error2] = field.computeTangentialError(0);

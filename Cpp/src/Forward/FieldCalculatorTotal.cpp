@@ -8,6 +8,7 @@
 #include "../../lib/Utils/Constants.h"
 #include "../../lib/Utils/UtilsDipole.h"
 #include "../../lib/Utils/UtilsSolvers.h"
+#include "../../lib/Utils/UtilsExport.h"
 
 FieldCalculatorTotal::FieldCalculatorTotal(
     const MASSystem masSystem
@@ -68,7 +69,11 @@ void FieldCalculatorTotal::constructor()
     Eigen::MatrixXcd amplitudes(B, N);
     Eigen::MatrixXcd amplitudes_ext(B, N);
 
-    // std::string filename;
+    // For tests
+    std::string fileex;
+    bool Surface0 = true;
+    bool Surface1 = false; 
+    bool Surface10 = false;
 
     
 
@@ -90,20 +95,20 @@ void FieldCalculatorTotal::constructor()
 
         std::cout << "System assembled in " << duration_assemble.count() << " seconds" << std::endl;
 
-        Eigen::JacobiSVD<Eigen::MatrixXcd> svd(A);
-        const auto& singularValues = svd.singularValues();
-        double maxSV = singularValues(0);
-        double minSV = singularValues(singularValues.size() - 1);
+        // Eigen::JacobiSVD<Eigen::MatrixXcd> svd(A);
+        // const auto& singularValues = svd.singularValues();
+        // double maxSV = singularValues(0);
+        // double minSV = singularValues(singularValues.size() - 1);
 
-        double condnr;
+        // double condnr;
     
-        if (minSV == 0) {
-            condnr = std::numeric_limits<double>::infinity(); // Matrix is singular
-        } else {
-            condnr = maxSV / minSV;
-        }
+        // if (minSV == 0) {
+        //     condnr = std::numeric_limits<double>::infinity(); // Matrix is singular
+        // } else {
+        //     condnr = maxSV / minSV;
+        // }
     
-        std::cout << "Condition number system matrix: " << condnr << std::endl << std::endl;
+        // std::cout << "Condition number system matrix: " << condnr << std::endl << std::endl;
 
 
         // ----------------- Solve system and time --------------------
@@ -125,18 +130,23 @@ void FieldCalculatorTotal::constructor()
         amplitudes.row(i) = amps.head(N);
         amplitudes_ext.row(i) = amps.tail(N);
 
+    
+        if (Surface0){
+            fileex = "Zero";
 
-        
-        // if (i == 0){
-        //     Export::saveMatrixCSV("FilesCSV/matrix_A_simple.csv", A);
+        } else if (Surface1){
+            fileex = "One";
             
-        // }
+        }  else if (Surface10){
+            fileex = "Ten";
 
-        // filename = "FilesCSV/solution_y_" + std::to_string(i) + ".csv";
-        // Export::saveVectorCSV(filename, amps);
+        } 
 
-        // filename = "FilesCSV/vector_b_" + std::to_string(i) + ".csv";
-        // Export::saveVectorCSV(filename, b);
+        Export::saveMatrixCSV("../CSV/PN/systemMatrix" + fileex + ".csv", A);
+
+        Export::saveVectorCSV("../CSV/PN/solution" + fileex + ".csv", amps);
+
+        Export::saveVectorCSV("../CSV//PN/rhs" + fileex + ".csv", b);
 
     }
 
@@ -144,7 +154,7 @@ void FieldCalculatorTotal::constructor()
     this->amplitudes_ext_ = amplitudes_ext;
     this->amplitudes_ = amplitudes;
 
-    std::cout << "Field Calculator initialized successfully!" << std::endl;
+    std::cout << std::endl << "Field Calculator initialized successfully!" << std::endl;
 }
 
 
