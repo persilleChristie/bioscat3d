@@ -31,44 +31,6 @@ class Spline:
 
         return np.max(abs(H))
     
-    def __calculate_normals_tangents__(self, x, y):
-        # X, Y = np.meshgrid(x, y)
-        # Z = self.__evaluate_at_points__(x, y)
-
-        # points = np.column_stack((X.ravel(), Y.ravel(), Z.ravel()))
-
-        # Compute normals
-        fx = self.__evaluate_at_points__(x, y, dx = 1).ravel()
-        fy = self.__evaluate_at_points__(x, y, dy = 1).ravel()
-    
-        # normals = np.column_stack((-fx, -fy, np.ones_like(fx)))
-
-        # # Pick reference vector based on condition per row
-        # x_axis = np.array([1, 0, 0])
-        # z_axis = np.array([0, 0, 1])
-        # ref = np.where(np.abs(normals[:, 2:3]) < 0.9, z_axis, x_axis)  # shape: (N, 3)
-
-        # # Project ref onto the normal and subtract for orthogonal component
-        # dot_ref_n = np.einsum('ij,ij->i', ref, normals)[:, np.newaxis]  # (N, 1)
-        # tangent1 = ref - dot_ref_n * normals
-        # tangent1 /= np.linalg.norm(tangent1, axis=1, keepdims=True)
-
-        # # Compute second tangent as cross product
-        # tangent2 = np.cross(normals, tangent1)
-
-        tangent1 = np.stack([np.ones_like(fx), np.zeros_like(fx), fx], axis=-1)
-        tangent2 = np.stack([np.zeros_like(fy), np.ones_like(fy), fy], axis=-1)
-
-        normals = np.cross(tangent1, tangent2)
-        tangent2 = np.cross(normals, tangent1)  # Ensure right-handed orthonormal basis
-
-        # Normalize
-        tangent1 /= np.linalg.norm(tangent1, axis=-1, keepdims=True)
-        tangent2 /= np.linalg.norm(tangent2, axis=-1, keepdims=True)
-        normals /= np.linalg.norm(normals, axis=-1, keepdims=True)
-
-        return normals, tangent1, tangent2
-    
     def calculate_points(self, resolution):
         # x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
         # y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)

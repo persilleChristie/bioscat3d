@@ -49,7 +49,7 @@ void FieldCalculatorUPW::computeFields(
 
         Eigen::Vector3cd H_in_perp (- cosTheta_in * phase1/constants.eta0, 0.0, - sinTheta_in * phase1/constants.eta0);
         Eigen::Vector3cd H_in_par (0.0, phase1/constants.eta0, 0.0);
-        Eigen::Vector3cd H_in = Rz * (sinBeta * H_in_perp + cosBeta * H_in_par);
+        Eigen::Vector3cd H_in = Rz * (cosBeta * H_in_perp + sinBeta * H_in_par);
         
 
         outE.row(i) = E_in.transpose(); 

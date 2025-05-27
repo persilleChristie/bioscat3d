@@ -7,6 +7,7 @@ MASSystem::MASSystem(const py::object spline, const double lambda, const double 
                         const Eigen::Vector3d& kinc, const Eigen::VectorXd& polarizations)
     : lambda_(lambda), kinc_(kinc), polarizations_(polarizations)
     {
+        constants.setWavelength(lambda);
         generateSurface(spline, dimension);
     }
 
@@ -83,8 +84,8 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     //radius = 1/max(maxcurvature, 1.0)
     double radius = 1.0 / std::max(maxcurvature, 1.0);
 
-    bool radius1 = false;
-    bool radius10 = true;
+    bool radius1 = true;
+    bool radius10 = false;
 
     if (radius1){
         radius = 1.0;

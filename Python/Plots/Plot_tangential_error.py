@@ -3,7 +3,8 @@ import numpy as np
 import glob
 import matplotlib.pyplot as plt
 
-name = "Zero"
+name = "Ten"
+name += "_014"
 
 # Find all CSV files starting with 'tangential_error' in the ../../CSV directory
 csv_files = sorted(glob.glob("../../CSV/tangential_error*_" + name + ".csv"))

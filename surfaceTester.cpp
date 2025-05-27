@@ -41,13 +41,13 @@ py::array_t<double> wrap_eigen(const Eigen::Matrix<double, Eigen::Dynamic, Eigen
 
 int main() {
     // Choose one true value amongs these
-    bool Surface0 = true;
+    bool Surface0 = false;
     bool Surface1 = false; 
-    bool Surface10 = false;
+    bool Surface10 = true;
 
     // Choose one true value amongs these
-    bool radius1 = false;
-    bool radius10 = true;
+    bool radius1 = true;
+    bool radius10 = false;
 
 
     const char* jsonPath = "...";
@@ -232,20 +232,20 @@ int main() {
     MASSystem mas(spline, lambda, dimension, k, beta_vec);
 
 
-    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + "_PN.csv", 
+    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + ".csv", 
                                     mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
-    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + "_inneraux_PN.csv",
+    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + "_inneraux.csv",
                                     mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
-    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + "_outeraux_PN.csv",
+    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + "_outeraux.csv",
                                     mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
     
-    // std::cout << std::endl << "Running FieldCalculatorTotal..." << std::endl << std::endl;
-    // FieldCalculatorTotal field(mas);
+    std::cout << std::endl << "Running FieldCalculatorTotal..." << std::endl << std::endl;
+    FieldCalculatorTotal field(mas);
 
-    // auto [error1, error2] = field.computeTangentialError(0);
+    auto [error1, error2] = field.computeTangentialError(0);
 
-    // Export::saveRealVectorCSV("../CSV/tangential_error1_" + fileex + ".csv", error1);
-    // Export::saveRealVectorCSV("../CSV/tangential_error2_" + fileex + ".csv", error2);
+    Export::saveRealVectorCSV("../CSV/tangential_error1_" + fileex + ".csv", error1);
+    Export::saveRealVectorCSV("../CSV/tangential_error2_" + fileex + ".csv", error2);
 
 
 

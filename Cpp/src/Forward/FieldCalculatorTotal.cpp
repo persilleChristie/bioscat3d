@@ -71,10 +71,15 @@ void FieldCalculatorTotal::constructor()
 
     // For tests
     std::string fileex;
+    // Choose one true value amongs these
     bool Surface0 = false;
     bool Surface1 = false; 
     bool Surface10 = true;
 
+
+    // Choose one true value amongs these
+    bool radius1 = true;
+    bool radius10 = false;
     
 
     for (int i = 0; i < B; ++i){
@@ -142,11 +147,21 @@ void FieldCalculatorTotal::constructor()
 
         } 
 
-        Export::saveMatrixCSV("../CSV/PN/systemMatrix" + fileex + ".csv", A);
+        if (radius1){
 
-        Export::saveVectorCSV("../CSV/PN/solution" + fileex + ".csv", amps);
+        fileex += "_014";
 
-        Export::saveVectorCSV("../CSV//PN/rhs" + fileex + ".csv", b);
+        } else if (radius10) {
+
+        fileex += "_0014";
+    }
+
+
+        Export::saveMatrixCSV("../CSV/PN/MAS_data/systemMatrix" + fileex + ".csv", A);
+
+        Export::saveVectorCSV("../CSV/PN/MAS_data/solution" + fileex + ".csv", amps);
+
+        Export::saveVectorCSV("../CSV/PN/MAS_data/rhs" + fileex + ".csv", b);
 
     }
 
@@ -166,15 +181,22 @@ void computeLinearCombinations(Eigen::MatrixX3cd& outE,
     Eigen::MatrixXcd amplitudes
     ){
 
-    int N = evalPoints.rows();
+    int M = evalPoints.rows();
 
-    Eigen::MatrixX3cd Ei(N, 3), Hi(N, 3);
+    Eigen::MatrixX3cd Ei(M, 3), Hi(M, 3);
 
-    for (size_t i = 0; i < dipoles.size(); ++i) {
-        dipoles[i]->computeFields(Ei, Hi, evalPoints);
+    int N = static_cast<int>(dipoles.size()) / 2;
+
+    for (int i = 0; i < N; ++i) {
+        dipoles[2 * i]->computeFields(Ei, Hi, evalPoints);
 
         outE += amplitudes.row(polarization_idx)(i) * Ei;
         outH += amplitudes.row(polarization_idx)(i) * Hi;
+
+        dipoles[2 * i + 1]->computeFields(Ei, Hi, evalPoints);
+
+        outE += amplitudes.row(polarization_idx)(i + N) * Ei;
+        outH += amplitudes.row(polarization_idx)(i + N) * Hi;
     }
 }
 
@@ -220,14 +242,6 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
         for (int i = 0; i < N; ++i){
             cross = 0.5 * outE.row(i).cross(outH.row(i).conjugate());
             integrand = cross.dot(normals.row(i));
-
-            // if (j == 0){
-            //     col = i % grid_size;
-            //     row = i / grid_size;
-
-            //     integrand_mat(row, col) = abs(integrand); 
-            // }
-
             integral += integrand * dA;
         }
 
@@ -260,7 +274,6 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangent
 
     Eigen::MatrixX3cd incE(N, 3), incH(N, 3);
     UPW_[polarization_index]->computeFields(incE, incH, control_points);
-
 
     // Check tangentiel elements
     Eigen::ArrayXd tangential_error1(N), tangential_error2(N);
