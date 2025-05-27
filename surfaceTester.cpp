@@ -40,9 +40,15 @@ py::array_t<double> wrap_eigen(const Eigen::Matrix<double, Eigen::Dynamic, Eigen
 
 
 int main() {
-    bool Surface0 = false;
+    // Choose one true value amongs these
+    bool Surface0 = true;
     bool Surface1 = false; 
-    bool Surface10 = true;
+    bool Surface10 = false;
+
+    // Choose one true value amongs these
+    bool radius1 = false;
+    bool radius10 = true;
+
 
     const char* jsonPath = "...";
     std::string fileex = "...";
@@ -70,7 +76,23 @@ int main() {
 
     } else {    
         std::cout << std::endl;
-        std::cout << "RUNNING NO TESTS, CHANGE TRUE/FALSE VALUES" << std::endl << std::endl;
+        std::cout << "RUNNING NO TESTS, CHANGE SURFACE TRUE/FALSE VALUES" << std::endl << std::endl;
+        return 1;
+    }
+
+    if (radius1){
+        std::cout << std::endl;
+        std::cout << "TESTING FOR RADIUS 1" << std::endl << std::endl;
+
+        fileex += "_014";
+    } else if (radius10) {
+        std::cout << std::endl;
+        std::cout << "TESTING FOR RADIUS 10" << std::endl << std::endl;
+
+        fileex += "_0014";
+    } else {
+        std::cout << std::endl;
+        std::cout << "RUNNING NO TESTS, CHANGE RADIUS TRUE/FALSE VALUES" << std::endl << std::endl;
         return 1;
     }
 
@@ -210,20 +232,20 @@ int main() {
     MASSystem mas(spline, lambda, dimension, k, beta_vec);
 
 
-    Export::saveSurfaceDataCSV("../CSV/PN/surface_data" + fileex + ".csv", 
+    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + "_PN.csv", 
                                     mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
-    Export::saveSurfaceDataCSV("../CSV/PN/surface_data_inneraux" + fileex + ".csv",
+    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + "_inneraux_PN.csv",
                                     mas.getIntPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
-    Export::saveSurfaceDataCSV("../CSV/PN/surface_data_outeraux" + fileex + ".csv",
+    Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + "_outeraux_PN.csv",
                                     mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
     
-    std::cout << std::endl << "Running FieldCalculatorTotal..." << std::endl << std::endl;
-    FieldCalculatorTotal field(mas);
+    // std::cout << std::endl << "Running FieldCalculatorTotal..." << std::endl << std::endl;
+    // FieldCalculatorTotal field(mas);
 
-    auto [error1, error2] = field.computeTangentialError(0);
+    // auto [error1, error2] = field.computeTangentialError(0);
 
-    Export::saveRealVectorCSV("../CSV/tangential_error1_" + fileex + ".csv", error1);
-    Export::saveRealVectorCSV("../CSV/tangential_error2_" + fileex + ".csv", error2);
+    // Export::saveRealVectorCSV("../CSV/tangential_error1_" + fileex + ".csv", error1);
+    // Export::saveRealVectorCSV("../CSV/tangential_error2_" + fileex + ".csv", error2);
 
 
 

@@ -1,13 +1,11 @@
 import pandas as pd
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
-matplotlib.use('Qt5Agg') 
 
 # Set tolerance for 0 values
 tol = 1e-16
 
-name = 'One'
+name = 'Ten'
 
 ############# PN ############
 # Load system matrix
@@ -32,6 +30,7 @@ df2 = df2.astype('string')
 
 y = df2.map(lambda x: complex(x.replace("i", "j").replace("+-","-"))).to_numpy()
 y_plot = np.tile(y, (1,100))
+
 # Plot
 fig, axs = plt.subplots(1, 3, figsize=(10, 5))
 im0 = axs[0].imshow(abs(A), cmap='viridis')
@@ -48,6 +47,16 @@ plt.colorbar(im2, ax=axs[2])
 
 plt.tight_layout()
 plt.show()
+
+# # Where do we have zeros?
+# fig, axs = plt.subplots(figsize=(10, 5))
+# im0 = axs.imshow(abs(A) < tol, cmap='viridis')
+# axs.set_title("PN systemmatrix = 0")
+# plt.colorbar(im0, ax=axs)
+
+# plt.show()
+
+print(f"Total zeros in PN system matrix: {np.sum(A == 0)}")
 
 ############# ANDREAS #############
 # # Load system matrix
