@@ -25,6 +25,8 @@ int main() {
         evalPoints.row(i) = Eigen::Vector3d(0.0, 0.0, -0.1 * i);
     }
 
+    evalPoints.row(0) = Eigen::Vector3d(3,7,11);
+
     // Compute fields
     // initialize and set dimentions of output matrices
     Eigen::MatrixX3cd E(N, 3), H(N, 3);

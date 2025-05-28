@@ -24,8 +24,8 @@ include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Forward)
 
 # add_executable(main ${SOURCES} main.cpp)
-add_executable(main ${SOURCES} fieldTester.cpp)
-# add_executable(main ${SOURCES} dipoleTester.cpp)
+# add_executable(main ${SOURCES} fieldTester.cpp)
+add_executable(main ${SOURCES} dipoleTester.cpp)
 
 target_link_libraries(main PRIVATE pybind11::embed Eigen3::Eigen)
 

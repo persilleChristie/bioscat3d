@@ -8,11 +8,12 @@
 Constants constants;  // Global constants
 
 int main() {
+    constants.setWavelength(0.7);  // Set wavelength for the dipole
     // 1. Define dipole
-    Eigen::Vector3d dipolePos(0.0, 0.0, 0.0);
-    Eigen::Vector3d dipoleDir(1.0, 0.0, 0.0);  // x-directed dipole
+    Eigen::Vector3d dipolePos(1,1,-1);
+    Eigen::Vector3d dipoleDir(1.0, 1.0, 2.0);  // x-directed dipole
     Dipole d(dipolePos, dipoleDir);
-    FieldCalculatorDipole dipoleCalc(d, true);  // 'true' → interior dipole
+    FieldCalculatorDipole dipoleCalc(d, false);  // 'true' → interior dipole
 
     // 2. Evaluation points along z-axis
     const int N = 5;
@@ -20,6 +21,8 @@ int main() {
     for (int i = 0; i < N; ++i) {
         evalPoints.row(i) = Eigen::Vector3d(0.0, 0.0, 0.1 * (i + 1));
     }
+
+    evalPoints.row(0) = Eigen::Vector3d(3,7,11);
 
     // 3. Output fields
     Eigen::MatrixX3cd E, H;

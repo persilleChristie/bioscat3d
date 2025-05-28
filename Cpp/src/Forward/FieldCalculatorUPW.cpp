@@ -32,6 +32,14 @@ void FieldCalculatorUPW::computeFields(
     double cosBeta = cos(polarization_);
     double sinBeta = sin(polarization_);
 
+    // print angles
+    std::cout << "cosTheta_in: " << cosTheta_in << ", sinTheta_in: " << sinTheta_in << std::endl;
+    std::cout << "cosPhi: " << cosPhi << ", sinPhi: " << sinPhi << std::endl;
+    std::cout << "cosBeta: " << cosBeta << ", sinBeta: " << sinBeta << std::endl;
+    std::cout << "k_: " << k_.transpose() << std::endl;
+    std::cout << "E0_: " << E0_ << std::endl;
+    std::cout << "polarization_: " << polarization_ << std::endl;
+
     auto Rz = TransformUtils::rotationMatrixZ(cosPhi, sinPhi);
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
 
@@ -41,7 +49,12 @@ void FieldCalculatorUPW::computeFields(
         Eigen::Vector3d x_rot = Rz_inv * x;
 
         std::complex<double> phase1 = E0_ * exp(- constants.j * constants.k0 * (x_rot[0] * sinTheta_in - x_rot[2] * cosTheta_in));
-
+        // print constants.k0
+        std::cout << "constants.k0: " << constants.k0 << std::endl;
+        // print x_rot
+        std::cout << "x_rot: " << x_rot.transpose() << std::endl;
+        // print phase1
+        std::cout << "Phase1 for point " << i << ": " << phase1 << std::endl;
         Eigen::Vector3cd E_in_perp (0.0, phase1, 0.0);
         Eigen::Vector3cd E_in_par (- cosTheta_in * phase1, 0.0, - sinTheta_in * phase1);
         Eigen::Vector3cd E_in = Rz * (cosBeta * E_in_perp + sinBeta * E_in_par);

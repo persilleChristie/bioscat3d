@@ -4,8 +4,6 @@
 # Ignore executable files
 *.exe
 
-*.gitignore
-
 *.csv
 
 # Build system
@@ -23,9 +21,6 @@ __pycache__/
 
 # Ignore CMakeLists.txt
 CMakeLists.txt
-
-# Ignore all CSV files
-*.csv
 
 # Ignore all HTML files
 *.html
