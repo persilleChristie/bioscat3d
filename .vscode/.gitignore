@@ -20,3 +20,12 @@ cmake_install.cmake
 # Python
 __pycache__/
 *.pyc
+
+# Ignore CMakeLists.txt
+CMakeLists.txt
+
+# Ignore all CSV files
+*.csv
+
+# Ignore all HTML files
+*.html
