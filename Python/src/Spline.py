@@ -23,7 +23,7 @@ class Spline:
         fyy = self.__evaluate_at_points__(x, y, dy = 2)
         fxy = self.__evaluate_at_points__(x, y, dx = 1, dy = 1)
 
-        #denom = (1 + fxx**2 + fyy**2)**1.5 # fejl her
+        
         numer = (1 + fx**2) * fyy - 2 * fx * fy * fxy + (1 + fy**2) * fxx
         denom = (1 + fx**2 + fy**2)**1.5
 
@@ -51,6 +51,8 @@ class Spline:
 
     
         # return test_points, normals, tangent1, tangent2
+
+
         x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
         y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)
         X, Y = np.meshgrid(x, y, indexing='ij')

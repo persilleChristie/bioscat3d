@@ -43,9 +43,9 @@ void FieldCalculatorTotal::constructor()
                                 Dipole(aux_int.row(i), aux_t2.row(i)), true));
  
         sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(aux_ext.row(i), aux_t1.row(i)), false));
+                                Dipole(aux_ext.row(i), -aux_t1.row(i)), false));
         sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(aux_ext.row(i), aux_t2.row(i)), false));
+                                Dipole(aux_ext.row(i), -aux_t2.row(i)), false));
     }
 
     // Save dipoles for calculating total field
@@ -72,9 +72,9 @@ void FieldCalculatorTotal::constructor()
     // For tests
     std::string fileex;
     // Choose one true value amongs these
-    bool Surface0 = false;
+    bool Surface0 = true;
     bool Surface1 = false; 
-    bool Surface10 = true;
+    bool Surface10 = false;
 
 
     // Choose one true value amongs these
@@ -253,7 +253,7 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
 }
 
 
-std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangentialError(int polarization_index){
+std::vector<Eigen::VectorXd> FieldCalculatorTotal::computeTangentialError(int polarization_index){
     auto control_points = mas_.getControlPoints();
     auto control_tangents1 = mas_.getControlTangents1();
     auto control_tangents2 = mas_.getControlTangents2();
@@ -266,20 +266,26 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> FieldCalculatorTotal::computeTangent
 
     computeLinearCombinations(intE, intH, control_points, polarization_index, dipoles_, amplitudes_);
 
-    // Compute field from exterior points and add UPW
+    // Compute field from exterior points 
     Eigen::MatrixX3cd extE = Eigen::MatrixX3cd::Zero(N, 3);
     Eigen::MatrixX3cd extH = Eigen::MatrixX3cd::Zero(N, 3); 
 
     computeLinearCombinations(extE, extH, control_points, polarization_index, dipoles_ext_, amplitudes_ext_);
 
+    // Compute incident field
     Eigen::MatrixX3cd incE(N, 3), incH(N, 3);
     UPW_[polarization_index]->computeFields(incE, incH, control_points);
 
-    // Check tangentiel elements
-    Eigen::ArrayXd tangential_error1(N), tangential_error2(N);
+    // Calculate tangentiel elements
+    Eigen::ArrayXd E_tangential_error1(N), E_tangential_error2(N), H_tangential_error1(N), H_tangential_error2(N);
 
-    tangential_error1 = ((intE - extE + incE).array() * control_tangents1.array()).rowwise().sum().abs();
-    tangential_error2 = ((intE - extE + incE).array() * control_tangents2.array()).rowwise().sum().abs();
+    Eigen::ArrayX3cd E_diff = (intE - extE + incE).array();
+    Eigen::ArrayX3cd H_diff = (intH - extH + incH).array();
 
-    return {tangential_error1.matrix(), tangential_error2.matrix()};
+    E_tangential_error1 = (E_diff * control_tangents1.array()).rowwise().sum().abs();
+    E_tangential_error2 = (E_diff * control_tangents2.array()).rowwise().sum().abs();
+    H_tangential_error1 = (H_diff * control_tangents1.array()).rowwise().sum().abs();
+    H_tangential_error2 = (H_diff * control_tangents2.array()).rowwise().sum().abs();
+
+    return {E_tangential_error1.matrix(), E_tangential_error2.matrix(), H_tangential_error1.matrix(), H_tangential_error2.matrix()};
 }

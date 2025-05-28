@@ -35,7 +35,7 @@ void FieldCalculatorDipole::computeFields(
     // Rotate back to global coordinates
     auto Ry_inv = TransformUtils::rotationMatrixYInv(cosTheta, sinTheta);
     auto Rz_inv = TransformUtils::rotationMatrixZInv(cosPhi, sinPhi);
-    Eigen::Matrix3d R_inverse = Ry_inv * Rz_inv;
+    Eigen::Matrix3d R_inverse = R.transpose(); // Ry_inv * Rz_inv;
 
     // Reserve memory for later
     double cosThetaX, sinThetaX, cosPhiX, sinPhiX;

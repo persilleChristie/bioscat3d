@@ -41,9 +41,9 @@ py::array_t<double> wrap_eigen(const Eigen::Matrix<double, Eigen::Dynamic, Eigen
 
 int main() {
     // Choose one true value amongs these
-    bool Surface0 = false;
+    bool Surface0 = true;
     bool Surface1 = false; 
-    bool Surface10 = true;
+    bool Surface10 = false;
 
     // Choose one true value amongs these
     bool radius1 = true;
@@ -242,12 +242,12 @@ int main() {
     std::cout << std::endl << "Running FieldCalculatorTotal..." << std::endl << std::endl;
     FieldCalculatorTotal field(mas);
 
-    auto [error1, error2] = field.computeTangentialError(0);
+    auto errors = field.computeTangentialError(0);
 
-    Export::saveRealVectorCSV("../CSV/tangential_error1_" + fileex + ".csv", error1);
-    Export::saveRealVectorCSV("../CSV/tangential_error2_" + fileex + ".csv", error2);
-
-
+    Export::saveRealVectorCSV("../CSV/E_tangential_error1_" + fileex + ".csv", errors[0]);
+    Export::saveRealVectorCSV("../CSV/E_tangential_error2_" + fileex + ".csv", errors[1]);
+    Export::saveRealVectorCSV("../CSV/H_tangential_error1_" + fileex + ".csv", errors[2]);
+    Export::saveRealVectorCSV("../CSV/H_tangential_error2_" + fileex + ".csv", errors[3]);
 
     return 0;
 }

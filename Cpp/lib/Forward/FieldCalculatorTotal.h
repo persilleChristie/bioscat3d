@@ -37,7 +37,7 @@ public:
 
     Eigen::MatrixXcd getAmplitudes() {return amplitudes_;}
 
-    std::pair<Eigen::VectorXd, Eigen::VectorXd> computeTangentialError(int polarization_index);
+    std::vector<Eigen::VectorXd> computeTangentialError(int polarization_index);
 
 private:
     Eigen::MatrixXcd amplitudes_;
