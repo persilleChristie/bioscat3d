@@ -1,16 +1,16 @@
 {
     "bumpData": [
         {
-            "x0": 0.0,
-            "y0": 0.0,
+            "x0": -0.08782191680684626,
+            "y0": 0.3155000144869413,
             "height": 0.15,
             "sigma": 0.075
         }
     ],
     "monitor_size": 1,
     "seed": 42,
-    "halfWidth_x": 1.0,
-    "halfWidth_y": 1.0,
+    "halfWidth_x": 0.35,
+    "halfWidth_y": 0.35,
     "halfWidth_z": 2.0,
     "resolution": 10,
     "pml_thickness": 2,

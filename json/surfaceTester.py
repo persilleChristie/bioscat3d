@@ -4,11 +4,11 @@ import json
 import os
 
 def generate_surface_params(
-    #keyword = "Zero07", # postfix to name JSON file
-    #keyword = "One07", # postfix to name JSON file
-    keyword = "Ten07", # postfix to name JSON file
-    halfWidth_x=0.7, # 1.0
-    halfWidth_y=0.7, # 1.0
+    #keyword = "Zero", # postfix to name JSON file
+    #keyword = "One", # postfix to name JSON file
+    keyword = "Ten", # postfix to name JSON file
+    halfWidth_x=0.35, # 1.0
+    halfWidth_y=0.35, # 1.0
     halfWidth_z=2.0,
     resolution=10, # Meep parameter  
     pml_thickness = 2, # Meep parameter
