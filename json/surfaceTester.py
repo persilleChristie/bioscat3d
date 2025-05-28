@@ -41,15 +41,15 @@ def generate_surface_params(
         bumpData = []
     elif keyword == "Ten":
         num_bumps=10
-        
-    bumpData = []
-    np.random.seed(seed)
-    for _ in range(num_bumps):
-        x0 = np.random.uniform(-halfWidth_x, halfWidth_x)
-        y0 = np.random.uniform(-halfWidth_y, halfWidth_y)
-        height = np.random.uniform(hights_bumps[0], hights_bumps[1])
-        sigma = np.random.uniform(sigmas_bumps[0], sigmas_bumps[1])
-        bumpData.append({"x0": x0, "y0": y0, "height": height, "sigma": sigma})
+        np.random.seed(seed)
+        for _ in range(num_bumps):
+            x0 = np.random.uniform(-halfWidth_x, halfWidth_x)
+            y0 = np.random.uniform(-halfWidth_y, halfWidth_y)
+            height = np.random.uniform(hights_bumps[0], hights_bumps[1])
+            sigma = np.random.uniform(sigmas_bumps[0], sigmas_bumps[1])
+            bumpData.append({"x0": x0, "y0": y0, "height": height, "sigma": sigma})
+    else:
+        bumps = []
 
     betas = np.linspace(0, np.pi/2, numBetas).tolist()
 
