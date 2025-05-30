@@ -46,8 +46,8 @@ int main() {
     bool Surface10 = false;
 
     // Choose one true value amongs these
-    bool radius1 = true;
-    bool radius10 = false;
+    bool radius1 = false;
+    bool radius10 = true;
 
 
     const char* jsonPath = "...";

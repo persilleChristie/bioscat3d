@@ -7,8 +7,8 @@ set(PYBIND11_FINDPYTHON ON)
 # Making sure packages work
 find_package(pybind11 REQUIRED)
 find_package(Eigen3 REQUIRED)
-#include_directories("/home/pernillechristie/rapidjson/include")
-include_directories(${CMAKE_SOURCE_DIR}/../rapidjson/include)
+include_directories("/home/pernillechristie/rapidjson/include")
+# include_directories(${CMAKE_SOURCE_DIR}/../rapidjson/include)
 
 
 # Copy Python script to the build dir so it can be found at runtime
@@ -23,9 +23,9 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Forward)
 
-add_executable(main ${SOURCES} main.cpp)
-# add_executable(main ${SOURCES} fieldTester.cpp)
-# add_executable(main ${SOURCES} dipoleTester.cpp)
+# add_executable(main ${SOURCES} main.cpp)
+add_executable(main ${SOURCES} surfaceTester.cpp)
+
 
 target_link_libraries(main PRIVATE pybind11::embed Eigen3::Eigen)
 

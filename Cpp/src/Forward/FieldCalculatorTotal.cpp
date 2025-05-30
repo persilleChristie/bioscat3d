@@ -37,6 +37,7 @@ void FieldCalculatorTotal::constructor()
     int Nprime = aux_int.rows();
     int N      = Nprime * 2;
 
+
     for (int i = 0; i < Nprime; ++i){
         sources_int.emplace_back(std::make_shared<FieldCalculatorDipole>(
                                 Dipole(aux_int.row(i), aux_t1.row(i)), true));
@@ -44,9 +45,9 @@ void FieldCalculatorTotal::constructor()
                                 Dipole(aux_int.row(i), aux_t2.row(i)), true));
  
         sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(aux_ext.row(i), -aux_t1.row(i)), false));
+                                Dipole(aux_ext.row(i), aux_t1.row(i)), false));
         sources_ext.emplace_back(std::make_shared<FieldCalculatorDipole>(
-                                Dipole(aux_ext.row(i), -aux_t2.row(i)), false));
+                                Dipole(aux_ext.row(i), aux_t2.row(i)), false));
     }
 
     // Save dipoles for calculating total field
@@ -81,8 +82,8 @@ void FieldCalculatorTotal::constructor()
 
 
     // Choose one true value amongs these
-    bool radius1 = true;
-    bool radius10 = false;
+    bool radius1 = false;
+    bool radius10 = true;
     
 
     for (int i = 0; i < B; ++i){

@@ -46,9 +46,6 @@ void FieldCalculatorDipole::computeFields(
         Eigen::Vector3d x_local = R_inverse * (x - dipole_.getPosition());
         double r = x_local.norm();
 
-        // print x_local
-        std::cout << "x_local: " << x_local.transpose() << std::endl;
-        
         double eta, k;
 
         // Use correct eta and wavenumber
@@ -64,18 +61,7 @@ void FieldCalculatorDipole::computeFields(
         // Compute polar coordinates
         TransformUtils::computeAngles(x_local, r, cosThetaX, sinThetaX, cosPhiX, sinPhiX);
 
-        // print angles
-        std::cout << "cosThetaX: " << cosThetaX << ", sinThetaX: " << sinThetaX << std::endl;
-        std::cout << "cosPhiX: " << cosPhiX << ", sinPhiX: " << sinPhiX << std::endl;
-        // print eta and k
-        std::cout << "eta: " << eta << ", k: " << k << std::endl;
-        // print r
-        std::cout << "r: " << r << std::endl;
-        // Compute complex exponential term
-
         std::complex<double> expK0r = std::exp(-constants.j * k * r);
-        // print expK0r
-        std::cout << "expK0r: " << expK0r << std::endl;
 
         if (r == 0.0) {
             outE.row(i) = Eigen::Vector3d::Zero();

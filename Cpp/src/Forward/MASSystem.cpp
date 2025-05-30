@@ -84,8 +84,8 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     //radius = 1/max(maxcurvature, 1.0)
     double radius = 1.0 / std::max(maxcurvature, 1.0);
 
-    bool radius1 = true;
-    bool radius10 = false;
+    bool radius1 = false;
+    bool radius10 = true;
 
     if (radius1){
         radius = 1.0;
@@ -95,8 +95,8 @@ void MASSystem::generateSurface(py::object spline, double dimension){
 
     std::cout << "Radius: " << radius << std::endl;
 
-    this->aux_points_int_ = result_aux[0] - ((1.0 - constants.alpha) * radius) * result_aux[1]; 
-    this->aux_points_ext_ = result_aux[0] + ((1.0 - constants.alpha) * radius) * result_aux[1];
+    this->aux_points_int_ = result_aux[0] - ((1 - constants.alpha) * radius) * result_aux[1]; 
+    this->aux_points_ext_ = result_aux[0] + ((1 - constants.alpha) * radius) * result_aux[1];
 
     this->aux_normals_ = result_aux[1];
     this->aux_tau1_ = result_aux[2];
