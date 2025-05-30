@@ -168,6 +168,7 @@ int main() {
     }
 
     // ------------ Run python code ---------------
+    // Should this be scoped to ensure Python interpreter is started and stopped correctly?
     py::scoped_interpreter guard{}; // Start Python interpreter
     py::module sys = py::module::import("sys");
     sys.attr("path").attr("insert")(1, ".");  // Add local dir to Python path

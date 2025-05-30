@@ -26,6 +26,7 @@ public:
                 const Eigen::Vector3d& kinc, const Eigen::VectorXd& polarizations); 
 
     // const std::vector<std::shared_ptr<FieldCalculatorUPW>>& getIncidentField();
+    //const std::pair<Eigen::Vector3d, double>&getInc() const {return {kinc_, lambda_};};
     const std::pair<Eigen::Vector3d, double> getInc() const {return {kinc_, lambda_};};
     const Eigen::VectorXd& getPolarizations() const         {return polarizations_;};
 

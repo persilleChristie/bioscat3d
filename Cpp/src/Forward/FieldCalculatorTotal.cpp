@@ -10,6 +10,7 @@
 #include "../../lib/Utils/UtilsSolvers.h"
 #include "../../lib/Utils/UtilsExport.h"
 
+// MassSystem is copied here?
 FieldCalculatorTotal::FieldCalculatorTotal(
     const MASSystem masSystem
 ) : mas_(masSystem)
@@ -49,6 +50,7 @@ void FieldCalculatorTotal::constructor()
     }
 
     // Save dipoles for calculating total field
+    // this->dipoles_ = std::move(sources_int);
     this->dipoles_ = sources_int;
     this->dipoles_ext_ = sources_ext;
 
@@ -60,6 +62,7 @@ void FieldCalculatorTotal::constructor()
     std::vector<std::shared_ptr<FieldCalculator>> UPW_list;
 
     // Load polarizations and incidence vector
+    // const auto& [kinc, lambda] = mas_.getInc();
     auto [kinc, lambda] = mas_.getInc();
     Eigen::VectorXd polarizations = mas_.getPolarizations();
 
@@ -85,6 +88,7 @@ void FieldCalculatorTotal::constructor()
     for (int i = 0; i < B; ++i){
         std::cout << "----------------- Beta nr. " << i + 1 << "/" << B << " -----------------" << std::endl;
         UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i));
+        // UPW_list.push_back(UPW) 
         UPW_list.emplace_back(UPW);
 
         // ----------------- Assemble system and time --------------------
@@ -132,6 +136,7 @@ void FieldCalculatorTotal::constructor()
 
         std::cout << "System solved in " << duration_solve.count() << " seconds" << std::endl;
 
+        
         amplitudes.row(i) = amps.head(N);
         amplitudes_ext.row(i) = amps.tail(N);
 

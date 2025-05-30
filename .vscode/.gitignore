@@ -15,12 +15,11 @@ cmake_install.cmake
 .ninja_deps
 .ninja_log
 
+build_tests/
+
 # Python
 __pycache__/
 *.pyc
-
-# Ignore CMakeLists.txt
-CMakeLists.txt
 
 # Ignore all HTML files
 *.html
