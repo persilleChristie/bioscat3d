@@ -17,14 +17,17 @@ configure_file(${CMAKE_SOURCE_DIR}/Python/src/Spline.py ${CMAKE_BINARY_DIR}/Spli
 # Allow us to compile all classes
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/Cpp/src/Forward/*.cpp
+    ${CMAKE_SOURCE_DIR}/Cpp/src/Inverse/*.cpp
 )
 
 # Include directories for headers
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Forward)
+include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Inverse)
 
 # add_executable(main ${SOURCES} main.cpp)
-add_executable(main ${SOURCES} surfaceTester.cpp)
+# add_executable(main ${SOURCES} surfaceTester.cpp)
+add_executable(main ${SOURCES} pcnTester.cpp)
 
 
 target_link_libraries(main PRIVATE pybind11::embed Eigen3::Eigen)

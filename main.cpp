@@ -10,23 +10,11 @@
 #include "Cpp/lib/Forward/MASSystem.h"
 #include "Cpp/lib/Forward/FieldCalculatorTotal.h"
 #include "Cpp/lib/Utils/UtilsExport.h"
+#include "Cpp/lib/Utils/UtilsPybind.h"
 
 namespace py = pybind11;
 
 Constants constants;
-
-
-/// @brief Translate Eigen matrix into numpy array without letting python own memory
-/// @param mat Eigen matrix 
-/// @return pybind11 array_t<double>
-py::array_t<double> wrap_eigen(Eigen::MatrixXd& mat) {
-    return py::array_t<double>(
-        {mat.rows(), mat.cols()},
-        {sizeof(double) * mat.cols(), sizeof(double)},
-        mat.data(),
-        py::none() // Do not let Python own the matrix 
-    );
-}
 
 
 int main() {
@@ -184,9 +172,9 @@ int main() {
         py::object SplineClass = spline_module.attr("Spline");
 
         // Wrap Eigen matrices as NumPy arrays (shared memory, no copy)
-        auto X_np = wrap_eigen(X_fine);
-        auto Y_np = wrap_eigen(Y_fine);
-        auto Z_np = wrap_eigen(Z_fine);
+        auto X_np = PybindUtils::eigen2numpy(X_fine);
+        auto Y_np = PybindUtils::eigen2numpy(Y_fine);
+        auto Z_np = PybindUtils::eigen2numpy(Z_fine);
 
         // Instantiate Python class
         spline = SplineClass(X_np, Y_np, Z_np);
@@ -234,10 +222,12 @@ int main() {
             std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
             FieldCalculatorTotal field(mas);
 
-            auto [error1, error2] = field.computeTangentialError(0);
+            auto errors = field.computeTangentialError(0);
 
-            Export::saveRealVectorCSV("../CSV/tangential_error1_" + std::to_string(count) + ".csv", error1);
-            Export::saveRealVectorCSV("../CSV/tangential_error2_" + std::to_string(count) + ".csv", error2);
+            Export::saveRealVectorCSV("../CSV/E_tangential_error1_" + std::to_string(count) + ".csv", errors[0]);
+            Export::saveRealVectorCSV("../CSV/E_tangential_error2_" + std::to_string(count) + ".csv", errors[1]);
+            Export::saveRealVectorCSV("../CSV/H_tangential_error1_" + std::to_string(count) + ".csv", errors[2]);
+            Export::saveRealVectorCSV("../CSV/H_tangential_error2_" + std::to_string(count) + ".csv", errors[3]);
             
             
             

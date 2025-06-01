@@ -21,7 +21,7 @@
 class FieldCalculatorTotal : public FieldCalculator {
 public:
     FieldCalculatorTotal(
-        const MASSystem masSystem
+        const MASSystem masSystem, bool verbose = false
     );
 
     void computeFields(
@@ -47,7 +47,7 @@ private:
     std::vector<std::shared_ptr<FieldCalculator>> UPW_;
     MASSystem mas_;
 
-    void constructor();
+    void constructor(bool verbose);
 };
 
 #endif // FIELDCALCULATORTOTAL_H

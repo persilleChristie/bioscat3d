@@ -12,13 +12,13 @@
 
 // MassSystem is copied here?
 FieldCalculatorTotal::FieldCalculatorTotal(
-    const MASSystem masSystem
+    const MASSystem masSystem, bool verbose
 ) : mas_(masSystem)
 {
-    constructor();
+    constructor(verbose);
 }
 
-void FieldCalculatorTotal::constructor()
+void FieldCalculatorTotal::constructor(bool verbose)
 {
     // ----------- CREATE DIPOLES --------------
     std::vector<std::shared_ptr<FieldCalculator>> sources_int;
@@ -64,7 +64,8 @@ void FieldCalculatorTotal::constructor()
 
     // Load polarizations and incidence vector
     // const auto& [kinc, lambda] = mas_.getInc();
-    auto [kinc, lambda] = mas_.getInc();
+    auto kinc = mas_.getInc();
+    double lambda = constants.getWavelength();
     Eigen::VectorXd polarizations = mas_.getPolarizations();
 
     int B = polarizations.size();
@@ -87,14 +88,17 @@ void FieldCalculatorTotal::constructor()
     
 
     for (int i = 0; i < B; ++i){
-        std::cout << "----------------- Beta nr. " << i + 1 << "/" << B << " -----------------" << std::endl;
+        if (verbose)
+        {std::cout << "----------------- Beta nr. " << i + 1 << "/" << B << " -----------------" << std::endl;}
         UPW = std::make_shared<FieldCalculatorUPW>(kinc, 1.0, polarizations(i));
         // UPW_list.push_back(UPW) 
         UPW_list.emplace_back(UPW);
 
         // ----------------- Assemble system and time --------------------
+        if (verbose){
         std::cout << "Assembling system..." << std::endl;
-        
+        }
+
         auto start_assemble = std::chrono::high_resolution_clock::now();
 
         SystemAssembler::assembleSystem(A, b, points, t1, t2, sources_int, sources_ext, UPW);
@@ -103,8 +107,9 @@ void FieldCalculatorTotal::constructor()
 
         auto duration_assemble = std::chrono::duration_cast<std::chrono::seconds>(stop_assemble - start_assemble);
 
+        if (verbose){
         std::cout << "System assembled in " << duration_assemble.count() << " seconds" << std::endl;
-
+        }
         // Eigen::JacobiSVD<Eigen::MatrixXcd> svd(A);
         // const auto& singularValues = svd.singularValues();
         // double maxSV = singularValues(0);
@@ -122,8 +127,10 @@ void FieldCalculatorTotal::constructor()
 
 
         // ----------------- Solve system and time --------------------
+        if (verbose){
         std::cout << "Solving system..." << std::endl;
-        
+        }
+
         auto start_solve = std::chrono::high_resolution_clock::now();
         
         // Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
@@ -135,39 +142,40 @@ void FieldCalculatorTotal::constructor()
 
         auto duration_solve = std::chrono::duration_cast<std::chrono::seconds>(stop_solve - start_solve);
 
+        if (verbose){
         std::cout << "System solved in " << duration_solve.count() << " seconds" << std::endl;
-
+        }
         
         amplitudes.row(i) = amps.head(N);
         amplitudes_ext.row(i) = amps.tail(N);
 
     
-        if (Surface0){
-            fileex = "Zero";
+    //     if (Surface0){
+    //         fileex = "Zero";
 
-        } else if (Surface1){
-            fileex = "One";
+    //     } else if (Surface1){
+    //         fileex = "One";
             
-        }  else if (Surface10){
-            fileex = "Ten";
+    //     }  else if (Surface10){
+    //         fileex = "Ten";
 
-        } 
+    //     } 
 
-        if (radius1){
+    //     if (radius1){
 
-        fileex += "_014";
+    //     fileex += "_014";
 
-        } else if (radius10) {
+    //     } else if (radius10) {
 
-        fileex += "_0014";
-    }
+    //     fileex += "_0014";
+    // }
 
 
-        Export::saveMatrixCSV("../CSV/PN/MAS_data/systemMatrix" + fileex + ".csv", A);
+    //     Export::saveMatrixCSV("../CSV/PN/MAS_data/systemMatrix" + fileex + ".csv", A);
 
-        Export::saveVectorCSV("../CSV/PN/MAS_data/solution" + fileex + ".csv", amps);
+    //     Export::saveVectorCSV("../CSV/PN/MAS_data/solution" + fileex + ".csv", amps);
 
-        Export::saveVectorCSV("../CSV/PN/MAS_data/rhs" + fileex + ".csv", b);
+    //     Export::saveVectorCSV("../CSV/PN/MAS_data/rhs" + fileex + ".csv", b);
 
     }
 
@@ -175,7 +183,8 @@ void FieldCalculatorTotal::constructor()
     this->amplitudes_ext_ = amplitudes_ext;
     this->amplitudes_ = amplitudes;
 
-    std::cout << std::endl << "Field Calculator initialized successfully!" << std::endl;
+    if (verbose){
+    std::cout << std::endl << "Field Calculator initialized successfully!" << std::endl;}
 }
 
 

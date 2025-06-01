@@ -27,7 +27,7 @@ public:
 
     // const std::vector<std::shared_ptr<FieldCalculatorUPW>>& getIncidentField();
     //const std::pair<Eigen::Vector3d, double>&getInc() const {return {kinc_, lambda_};};
-    const std::pair<Eigen::Vector3d, double> getInc() const {return {kinc_, lambda_};};
+    const Eigen::Vector3d getInc() const {return kinc_;};
     const Eigen::VectorXd& getPolarizations() const         {return polarizations_;};
 
     // void setPoints(Eigen::MatrixX3d points);
@@ -49,7 +49,6 @@ public:
     // const std::vector<int>& getIndecees() const {return aux_test_indices_;};
 
 private:
-    double lambda_;
     Eigen::Vector3d kinc_;
     Eigen::VectorXd polarizations_;
 
