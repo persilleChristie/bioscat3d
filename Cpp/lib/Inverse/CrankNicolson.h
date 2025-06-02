@@ -2,11 +2,14 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <fstream>
+#include <pybind11/embed.h>
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+
 
 class CrankNicolson {
     public:
         CrankNicolson(const double dimension,
-                        const double lambda,
                         const Eigen::Vector3d& kinc, 
                         const double polarization,
                         const Eigen::MatrixX3cd& data, 
@@ -20,14 +23,13 @@ class CrankNicolson {
     private:
         // MAS constants
         const double dimension_;
-        const double lambda_;
         const Eigen::Vector3d kinc_;
         const Eigen::VectorXd polarization_;
         Eigen::MatrixXd X_;
         Eigen::MatrixXd Y_;
-        std::shared_ptr<py::array_t<double>> X_np_;
-        std::shared_ptr<py::array_t<double>> Y_np_;
-        std::shared_ptr<py::object> SplineClass_;
+        std::shared_ptr<pybind11::array_t<double>> X_np_;
+        std::shared_ptr<pybind11::array_t<double>> Y_np_;
+        pybind11::object SplineClass_;
 
         // pCN
         const Eigen::MatrixX3cd data_;

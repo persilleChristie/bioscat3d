@@ -22,7 +22,7 @@ namespace py = pybind11;
 */
 class MASSystem {
 public:
-    MASSystem(const py::object spline, const double lambda, const double dimension, 
+    MASSystem(const py::object spline, const double dimension, 
                 const Eigen::Vector3d& kinc, const Eigen::VectorXd& polarizations); 
 
     // const std::vector<std::shared_ptr<FieldCalculatorUPW>>& getIncidentField();
@@ -66,7 +66,6 @@ private:
     Eigen::MatrixX3d control_points_;
     Eigen::MatrixX3d control_tangents1_;
     Eigen::MatrixX3d control_tangents2_;
-    // std::vector<int> aux_test_indices_;
 
     void generateSurface(py::object spline, double dimension);
 };

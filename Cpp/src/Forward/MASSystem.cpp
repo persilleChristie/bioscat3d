@@ -5,7 +5,7 @@
 using std::ignore;
 
 
-MASSystem::MASSystem(const py::object spline, const double lambda, const double dimension,
+MASSystem::MASSystem(const py::object spline, const double dimension,
                         const Eigen::Vector3d& kinc, const Eigen::VectorXd& polarizations)
     : kinc_(kinc), polarizations_(polarizations)
     {
@@ -29,7 +29,9 @@ void MASSystem::generateSurface(py::object spline, double dimension){
     int test_point_res = static_cast<int>(std::ceil(constants.auxpts_pr_lambda * dimension/lambda)); // static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
 
     // Calculate points on surface and translate to Eigen
+    std::cout << "MAS: Line 32" << std::endl;
     auto result = PybindUtils::call_spline(spline, test_point_res);
+    std::cout << "MAS: Line 34" << std::endl;
 
     // Save in class
     this->points_ = result[0];

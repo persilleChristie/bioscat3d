@@ -6,6 +6,15 @@ class Spline:
         self.Xfine = Xfine
         self.Yfine = Yfine
         self.Zfine = Zfine
+
+        print("Xfine range:", Xfine.min(), Xfine.max())
+        print("Yfine range:", Yfine.min(), Yfine.max())
+        print("Zfine range:", Zfine.min(), Zfine.max())
+        print("Xfine[0:5, 0:5]:", Xfine[:5, :5])
+        print("Yfine[0:5, 0:5]:", Yfine[:5, :5])
+        print("Zfine[0:5, 0:5]:", Zfine[:5, :5])
+
+
         
         self.tcks = bisplrep(Xfine.ravel(), Yfine.ravel(), Zfine.ravel(), s=S)
         self.max_curvature = self.__compute_max_mean_curvature__()

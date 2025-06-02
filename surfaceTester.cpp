@@ -229,7 +229,7 @@ int main() {
 
 
     // ------------ Create MAS sytem ---------------
-    MASSystem mas(spline, lambda, dimension, k, beta_vec);
+    MASSystem mas(spline, dimension, k, beta_vec);
 
 
     Export::saveSurfaceDataCSV("../CSV/PN/surface" + fileex + ".csv", 

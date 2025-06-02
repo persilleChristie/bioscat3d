@@ -23,6 +23,14 @@ inline py::array_t<double> eigen2numpy(Eigen::MatrixXd& mat) {
         py::none() // Do not let Python own the matrix 
     );
 }
+// inline py::array_t<double> eigen2numpy(Eigen::MatrixXd& mat) {
+//     return py::array_t<double>(
+//         {mat.rows(), mat.cols()},
+//         {sizeof(double), sizeof(double) * mat.rows()},
+//         mat.data(),
+//         py::none()
+//     );
+// }
 
 /// @brief Translate numpy array to row major Eigen matrix 
 /// @param nparray py::array_t
@@ -33,6 +41,7 @@ inline Eigen::Matrix<double, Eigen::Dynamic,
                         Eigen::Dynamic, Eigen::RowMajor> numpy2eigen(py::array_t<double> nparray, int rows, int cols){
     Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> 
     matrix((double*)nparray.request().ptr, rows, cols);
+    // Eigen::Map<Eigen::MatrixXd> matrix((double*)nparray.request().ptr, rows, cols);
 
     return matrix;
 }

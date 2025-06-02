@@ -176,10 +176,10 @@ int main(){
         return 1;
     }
 
-    MASSystem mas(spline, lambda, dimension, k, beta_vec);
+    MASSystem mas(spline, dimension, k, beta_vec);
 
     // Generate field calculator (inverse crime)
-    FieldCalculatorTotal truefield(mas);
+    FieldCalculatorTotal truefield(mas, true);
 
     // Generate measure-points
     Eigen::MatrixX3d measurepts(10,3);
@@ -206,8 +206,9 @@ int main(){
     double gamma = 100000.0;
     int iterations = 1500;
 
-    CrankNicolson pcn(dimension, lambda, k, beta_vec[0], Etrue, measurepts, delta, gamma, iterations);
+    CrankNicolson pcn(dimension, k, beta_vec[0], Etrue, measurepts, delta, gamma, iterations);
 
+    pcn.run(true);
 
 
     return 0;

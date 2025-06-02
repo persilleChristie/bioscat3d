@@ -28,7 +28,6 @@ namespace py = pybind11;
 /// @param gamma constant for pCN
 /// @param iterations number of iterations of pCN
 CrankNicolson::CrankNicolson(const double dimension, 
-                        const double lambda,
                         const Eigen::Vector3d& kinc, 
                         const double polarization,
                         const Eigen::MatrixX3cd& data, 
@@ -36,7 +35,7 @@ CrankNicolson::CrankNicolson(const double dimension,
                         const double delta, 
                         const double gamma, 
                         const int iterations)
-    : dimension_(dimension), lambda_(lambda), kinc_(kinc), 
+    : dimension_(dimension), kinc_(kinc), 
         polarization_(Eigen::VectorXd::Constant(1, polarization)),
         data_(data), data_points_(data_points), delta_(delta), 
         gamma_(gamma), iterations_(iterations) { 
@@ -49,12 +48,16 @@ CrankNicolson::CrankNicolson(const double dimension,
 void CrankNicolson::constructor(){
 
     // --------- Generate grid ---------
-    int N = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension_ / lambda_));
+    int N = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension_ / constants.getWavelength()));
 
     double half_dim = dimension_ / 2.0;
     
     Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(N, -half_dim, half_dim);
     Eigen::VectorXd y = Eigen::VectorXd::LinSpaced(N, -half_dim, half_dim);
+
+    std::cout << "x: " << x.transpose() << std::endl;
+    std::cout << "y: " << y.transpose() << std::endl;
+
 
     Eigen::MatrixXd X(N, N), Y(N, N);
     for (int i = 0; i < N; ++i) {  // Works as meshgrid
@@ -62,22 +65,26 @@ void CrankNicolson::constructor(){
         Y.col(i) = y;
     }
 
+    std::cout << "X range: " << X.minCoeff() << " to " << X.maxCoeff() << std::endl;
+    std::cout << "Y range: " << Y.minCoeff() << " to " << Y.maxCoeff() << std::endl;
+    std::cout << "Shape: " << X.rows() << " x " << X.cols() << std::endl;
+
+
     this->X_ = X;
     this->Y_ = Y;
 
     // ------------ Run python code ---------------
-    // Should this be scoped to ensure Python interpreter is started and stopped correctly?
-    py::scoped_interpreter guard{}; // Start Python interpreter
-    py::module sys = py::module::import("sys");
-    sys.attr("path").attr("insert")(1, ".");  // Add local dir to Python path
-
-
+    
     try {
+        // Should this be scoped to ensure Python interpreter is started and stopped correctly?
+        py::module sys = py::module::import("sys");
+        sys.attr("path").attr("insert")(1, ".");  // Add local dir to Python path
+    
         // Import the Python module
         py::module spline_module = py::module::import("Spline");
 
         // Get the class
-        this->SplineClass_ = std::make_shared<py::object>(spline_module.attr("Spline"));
+        this->SplineClass_ = std::move(spline_module.attr("Spline"));
 
         // Wrap Eigen matrices as NumPy arrays (shared memory, no copy)
         this->X_np_ = std::make_shared<py::array_t<double>>(PybindUtils::eigen2numpy(X));
@@ -94,13 +101,15 @@ void CrankNicolson::constructor(){
 }
 
 double CrankNicolson::logLikelihood(Eigen::MatrixXd& Zvals){
-
+    
+    std::cout << "Loglike: Line 96" << std::endl;
     auto Z_np = PybindUtils::eigen2numpy(Zvals);
 
-    py::object spline = SplineClass_(X_, Y_, Z_np);
-
-    MASSystem mas(spline, lambda_, dimension_, kinc_, polarization_);
-    
+    std::cout << "loglike: Line 99" << std::endl;
+    py::object spline = SplineClass_(*X_np_, *Y_np_, Z_np);  // Call the actual function
+    std::cout << "loglike: Line 101" << std::endl;
+    MASSystem mas(spline, dimension_, kinc_, polarization_);
+    std::cout << "loglike: Line 103" << std::endl;
     FieldCalculatorTotal field(mas);
     int M = data_points_.rows();
 
@@ -171,21 +180,25 @@ void CrankNicolson::run(bool verbose){
         // ????? TODO: Update delta, gamma ?????
     }
 
-    // std::cout << "Surface: " << previous << std::endl;
-    Export::saveRealVectorCSV("Estimate.csv", previous.col(2));
-    
-    std::ofstream file("totalcount.csv");
-    if (file.is_open()) {
-        for (size_t i = 0; i < totalcount.size(); ++i) {
-            file << totalcount[i];
-            if (i < totalcount.size() - 1)
-                file << ",";
-        }
-        file << "\n";
-        file.close();
-        std::cout << "CSV file written successfully.\n";
-    } else {
-        std::cerr << "Unable to open file.\n";
+    if (verbose){
+        std::cout << "Number of accepted proposals: " << totalcount[size(totalcount) - 1] << std::endl;
     }
+
+    // // std::cout << "Surface: " << previous << std::endl;
+    // Export::saveRealVectorCSV("Estimate.csv", previous.col(2));
+    
+    // std::ofstream file("totalcount.csv");
+    // if (file.is_open()) {
+    //     for (size_t i = 0; i < totalcount.size(); ++i) {
+    //         file << totalcount[i];
+    //         if (i < totalcount.size() - 1)
+    //             file << ",";
+    //     }
+    //     file << "\n";
+    //     file.close();
+    //     std::cout << "CSV file written successfully.\n";
+    // } else {
+    //     std::cerr << "Unable to open file.\n";
+    // }
 
 }
