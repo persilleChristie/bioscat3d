@@ -87,8 +87,8 @@ void CrankNicolson::constructor(){
         this->SplineClass_ = std::move(spline_module.attr("Spline"));
 
         // Wrap Eigen matrices as NumPy arrays (shared memory, no copy)
-        this->X_np_ = std::make_shared<py::array_t<double>>(PybindUtils::eigen2numpy(X));
-        this->Y_np_ = std::make_shared<py::array_t<double>>(PybindUtils::eigen2numpy(Y));
+        this->X_np_ = py::array_t<double>(PybindUtils::eigen2numpy(X));
+        this->Y_np_ = py::array_t<double>(PybindUtils::eigen2numpy(Y));
 
 
     } catch (const py::error_already_set &e) {
@@ -106,7 +106,7 @@ double CrankNicolson::logLikelihood(Eigen::MatrixXd& Zvals){
     auto Z_np = PybindUtils::eigen2numpy(Zvals);
 
     std::cout << "loglike: Line 99" << std::endl;
-    py::object spline = SplineClass_(*X_np_, *Y_np_, Z_np);  // Call the actual function
+    py::object spline = SplineClass_(X_np_, Y_np_, Z_np);  
     std::cout << "loglike: Line 101" << std::endl;
     MASSystem mas(spline, dimension_, kinc_, polarization_);
     std::cout << "loglike: Line 103" << std::endl;

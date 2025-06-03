@@ -15,7 +15,7 @@ namespace PybindUtils {
 /// @brief Translate Eigen matrix into numpy array without letting python own memory
 /// @param mat Eigen matrix 
 /// @return pybind11 array_t<double>
-inline py::array_t<double> eigen2numpy(Eigen::MatrixXd& mat) {
+inline py::array_t<double> eigen2numpy(const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& mat) {
     return py::array_t<double>(
         {mat.rows(), mat.cols()},
         {sizeof(double) * mat.cols(), sizeof(double)},
@@ -48,8 +48,11 @@ inline Eigen::Matrix<double, Eigen::Dynamic,
 
 inline std::vector<Eigen::MatrixX3d> call_spline(py::object spline, int resolution){ 
 
+    std::cout << "call spline, l. 51" << std::endl;
+    std::cout << "Resolution: " << resolution << std::endl;
     py::tuple result = spline.attr("calculate_points")(resolution);
-
+    
+    std::cout << "call spline, l. 54" << std::endl;
     py::array_t<double> py_points = result[0].cast<py::array_t<double>>();
     py::array_t<double> py_normals = result[1].cast<py::array_t<double>>();
     py::array_t<double> py_tangents1 = result[2].cast<py::array_t<double>>();

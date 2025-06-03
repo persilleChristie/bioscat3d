@@ -27,8 +27,8 @@ class CrankNicolson {
         const Eigen::VectorXd polarization_;
         Eigen::MatrixXd X_;
         Eigen::MatrixXd Y_;
-        std::shared_ptr<pybind11::array_t<double>> X_np_;
-        std::shared_ptr<pybind11::array_t<double>> Y_np_;
+        pybind11::array_t<double> X_np_;
+        pybind11::array_t<double> Y_np_;
         pybind11::object SplineClass_;
 
         // pCN

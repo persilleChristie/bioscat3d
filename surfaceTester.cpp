@@ -153,6 +153,7 @@ int main() {
     // Read lambdas
     double lambda = doc["maxLambda"].GetDouble();
     double lambda_fine = 0.3 * lambda;
+    constants.setWavelength(lambda);
 
 
     // ------------- Decide highest number of auxilliary points --------------
@@ -240,7 +241,7 @@ int main() {
                                     mas.getExtPoints(), mas.getAuxTau1(), mas.getAuxTau2(), mas.getAuxNormals());
     
     std::cout << std::endl << "Running FieldCalculatorTotal..." << std::endl << std::endl;
-    FieldCalculatorTotal field(mas);
+    FieldCalculatorTotal field(mas, true);
 
     auto errors = field.computeTangentialError(0);
 

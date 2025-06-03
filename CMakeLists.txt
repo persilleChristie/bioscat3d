@@ -26,8 +26,8 @@ include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Forward)
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Inverse)
 
 # add_executable(main ${SOURCES} main.cpp)
-add_executable(main ${SOURCES} surfaceTester.cpp)
-# add_executable(main ${SOURCES} pcnTester.cpp)
+# add_executable(main ${SOURCES} surfaceTester.cpp)
+add_executable(main ${SOURCES} pcnTester.cpp)
 
 
 target_link_libraries(main PRIVATE pybind11::embed Eigen3::Eigen)
