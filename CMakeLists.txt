@@ -59,7 +59,6 @@ execute_process(
 # Hardcode to shared library to avoid .a reference
 set(PYTHON_LIB libpython3.11.so)
 
-
 set(PYTHON_LIBRARY ${PYTHON_LIBRARY_DIR}/${PYTHON_LIB})
 
 message(STATUS "Using Python include: ${PYTHON_INCLUDE_DIR}")
@@ -73,7 +72,8 @@ find_package(pybind11 REQUIRED CONFIG)
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Utils)
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Forward)
 include_directories(${CMAKE_SOURCE_DIR}/Cpp/lib/Inverse)
-include_directories(${CMAKE_SOURCE_DIR}/../rapidjson/include)
+# include_directories(${CMAKE_SOURCE_DIR}/../rapidjson/include)
+include_directories(${CMAKE_SOURCE_DIR}/../../rapidjson/include)
 include_directories(${PYTHON_INCLUDE_DIR})
 
 # --- Copy Python file to build dir ---
@@ -98,3 +98,4 @@ else()
     target_compile_options(main PRIVATE -Wall -Wextra -O2)
 endif()
 
+# cmake -DCMAKE_BUILD_TYPE=Debug ..
