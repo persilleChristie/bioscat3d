@@ -183,9 +183,9 @@ int main() {
     // Export::saveRealMatrixCSV("../CSV/PN/xfine_" + fileex + ".csv", X_fine);
     // Export::saveRealMatrixCSV("../CSV/PN/yfine_" + fileex + ".csv", Y_fine);
     // Export::saveRealMatrixCSV("../CSV/PN/zfine_" + fileex + ".csv", Z_fine);
-
-    // ------------ Run python code ---------------
+    
     py::scoped_interpreter guard{}; // Start Python interpreter
+    // ------------ Run python code ---------------
     py::module sys = py::module::import("sys");
     sys.attr("path").attr("insert")(1, ".");  // Add local dir to Python path
 

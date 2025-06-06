@@ -15,9 +15,6 @@ public:
     /// @brief Constructor for FieldCalculatorDipole.
     /// @param dipole The dipole object containing position and direction.
     /// @param interior Boolean indicating if the dipole is in the interior (true) or exterior (false).
-    /// @details If `interior` is true, the fields are computed as if the dipole is inside the surface;
-    /// if false, the fields are computed as if the dipole is outside the surface.
-    /// @note The dipole's direction should be a unit vector.
     FieldCalculatorDipole(const Dipole& dipole, const bool interior);
 
     /// @brief Computes the electric and magnetic fields at specified evaluation points.
@@ -27,7 +24,6 @@ public:
     /// @param outH Output matrix for magnetic field components (Nx3 complex numbers).
     /// @param evalPoints Matrix of evaluation points (Nx3 real numbers).
     /// @param polarization_idx Index of the polarization to use (default is 0, used in total fields).
-    /// @note The polarization index is only used in total fields and can be ignored for dipole fields.
     virtual void computeFields(
         Eigen::MatrixX3cd& outE,
         Eigen::MatrixX3cd& outH,

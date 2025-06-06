@@ -19,7 +19,6 @@ public:
     /// @param verbose Boolean indicating whether to print verbose output during initialization (default is false).
     /// @details This constructor initializes the total field calculator with the provided MASSystem,
     /// setting up the necessary dipoles and plane waves based on the system's parameters.
-    /// It also allocates space for the amplitudes of the fields.
     FieldCalculatorTotal(const MASSystem& masSystem, bool verbose = false);
 
 

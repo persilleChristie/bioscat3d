@@ -9,7 +9,7 @@
 class FieldCalculator {
 public:
 
-    /// @brief  Compute the electromagnetic fields at specified evaluation points.
+    /// @brief Compute the electromagnetic fields at specified evaluation points.
     /// @param outE Output matrix for electric field components (Nx3 complex numbers).
     /// @param outH Output matrix for magnetic field components (Nx3 complex numbers).
     /// @param evalPoints Matrix of evaluation points (Nx3 real numbers).

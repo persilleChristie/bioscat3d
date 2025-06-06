@@ -12,7 +12,7 @@ namespace py = pybind11;
 /// @class MASSystem
 /// @brief Represents a Method of Auxiliary Sources (MAS) system including the surface and incident field.
 /// @details
-/// Stores and manages the test surface and auxiliary point clouds (interior and exterior),
+/// Stores and manages the test surface and auxiliary points (interior and exterior),
 /// generated from a Python spline. Also stores the parameters for the incident field,
 /// such as the wavevector and polarization angles.
 class MASSystem {
@@ -26,7 +26,7 @@ public:
                 const Eigen::Vector3d& kinc, const Eigen::VectorXd& polarizations); 
 
     // const std::vector<std::shared_ptr<FieldCalculatorUPW>>& getIncidentField();
-    //const std::pair<Eigen::Vector3d, double>&getInc() const {return {kinc_, lambda_};};
+    // const std::pair<Eigen::Vector3d, double>&getInc() const {return {kinc_, lambda_};};
     const Eigen::Vector3d getInc() const {return kinc_;};
     const Eigen::VectorXd& getPolarizations() const         {return polarizations_;};
 
