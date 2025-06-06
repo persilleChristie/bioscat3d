@@ -9,12 +9,21 @@
 
 namespace Export {
 
+/// @brief Converts a complex number to a string representation.
+/// @param val The complex number to convert.
+/// @return A string representation of the complex number in the format "real+imagi".
+/// @details The function formats the complex number as "real+imagi", where "real" is the real part and "imagi" is the imaginary part.
 inline std::string complexToString(const std::complex<double>& val) {
     std::ostringstream oss;
     oss << val.real() << "+" << val.imag() << "i";
     return oss.str();
 }
 
+/// @brief Converts a complex number to a string representation.
+/// @details Formats as "real+imagi" using default stream precision.
+/// @param val The complex number to convert.
+/// @param precision The number of decimal places to include in the string representation.
+/// @return A string representation of the complex number in the format "real+imagi", with the specified precision.
 inline void saveMatrixCSV(const std::string& filename, const Eigen::MatrixXcd& mat) {
     std::ofstream file(filename);
     if (!file) throw std::runtime_error("Failed to open file: " + filename);
@@ -27,7 +36,10 @@ inline void saveMatrixCSV(const std::string& filename, const Eigen::MatrixXcd& m
     }
     file.close();
 }
-
+/// @brief Saves a complex vector to a CSV file.
+/// @param filename The name of the file to save the vector to.
+/// @param vec The complex vector to save.
+/// @details The function opens the specified file and writes each element of the vector to a new line in the format "real+imagi".
 inline void saveVectorCSV(const std::string& filename, const Eigen::VectorXcd& vec) {
     std::ofstream file(filename);
     if (!file) throw std::runtime_error("Failed to open file: " + filename);
@@ -37,6 +49,10 @@ inline void saveVectorCSV(const std::string& filename, const Eigen::VectorXcd& v
     file.close();
 }
 
+/// @brief Saves a real matrix to a CSV file.
+/// @param filename The name of the file to save the matrix to.
+/// @param mat The real matrix to save.
+/// @details The function opens the specified file and writes each element of the matrix in CSV format, with each row on a new line.
 inline void saveRealMatrixCSV(const std::string& filename, const Eigen::MatrixXd& mat) {
     std::ofstream file(filename);
     if (!file) throw std::runtime_error("Failed to open file: " + filename);
@@ -50,6 +66,10 @@ inline void saveRealMatrixCSV(const std::string& filename, const Eigen::MatrixXd
     file.close();
 }
 
+/// @brief Saves a real vector to a CSV file.
+/// @param filename The name of the file to save the vector to.
+/// @param vec The real vector to save.
+/// @details The function opens the specified file and writes each element of the vector to a new line.
 inline void saveRealVectorCSV(const std::string& filename, const Eigen::VectorXd& vec) {
     std::ofstream file(filename);
     if (!file) throw std::runtime_error("Failed to open file: " + filename);
@@ -59,6 +79,14 @@ inline void saveRealVectorCSV(const std::string& filename, const Eigen::VectorXd
     file.close();
 }
 
+/// @brief Saves surface data to a CSV file.
+/// @param filename The name of the file to save the surface data to.
+/// @param x The matrix of points on the surface (Nx3).
+/// @param tau1 The first tangent vector at the surface points (Nx3).
+/// @param tau2 The second tangent vector at the surface points (Nx3).
+/// @param normal The normal vector at the surface points (Nx3).
+/// @details The function checks that all matrices have 3 columns and the same number of rows,
+/// and then writes the data to the specified CSV file in a structured format.
 inline void saveSurfaceDataCSV(
     const std::string& filename,
     const Eigen::MatrixXd& x,
@@ -83,11 +111,8 @@ inline void saveSurfaceDataCSV(
         for (int j = 0; j < 3; ++j) file << normal(i, j) << (j < 2 ? "," : "");
         file << "\n";
     }
-
     file.close();
 }
-
-
 } // namespace Export
 
 #endif // UTILS_EXPORT_H

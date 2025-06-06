@@ -12,7 +12,7 @@
 
 // MassSystem is copied here?
 FieldCalculatorTotal::FieldCalculatorTotal(
-    const MASSystem masSystem, bool verbose
+    const MASSystem& masSystem, bool verbose
 ) : mas_(masSystem)
 {
     constructor(verbose);
@@ -77,14 +77,14 @@ void FieldCalculatorTotal::constructor(bool verbose)
     // For tests
     std::string fileex;
     // Choose one true value amongs these
-    bool Surface0 = true;
-    bool Surface1 = false; 
+    bool Surface0 = false;
+    bool Surface1 = true; 
     bool Surface10 = false;
 
 
     // Choose one true value amongs these
-    bool radius1 = false;
-    bool radius10 = true;
+    bool radius1 = true;
+    bool radius10 = false;
     
 
     for (int i = 0; i < B; ++i){
@@ -95,9 +95,9 @@ void FieldCalculatorTotal::constructor(bool verbose)
         UPW_list.emplace_back(UPW);
 
         // ----------------- Assemble system and time --------------------
-        if (verbose){
-        std::cout << "Assembling system..." << std::endl;
-        }
+        if (verbose) {
+            std::cout << "Assembling system..." << std::endl;
+        };
 
         auto start_assemble = std::chrono::high_resolution_clock::now();
 
@@ -108,8 +108,8 @@ void FieldCalculatorTotal::constructor(bool verbose)
         auto duration_assemble = std::chrono::duration_cast<std::chrono::seconds>(stop_assemble - start_assemble);
 
         if (verbose){
-        std::cout << "System assembled in " << duration_assemble.count() << " seconds" << std::endl;
-        }
+            std::cout << "System assembled in " << duration_assemble.count() << " seconds" << std::endl;
+        };
         // Eigen::JacobiSVD<Eigen::MatrixXcd> svd(A);
         // const auto& singularValues = svd.singularValues();
         // double maxSV = singularValues(0);
@@ -128,8 +128,8 @@ void FieldCalculatorTotal::constructor(bool verbose)
 
         // ----------------- Solve system and time --------------------
         if (verbose){
-        std::cout << "Solving system..." << std::endl;
-        }
+            std::cout << "Solving system..." << std::endl;
+        };
 
         auto start_solve = std::chrono::high_resolution_clock::now();
         
@@ -183,8 +183,10 @@ void FieldCalculatorTotal::constructor(bool verbose)
     this->amplitudes_ext_ = amplitudes_ext;
     this->amplitudes_ = amplitudes;
 
-    if (verbose){
-    std::cout << std::endl << "Field Calculator initialized successfully!" << std::endl;}
+    if (verbose)
+    {
+        std::cout << std::endl << "Field Calculator initialized successfully!" << std::endl;
+    };
 }
 
 
@@ -193,7 +195,7 @@ void computeLinearCombinations(Eigen::MatrixX3cd& outE,
     const Eigen::MatrixX3d& evalPoints,
     int polarization_idx,
     std::vector<std::shared_ptr<FieldCalculator>> dipoles,
-    Eigen::MatrixXcd amplitudes
+    const Eigen::MatrixXcd& amplitudes
     ){
 
     int M = evalPoints.rows();

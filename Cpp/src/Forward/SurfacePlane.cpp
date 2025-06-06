@@ -2,6 +2,11 @@
 #include "../../lib/Forward/SurfacePlane.h"
 #include "../../lib/Utils/Constants.h"
 
+/// @file SurfacePlane.cpp
+/// @brief Implementation of the SurfacePlane class, which generates a rectangular surface in 3D space.
+/// @details This class creates a surface defined by a corner point, two basis vectors, and their respective sizes.
+/// The surface is generated as a grid of points, with normals and tangent vectors calculated based on the basis vectors.
+/// The surface can be used in various applications such as simulations, visualizations, or as a base for further geometric operations.
 SurfacePlane::SurfacePlane(Eigen::Vector3d cornerPoint,
     Eigen::Vector3d basis1,
     Eigen::Vector3d basis2,
@@ -20,7 +25,9 @@ const Eigen::MatrixXd& SurfacePlane::getTau1()    const { return tau1_;    }
 const Eigen::MatrixXd& SurfacePlane::getTau2()    const { return tau2_;    }
 
 
-
+/// @brief Generates the surface points, normals, and tangent vectors.
+/// This method computes the grid of points on the plane, calculates the normals,
+/// and computes the tangent vectors tau1 and tau2 based on the basis vectors and resolution.
 void SurfacePlane::generateSurface() {
     Constants constants;
     double totalsize1 = size1_ * basis1_.norm();

@@ -9,12 +9,18 @@
 
 using namespace Eigen;
 
+/// @file SystemAssembler.cpp
+/// @brief Implementation of the SystemAssembler class, which assembles the system matrix and right-hand side vector for the MAS.
+/// @details This class constructs the system matrix `A` and the right-hand side vector `b` based on the contributions from interior and exterior sources, as well as the incident field.
+/// @note The system is assembled based on the evaluation points, tangential vectors, and sources provided.
+/// @note The method `assembleSystem` computes the contributions from both interior and exterior sources, as well as the incident field, to populate the system matrix and right-hand side vector.
+/// @note The method assumes that the sources are provided in pairs, where each pair corresponds to a dipole at the same point.
 void SystemAssembler::assembleSystem(
     Eigen::MatrixXcd& A,
     Eigen::VectorXcd& b,
-    Eigen::MatrixX3d points,
-    Eigen::MatrixX3d tau1,
-    Eigen::MatrixX3d tau2,
+    Eigen::MatrixX3d& points,
+    Eigen::MatrixX3d& tau1,
+    Eigen::MatrixX3d& tau2,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources_int,
     const std::vector<std::shared_ptr<FieldCalculator>>& sources_ext,
     const std::shared_ptr<FieldCalculator>& incident

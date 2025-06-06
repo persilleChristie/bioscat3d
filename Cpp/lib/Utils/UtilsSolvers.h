@@ -5,12 +5,14 @@
 #include <iostream>
 #include <string>
 
+/// @file UtilsSolvers.h
+/// @brief Utility functions for solving linear systems using Eigen library.
 namespace UtilsSolvers {
 
     using Eigen::MatrixXcd;
     using Eigen::VectorXcd;
 
-    /// Solve linear system using FullPivLU decomposition.
+    /// Solve linear system using Eigen's FullPivLU decomposition.
     /// @param A The system matrix.
     /// @param b The right-hand side vector.
     /// @param verbose Whether to print solver info (default: false).

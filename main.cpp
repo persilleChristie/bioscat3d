@@ -19,9 +19,9 @@ Constants constants;
 
 int main() {
     // Flags for tests (max one true)
-    bool SurfacePointsTest = true;
+    bool SurfacePointsTest = false;
     bool PlaneTest = false; // This should run with a flat surface, no surface bumps
-    bool FullSurfaceTest = false;
+    bool FullSurfaceTest = true;
     
     if (SurfacePointsTest){
         std::cout << std::endl;
@@ -119,25 +119,37 @@ int main() {
     Eigen::VectorXd lambdas = Eigen::VectorXd::LinSpaced(lambda_nr, lambda_min, lambda_max);
 
     // ------------- Decide highest number of auxilliary points --------------
+    // print constants.auxpts_pr_lambda
+    std::cout << "Constants auxpts_pr_lambda: " << constants.auxpts_pr_lambda << std::endl;
+    std::cout << "Auxiliary points per wavelength: " << constants.auxpts_pr_lambda << std::endl;
     int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / lambda_min));
     std::cout << "Number of fine points: " << N_fine << std::endl;
+
+    std::cout << "half_dim: " << half_dim << std::endl;
+    std::cout << "auxpts_pr_lambda: " << constants.auxpts_pr_lambda << std::endl;
+    std::cout << "N_fine: " << N_fine << std::endl;
+
 
 
     // ------------- Generate grid -------------
     Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(N_fine, -half_dim, half_dim);
     Eigen::VectorXd y = Eigen::VectorXd::LinSpaced(N_fine, -half_dim, half_dim);
 
-    Eigen::MatrixXd X_fine(N_fine, N_fine), Y_fine(N_fine, N_fine);
-    for (int i = 0; i < N_fine; ++i) {  // Works as meshgrid
-        X_fine.row(i) = x.transpose();
-        Y_fine.col(i) = y;
-    }
+    // Eigen::MatrixXd X_fine(N_fine, N_fine), Y_fine(N_fine, N_fine);
+    // for (int i = 0; i < N_fine; ++i) {  // Works as meshgrid
+    //     X_fine.row(i) = x.transpose();
+    //     Y_fine.col(i) = y;
+    // }
 
-    // suggestion:
-    // X_fine = x.transpose().replicate(N_fine, 1); // rows = N_fine, cols = N_fine
-    // Y_fine = y.replicate(1, N_fine);             // rows = N_f
+    Eigen::MatrixXd X_fine = x.replicate(1, N_fine);           // column vector → N rows, N columns
+    Eigen::MatrixXd Y_fine = y.transpose().replicate(N_fine, 1); // row vector → N rows, N columns
+    Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 1.0);
 
-    Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
+    std::cout << "main line 148" << std::endl;
+    std::cout << "X_fine(0, 0): " << X_fine(0, 0) << std::endl;
+    std::cout << "Y_fine(0, 0): " << Y_fine(0, 0) << std::endl;
+    std::cout << "Z_fine(0, 0): " << Z_fine(0, 0) << std::endl;
+
 
     if (SurfacePointsTest || FullSurfaceTest){
         // Iterate over bumpData array
@@ -155,6 +167,13 @@ int main() {
         }
     }
 
+    std::cout << "Z_fine range: " << Z_fine.minCoeff() << " to " << Z_fine.maxCoeff() << std::endl;
+    std::cout << "Z_fine sample: \n" << Z_fine.block(0, 0, 5, 5) << std::endl;
+
+    std::cout << "X_fine (0:5, 0:5) before Python: \n" << X_fine.block(0, 0, 5, 5) << std::endl;
+    std::cout << "Y_fine (0:5, 0:5) before Python: \n" << Y_fine.block(0, 0, 5, 5) << std::endl;
+    std::cout << "Z_fine (0:5, 0:5) before Python: \n" << Z_fine.block(0, 0, 5, 5) << std::endl;
+
     // ------------ Run python code ---------------
     // Should this be scoped to ensure Python interpreter is started and stopped correctly?
     py::scoped_interpreter guard{}; // Start Python interpreter
@@ -164,17 +183,22 @@ int main() {
     // Declare variables needed outside the try-statement
     py::object spline;
 
+    // GOOD: only declare arrays; matrices already declared and filled above
+    py::array_t<double> X_np, Y_np, Z_np;
+
     try {
         // Import the Python module
         py::module spline_module = py::module::import("Spline");
-
         // Get the class
         py::object SplineClass = spline_module.attr("Spline");
 
         // Wrap Eigen matrices as NumPy arrays (shared memory, no copy)
-        auto X_np = PybindUtils::eigen2numpy(X_fine);
-        auto Y_np = PybindUtils::eigen2numpy(Y_fine);
-        auto Z_np = PybindUtils::eigen2numpy(Z_fine);
+        using RowMatrixXd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
+        X_np = PybindUtils::eigen2numpy(X_fine);
+        Y_np = PybindUtils::eigen2numpy(Y_fine);
+        Z_np = PybindUtils::eigen2numpy(Z_fine);
+
 
         // Instantiate Python class
         spline = SplineClass(X_np, Y_np, Z_np);
@@ -189,7 +213,8 @@ int main() {
     int count = 0;
 
     if (SurfacePointsTest){
-        MASSystem mas(spline, lambdas[0], dimension, k, beta_vec);
+        constants.setWavelength(lambda_min);
+        MASSystem mas(spline, dimension, k, beta_vec);
 
         Export::saveSurfaceDataCSV("../CSV/PN/surface_data_PN.csv", 
                                             mas.getPoints(), mas.getTau1(), mas.getTau2(), mas.getNormals());
@@ -201,9 +226,10 @@ int main() {
     } 
     else {
         for (auto lambda : lambdas){
+            constants.setWavelength(lambda);
             std::cout << "Running MASSystem with lambda: " << lambda << std::endl;
 
-            MASSystem mas(spline, lambda, dimension, k, beta_vec);
+            MASSystem mas(spline, dimension, k, beta_vec);
             // print variables from MASSystem - for points and tangents only print a few
             std::cout << "Points: " << mas.getPoints().block(0, 0, 5, 3) << std::endl;
             std::cout << "Tangents1: " << mas.getTau1().block(0, 0, 5, 3) << std::endl;
@@ -215,7 +241,7 @@ int main() {
             std::cout << "Auxiliary points (exterior): " << mas.getExtPoints().block(0, 0, 5, 3) << std::endl;
             std::cout << "Auxiliary tangents1: " << mas.getAuxTau1().block(0, 0, 5, 3) << std::endl;
             std::cout << "Auxiliary tangents2: " << mas.getAuxTau2().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Incidence vector: " << mas.getInc().first.transpose() << std::endl;
+            std::cout << "Incidence vector: " << mas.getInc().transpose() << std::endl;
             std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
             std::cout << "----------------------------------------" << std::endl;
 

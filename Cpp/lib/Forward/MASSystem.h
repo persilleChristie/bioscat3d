@@ -9,19 +9,19 @@
 
 namespace py = pybind11;
 
-/**
-    * Class MASSystem, storing a testsurface and two auxillariy surfaces for running MAS. It also stores all 
-    * parameters for the incident field.
-    *  
-    * @param jsonPath char with path to json file including the parameters needed for each surface:
-    *       - Bump needs 'resolution', 'halfWidth_x', 'halfWidth_y', 'halfWidth_z', 'bumpData' (hereunder 
-    *                   'x0', 'y0', 'height' and 'sigma'), 'k' (incidence vector) and 'betas' (list of polarizations)
-    *       - GP needs ...
-    * @param surfaceType string indicating type of surface - allowed types are 'Bump' and 'GP'
-    * @param constants updated Constants file
-*/
+/// @class MASSystem
+/// @brief Represents a Method of Auxiliary Sources (MAS) system including the surface and incident field.
+/// @details
+/// Stores and manages the test surface and auxiliary point clouds (interior and exterior),
+/// generated from a Python spline. Also stores the parameters for the incident field,
+/// such as the wavevector and polarization angles.
 class MASSystem {
 public:
+    /// @brief Constructor that initializes the MAS surface system.
+    /// @param spline A Python object representing the spline surface (must expose `max_curvature` and be callable).
+    /// @param dimension The physical dimension (width) of the surface domain.
+    /// @param kinc The incident wave vector as an Eigen::Vector3d.
+    /// @param polarizations The polarizations of the incident field as an Eigen::VectorXd.
     MASSystem(const py::object spline, const double dimension, 
                 const Eigen::Vector3d& kinc, const Eigen::VectorXd& polarizations); 
 
@@ -67,7 +67,10 @@ private:
     Eigen::MatrixX3d control_tangents1_;
     Eigen::MatrixX3d control_tangents2_;
 
-    void generateSurface(py::object spline, double dimension);
+    /// @brief Generates the surface points, normals, and tangents based on the provided spline object.
+    /// @param spline A Python object representing the spline surface.
+    /// @param dimension The dimension of the MAS system.
+    void generateSurface(py::object spline, const double dimension);
 };
 
-#endif // MAS_SURFACE_H
+#endif // MAS_SYSTEM_H

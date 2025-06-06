@@ -1,23 +1,36 @@
+#ifndef GAUSSIAN_PROCESS_H
+#define GAUSSIAN_PROCESS_H
+
 // #pragma once
 #include <Eigen/Dense>
 #include <cmath>
 #include <random>
 
+/// @brief Namespace for Gaussian Process utilities.
+/// @details This namespace contains functions for Gaussian Process kernels, mean functions, and sampling methods.
 namespace GaussianProcess{
-//
 // --- RBF Kernel ---
 // k(x, x') = σ_f² * exp(-||x - x'||² / (2ℓ²))
-// 
+/// @brief Computes the Radial Basis Function (RBF) kernel between two points.
+/// @param x1 First point as an Eigen vector.
+/// @param x2 Second point as an Eigen vector.
+/// @param lengthScale Length scale parameter for the kernel.
+/// @param sigmaF Signal variance parameter for the kernel.
+/// @return The value of the RBF kernel between x1 and x2.
 inline double rbf_kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2,
                          double lengthScale, double sigmaF) {
     double r2 = (x1 - x2).squaredNorm();
     return sigmaF * sigmaF * std::exp(-r2 / (2.0 * lengthScale * lengthScale));
 }
 
-//
 // --- Matern 3/2 Kernel ---
 // k(x, x') = σ_f² * (1 + sqrt(3) r / ℓ) * exp(-sqrt(3) r / ℓ)
-//
+/// @brief Computes the Matern 3/2 kernel between two points.
+/// @param x1 First point as an Eigen vector.
+/// @param x2 Second point as an Eigen vector.
+/// @param lengthScale Length scale parameter for the kernel.
+/// @param sigmaF Signal variance parameter for the kernel.
+/// @return The value of the Matern 3/2 kernel between x1 and x2.
 inline double matern32_kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2,
                               double lengthScale, double sigmaF) {
     double r = (x1 - x2).norm();
@@ -25,10 +38,14 @@ inline double matern32_kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& 
     return sigmaF * sigmaF * (1.0 + s) * std::exp(-s);
 }
 
-//
 // --- Matern 5/2 Kernel ---
 // k(x, x') = σ_f² * (1 + sqrt(5) r / ℓ + 5r²/(3ℓ²)) * exp(-sqrt(5) r / ℓ)
-//
+/// @brief Computes the Matern 5/2 kernel between two points.
+/// @param x1 First point as an Eigen vector.
+/// @param x2 Second point as an Eigen vector.
+/// @param lengthScale Length scale parameter for the kernel.
+/// @param sigmaF Signal variance parameter for the kernel.
+/// @return The value of the Matern 5/2 kernel between x1 and x2.
 inline double matern52_kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2,
                               double lengthScale, double sigmaF) {
     double r = (x1 - x2).norm();
@@ -36,15 +53,20 @@ inline double matern52_kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& 
     return sigmaF * sigmaF * (1.0 + s + (5.0 / 3.0) * r * r / (lengthScale * lengthScale)) * std::exp(-s);
 }
 
-//
 // --- Zero Mean Function ---
-//
+/// @brief Returns a zero mean vector for Gaussian Processes.
+/// @param X Input matrix (not used, but can be used to determine the size of the output).
+/// @return A zero vector of size equal to the number of rows in X.
 inline Eigen::VectorXd zero_mean(const Eigen::MatrixXd& X) {
     return Eigen::VectorXd::Zero(X.rows());
-
 }
 
-
+/// @brief Samples from a Gaussian Process with RBF kernel.
+/// @param X Input matrix of shape (N, D) where N is the number of points and D is the dimensionality.
+/// @param length_scale Length scale parameter for the RBF kernel.
+/// @param sigma_f Signal variance parameter for the RBF kernel.
+/// @param gen Random number generator.
+/// @return A vector of shape (N,) containing the sampled values from the Gaussian Process.
 inline Eigen::VectorXd sample_gp_2d_fast(const Eigen::MatrixXd& X,
                                   double length_scale,
                                   double sigma_f,
@@ -81,7 +103,16 @@ inline Eigen::VectorXd sample_gp_2d_fast(const Eigen::MatrixXd& X,
     return llt.matrixL() * z;
 }
 
-
+/// @brief Samples from a Gaussian Process with RBF kernel on a grid defined by X1 and X2.
+/// @param X1 First dimension grid points (M, N).
+/// @param X2 Second dimension grid points (M, N).
+/// @param length_scale Length scale parameter for the RBF kernel.
+/// @param sigma_f Signal variance parameter for the RBF kernel.
+/// @param gen Random number generator.
+/// @return A matrix of shape (M, N) containing the sampled values from the Gaussian Process on the grid.
+/// @details This function flattens the meshgrid defined by X1 and X2 into a single matrix of shape (total_points, 2),
+/// computes the pairwise squared distances, applies the RBF kernel, and samples from the Gaussian Process using Cholesky decomposition.
+/// The output is reshaped back to the original grid shape (M, N).
 inline Eigen::MatrixXd sample_gp_on_grid_rbf_fast(const Eigen::MatrixXd& X1,
                                                   const Eigen::MatrixXd& X2,
                                                   double length_scale,
@@ -136,9 +167,19 @@ inline Eigen::MatrixXd sample_gp_on_grid_rbf_fast(const Eigen::MatrixXd& X1,
     return F;
 }
 
-
 enum class MaternType { Matern32, Matern52 };
 
+/// @brief Samples from a Gaussian Process with Matern kernel on a grid defined by X1 and X2.
+/// @param X1 First dimension grid points (M, N).
+/// @param X2 Second dimension grid points (M, N).
+/// @param length_scale Length scale parameter for the Matern kernel.
+/// @param sigma_f Signal variance parameter for the Matern kernel.
+/// @param gen Random number generator.
+/// @param kernel_type Type of Matern kernel to use (Matern 3/2 or Matern 5/2).
+/// @return A matrix of shape (M, N) containing the sampled values from the Gaussian Process on the grid.
+/// @details This function flattens the meshgrid defined by X1 and X2 into a single matrix of shape (total_points, 2),
+/// computes the pairwise squared distances, applies the selected Matern kernel, and samples from the Gaussian Process using Cholesky decomposition.
+/// The output is reshaped back to the original grid shape (M, N).
 inline Eigen::MatrixXd sample_gp_on_grid_matern_fast(const Eigen::MatrixXd& X1,
                                                      const Eigen::MatrixXd& X2,
                                                      double length_scale,
@@ -209,5 +250,6 @@ inline Eigen::MatrixXd sample_gp_on_grid_matern_fast(const Eigen::MatrixXd& X1,
     return F;
 }
 
+} // namespace GaussianProcess
+#endif // GAUSSIAN_PROCESS_H
 
-}

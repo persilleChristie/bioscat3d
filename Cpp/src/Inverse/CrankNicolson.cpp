@@ -45,6 +45,8 @@ CrankNicolson::CrankNicolson(const double dimension,
         std::cout << "pCN initialized succesfully" << std::endl;
     }
 
+/// @brief Constructor for CrankNicolson class
+/// This method generates the grid of points and initializes the Python spline class for further calculations.
 void CrankNicolson::constructor(){
 
     // --------- Generate grid ---------
@@ -100,6 +102,12 @@ void CrankNicolson::constructor(){
 
 }
 
+/// @brief Computes the log-likelihood of the data given the surface represented by Zvals.
+/// @param Zvals The surface values at the grid points (NxM matrix).
+/// @return The log-likelihood value.
+/// @details This method uses the MASSystem and FieldCalculatorTotal classes to compute the fields at the data points
+/// and calculates the log-likelihood based on the difference between the computed fields and the measured data.
+/// @note The log-likelihood is computed as -0.5 * gamma * (Eout - data)^2, where Eout is the computed electric field at the data points.
 double CrankNicolson::logLikelihood(Eigen::MatrixXd& Zvals){
     
     std::cout << "Loglike: Line 96" << std::endl;
@@ -124,6 +132,13 @@ double CrankNicolson::logLikelihood(Eigen::MatrixXd& Zvals){
     return loglike;
 }
 
+/// @brief Runs the Crank-Nicolson algorithm to update the surface estimate.
+/// @param verbose If true, prints additional information during the run.
+/// @details This method initializes the Gaussian Process generator, generates an initial guess for the surface,
+/// and iteratively updates the surface estimate using the pCN algorithm. It computes the acceptance probability
+/// based on the log-likelihood of the proposed surface and the previous surface. If the proposal is accepted,
+/// it updates the previous surface and log-likelihood; otherwise, it retains the previous surface.
+/// The method also tracks the number of accepted proposals and can print this information if verbose is true.
 void CrankNicolson::run(bool verbose){
     double logLikelihoodPrev, logLikelihoodProp;
     double alpha;

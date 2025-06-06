@@ -6,7 +6,7 @@ import os
 import re
 
 name = "Zero"
-name += "_0014"
+name += "_014"
 
 # Find all CSV files starting with 'tangential_error' in the ../../CSV directory
 csv_files = sorted(glob.glob("../../CSV/*_tangential_error*_" + name + ".csv"))

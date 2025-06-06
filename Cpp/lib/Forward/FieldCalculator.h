@@ -3,10 +3,17 @@
 
 #include <Eigen/Dense>
 
+/// @brief Base class for field calculators.
+/// @details This class defines the
+/// interface for computing electromagnetic fields at specified evaluation points.
 class FieldCalculator {
 public:
 
-    // Batched field computation
+    /// @brief  Compute the electromagnetic fields at specified evaluation points.
+    /// @param outE Output matrix for electric field components (Nx3 complex numbers).
+    /// @param outH Output matrix for magnetic field components (Nx3 complex numbers).
+    /// @param evalPoints Matrix of evaluation points (Nx3 real numbers).
+    /// @param polarization_idx Index of the polarization to use (default is 0, used in total fields).
     virtual void computeFields(
         Eigen::MatrixX3cd& outE,
         Eigen::MatrixX3cd& outH,
@@ -14,7 +21,15 @@ public:
         int polarization_idx = 0 // Only used in total fields
     ) const = 0;
 
-    // Tangential components
+    /// @brief Compute the tangential components of the electric and magnetic fields.
+    /// @param outE Output matrix for electric field components (Nx3 complex numbers).
+    /// @param outH Output matrix for magnetic field components (Nx3 complex numbers).
+    /// @param outEt1 Output matrix for tangential electric field component along tau1 (Nx3 complex numbers).
+    /// @param outEt2 Output matrix for tangential electric field component along tau2 (Nx3 complex numbers).
+    /// @param outHt1 Output matrix for tangential magnetic field component along tau1 (Nx3 complex numbers).
+    /// @param outHt2 Output matrix for tangential magnetic field component along tau2 (Nx3 complex numbers).
+    /// @param tau1 Tangential vector 1 (Nx3 real numbers).
+    /// @param tau2 Tangential vector 2 (Nx3 real numbers).
     virtual void computeTangentialFields(
         Eigen::MatrixX3cd& outE,
         Eigen::MatrixX3cd& outH,
