@@ -4,9 +4,9 @@ import json
 import os
 
 def generate_surface_params(
-    keyword = "NormalNewGeom", # postfix to name JSON file
-    halfWidth_x=1.0, # 1.50
-    halfWidth_y=1.0, # 1.50
+    keyword = "Meep", # postfix to name JSON file
+    halfWidth_x=1.5, # 1.50
+    halfWidth_y=1.5, # 1.50
     halfWidth_z=2.0,
     resolution=10, # Meep parameter  
     pml_thickness = 2, # Meep parameter
@@ -19,10 +19,10 @@ def generate_surface_params(
     alpha = 0.86, # disctance scale for source points in MAS
     omega = 1.0, # What does this represent
     k = [0 ,0 , -1.0],
-    numBetas = 1, # makes unidistant betas on the interval [0, pi/2]
-    lambda_n = 1, # number of wavelengths to be used in the simulation
-    minLambda = 0.7, # minimum wavelength 0.25
-    maxLambda = 0.7, # maximum wavelength 0.8
+    numBetas = 7, # makes unidistant betas on the interval [0, pi/2]
+    lambda_n = 7, # number of wavelengths to be used in the simulation
+    minLambda = 0.20, # minimum wavelength 0.25
+    maxLambda = 0.80, # maximum wavelength 0.8
 ):
     
     filename = "surfaceParams" + keyword + ".json"

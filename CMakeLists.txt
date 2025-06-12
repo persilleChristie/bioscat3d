@@ -98,4 +98,5 @@ else()
     target_compile_options(main PRIVATE -Wall -Wextra -O2)
 endif()
 
-# cmake -DCMAKE_BUILD_TYPE=Debug ..
+# Cmake call: cmake -DCMAKE_BUILD_TYPE=Debug ..
+
