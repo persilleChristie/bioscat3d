@@ -87,8 +87,9 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 
 # --- Build target ---
 # add_executable(main ${SOURCES} main.cpp)
- add_executable(main ${SOURCES} surfaceTester.cpp)
+# add_executable(main ${SOURCES} surfaceTester.cpp)
 # add_executable(main ${SOURCES} pcnTester.cpp)
+add_executable(main ${SOURCES} dipoleTester.cpp)
 
 target_link_libraries(main PRIVATE Eigen3::Eigen ${PYTHON_LIBRARY})
 # Apply proper flags based on build type
