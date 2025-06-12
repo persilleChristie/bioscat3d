@@ -20,8 +20,8 @@ Constants constants;
 int main() {
     // Flags for tests (max one true)
     bool SurfacePointsTest = false;
-    bool PlaneTest = false; // This should run with a flat surface, no surface bumps
-    bool FullSurfaceTest = true;
+    bool PlaneTest = true; // This should run with a flat surface, no surface bumps
+    bool FullSurfaceTest = false;
     
     if (SurfacePointsTest){
         std::cout << std::endl;
@@ -143,7 +143,7 @@ int main() {
 
     Eigen::MatrixXd X_fine = x.replicate(1, N_fine);           // column vector → N rows, N columns
     Eigen::MatrixXd Y_fine = y.transpose().replicate(N_fine, 1); // row vector → N rows, N columns
-    Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 1.0);
+    Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0.0);
 
     std::cout << "main line 148" << std::endl;
     std::cout << "X_fine(0, 0): " << X_fine(0, 0) << std::endl;
@@ -231,22 +231,22 @@ int main() {
 
             MASSystem mas(spline, dimension, k, beta_vec);
             // print variables from MASSystem - for points and tangents only print a few
-            std::cout << "Points: " << mas.getPoints().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Tangents1: " << mas.getTau1().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Tangents2: " << mas.getTau2().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Control points: " << mas.getControlPoints().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Control tangents1: " << mas.getControlTangents1().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Control tangents2: " << mas.getControlTangents2().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Auxiliary points (interior): " << mas.getIntPoints().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Auxiliary points (exterior): " << mas.getExtPoints().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Auxiliary tangents1: " << mas.getAuxTau1().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Auxiliary tangents2: " << mas.getAuxTau2().block(0, 0, 5, 3) << std::endl;
-            std::cout << "Incidence vector: " << mas.getInc().transpose() << std::endl;
-            std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
-            std::cout << "----------------------------------------" << std::endl;
+            // std::cout << "Points: " << mas.getPoints().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Tangents1: " << mas.getTau1().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Tangents2: " << mas.getTau2().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Control points: " << mas.getControlPoints().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Control tangents1: " << mas.getControlTangents1().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Control tangents2: " << mas.getControlTangents2().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Auxiliary points (interior): " << mas.getIntPoints().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Auxiliary points (exterior): " << mas.getExtPoints().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Auxiliary tangents1: " << mas.getAuxTau1().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Auxiliary tangents2: " << mas.getAuxTau2().block(0, 0, 5, 3) << std::endl;
+            // std::cout << "Incidence vector: " << mas.getInc().transpose() << std::endl;
+            // std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
+            // std::cout << "----------------------------------------" << std::endl;
 
             std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
-            FieldCalculatorTotal field(mas);
+            FieldCalculatorTotal field(mas, true);
 
             auto errors = field.computeTangentialError(0);
 

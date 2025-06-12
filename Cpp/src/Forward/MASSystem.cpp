@@ -29,13 +29,13 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
 
         // --------- Generate test points -----------
         const double lambda = constants.getWavelength();
-        const int test_point_res = static_cast<int>(std::ceil(constants.auxpts_pr_lambda * dimension/lambda)); // static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/lambda_));
+        const int test_point_res = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/constants.getWavelength()));
 
         // Calculate points on surface and translate to Eigen
         std::cout << "MAS: Line 32" << std::endl;
         const auto result = PybindUtils::call_spline(spline, test_point_res);
         std::cout << "MAS: Line 34" << std::endl;
-
+        
         // Save in class
         this->points_ = result[0];
         this->normals_ = result[1];
@@ -48,6 +48,7 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
         this->control_points_ = control_result[0];
         this->control_tangents1_ = control_result[2];
         this->control_tangents2_ = control_result[3];
+
 
         // --------- Generate auxiliary points -----------
         const int aux_points_res = std::ceil(constants.auxpts_pr_lambda * dimension/lambda);
@@ -76,5 +77,4 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
         this->aux_normals_ = result_aux[1];
         this->aux_tau1_ = result_aux[2];
         this->aux_tau2_ = result_aux[3];
-
 }
