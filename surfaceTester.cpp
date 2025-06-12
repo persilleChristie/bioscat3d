@@ -7,6 +7,7 @@
 #include "rapidjson/document.h" 
 #include "rapidjson/istreamwrapper.h"
 #include "Cpp/lib/Utils/Constants.h"
+#include "Cpp/lib/Utils/ConstantsModel.h"
 #include "Cpp/lib/Forward/MASSystem.h"
 #include "Cpp/lib/Forward/FieldCalculatorTotal.h"
 #include "Cpp/lib/Utils/UtilsExport.h"
@@ -16,6 +17,7 @@ namespace py = pybind11;
 using MatrixRM = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>; // Define RowMajer matrix in Eigen
 
 Constants constants;
+ConstantsModel constantsModel;
 
 
 /// @brief Translate Eigen matrix into numpy array without letting python own memory
@@ -148,8 +150,10 @@ int main() {
     const double lambda_fine = lambda;
     constants.setWavelength(lambda);
 
+    constantsModel.setAuxPtsPrLambda(8);
+
     // ------------- Decide highest number of auxilliary points --------------
-    const int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / lambda_fine));
+    const int N_fine = static_cast<int>(std::ceil(sqrt(2) * constantsModel.getAuxPtsPrLambda() * dimension / lambda_fine));
     std::cout << "Number of fine points: " << N_fine << std::endl;
 
     // ------------- Generate grid -------------

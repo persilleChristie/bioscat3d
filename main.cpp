@@ -7,6 +7,7 @@
 #include "rapidjson/document.h" 
 #include "rapidjson/istreamwrapper.h"
 #include "Cpp/lib/Utils/Constants.h"
+#include "Cpp/lib/Utils/ConstantsModel.h"
 #include "Cpp/lib/Forward/MASSystem.h"
 #include "Cpp/lib/Forward/FieldCalculatorTotal.h"
 #include "Cpp/lib/Utils/UtilsExport.h"
@@ -15,6 +16,7 @@
 namespace py = pybind11;
 
 Constants constants;
+ConstantsModel constantsModel;
 
 
 int main() {
@@ -119,14 +121,14 @@ int main() {
     Eigen::VectorXd lambdas = Eigen::VectorXd::LinSpaced(lambda_nr, lambda_min, lambda_max);
 
     // ------------- Decide highest number of auxilliary points --------------
-    // print constants.auxpts_pr_lambda
-    std::cout << "Constants auxpts_pr_lambda: " << constants.auxpts_pr_lambda << std::endl;
-    std::cout << "Auxiliary points per wavelength: " << constants.auxpts_pr_lambda << std::endl;
-    int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / lambda_min));
+    auto auxpts_pr_lambda = constantsModel.getAuxPtsPrLambda();
+    std::cout << "Constants auxpts_pr_lambda: " << auxpts_pr_lambda << std::endl;
+    std::cout << "Auxiliary points per wavelength: " << auxpts_pr_lambda << std::endl;
+    int N_fine = static_cast<int>(std::ceil(sqrt(2) * auxpts_pr_lambda * dimension / lambda_min));
     std::cout << "Number of fine points: " << N_fine << std::endl;
 
     std::cout << "half_dim: " << half_dim << std::endl;
-    std::cout << "auxpts_pr_lambda: " << constants.auxpts_pr_lambda << std::endl;
+    std::cout << "auxpts_pr_lambda: " << auxpts_pr_lambda << std::endl;
     std::cout << "N_fine: " << N_fine << std::endl;
 
 

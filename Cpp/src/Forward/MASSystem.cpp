@@ -1,5 +1,6 @@
 #include "../../lib/Forward/MASSystem.h"
 #include "../Utils/Constants.h"
+#include "../Utils/ConstantsModel.h"
 #include "../Utils/UtilsPybind.h"
 #include <map>
 using std::ignore;
@@ -22,6 +23,9 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
     /// @details This method generates the surface points, normals, and tangents by calling the spline object with a specified resolution.
     void MASSystem::generateSurface(const py::object spline, const double dimension){
 
+        auto alpha = constantsModel.getAlpha();
+        auto auxpts_pr_lambda = constantsModel.getAuxPtsPrLambda();
+
         std::cout << "Generating surface" << std::endl;
 
         const double maxcurvature = spline.attr("max_curvature").cast<double>();
@@ -29,12 +33,10 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
 
         // --------- Generate test points -----------
         const double lambda = constants.getWavelength();
-        const int test_point_res = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension/constants.getWavelength()));
+        const int test_point_res = static_cast<int>(std::ceil(sqrt(2) * auxpts_pr_lambda * dimension/lambda));
 
         // Calculate points on surface and translate to Eigen
-        std::cout << "MAS: Line 32" << std::endl;
         const auto result = PybindUtils::call_spline(spline, test_point_res);
-        std::cout << "MAS: Line 34" << std::endl;
         
         // Save in class
         this->points_ = result[0];
@@ -51,7 +53,7 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
 
 
         // --------- Generate auxiliary points -----------
-        const int aux_points_res = std::ceil(constants.auxpts_pr_lambda * dimension/lambda);
+        const int aux_points_res = std::ceil(auxpts_pr_lambda * dimension/lambda);
 
         // Calculate points on surface and translate to Eigen
         const auto result_aux = PybindUtils::call_spline(spline, aux_points_res);
@@ -71,8 +73,8 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
 
         std::cout << "Radius: " << radius << std::endl;
 
-        this->aux_points_int_ = result_aux[0] - ((1 - constants.alpha) * radius) * result_aux[1]; 
-        this->aux_points_ext_ = result_aux[0] + ((1 - constants.alpha) * radius) * result_aux[1];
+        this->aux_points_int_ = result_aux[0] - ((1 - alpha) * radius) * result_aux[1]; 
+        this->aux_points_ext_ = result_aux[0] + ((1 - alpha) * radius) * result_aux[1];
 
         this->aux_normals_ = result_aux[1];
         this->aux_tau1_ = result_aux[2];
