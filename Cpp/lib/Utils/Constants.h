@@ -33,9 +33,6 @@ struct Constants {
     // Chosen constants (I have used the same constants as Mirza for some of them)
     static constexpr double n1   = sqrt(epsilon1/epsilon0); // 1.6;         // Refractive index of the nanowire/nanostructure 
                                                                  // (relative permittivity times relative permeability)
-    static constexpr double alpha = 0.86;        // Scaling for placement of auxiliary sources for the nanowires
-
-    static constexpr int auxpts_pr_lambda = 3;
 
     // Computed constants
     double k0;              // Wave number in free space

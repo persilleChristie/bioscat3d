@@ -13,6 +13,7 @@
 #include "../../lib/Utils/UtilsExport.h"
 #include "../../lib/Utils/UtilsPybind.h"
 #include "../../lib/Utils/Constants.h"
+#include "../../lib/Utils/ConstantsModel.h"
 
 namespace py = pybind11;
 
@@ -50,7 +51,7 @@ CrankNicolson::CrankNicolson(const double dimension,
 void CrankNicolson::constructor(){
 
     // --------- Generate grid ---------
-    int N = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension_ / constants.getWavelength()));
+    int N = static_cast<int>(std::ceil(sqrt(2) * constantsModel.getAuxPtsPrLambda() * dimension_ / constants.getWavelength()));
 
     double half_dim = dimension_ / 2.0;
     

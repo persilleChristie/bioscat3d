@@ -97,5 +97,10 @@
         "valarray": "cpp",
         "regex": "cpp",
         "any": "cpp"
-    }
+    },
+
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.buildType": "Debug"
+
 }
