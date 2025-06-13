@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import re
 
-name = "Zero"
+name = "Ten"
 name += "_014"
 
 # Find all CSV files starting with 'tangential_error' in the ../../CSV directory
