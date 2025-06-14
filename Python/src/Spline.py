@@ -8,13 +8,6 @@ class Spline:
         self.Yfine = Yfine
         self.Zfine = Zfine
 
-        print("Xfine range:", Xfine.min(), Xfine.max())
-        print("Yfine range:", Yfine.min(), Yfine.max())
-        print("Zfine range:", Zfine.min(), Zfine.max())
-        print("Xfine[0:5, 0:5]:", Xfine[:5, :5])
-        print("Yfine[0:5, 0:5]:", Yfine[:5, :5])
-        print("Zfine[0:5, 0:5]:", Zfine[:5, :5])
-
         
         self.tcks = bisplrep(Xfine.ravel(), Yfine.ravel(), Zfine.ravel(), s=S)
         self.max_curvature = self.__compute_max_mean_curvature__()
@@ -41,27 +34,6 @@ class Spline:
         return np.max(abs(H))
     
     def calculate_points(self, resolution):
-        # x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
-        # y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)
-
-        # X, Y = np.meshgrid(x, y)
-        # Z = self.__evaluate_at_points__(x, y)
-        # test_points = np.column_stack((X.ravel(), Y.ravel(), Z.ravel()))
-
-        # normals, tangent1, tangent2 = self.__calculate_normals_tangents__(x, y)
-
-        # dot_12 = np.einsum('ij,ij->i', tangent1, tangent2)
-        # dot_1n = np.einsum('ij,ij->i', tangent1, normals)
-        # dot_2n = np.einsum('ij,ij->i', tangent2, normals)
-
-        # print("Max deviation from orthogonality:", np.max(np.abs([dot_12, dot_1n, dot_2n])))
-        # print("Minimum value of normal z-value: ", np.min(normals[:,2]))
-
-
-    
-        # return test_points, normals, tangent1, tangent2
-
-
         x = np.linspace(self.Xfine.min(), self.Xfine.max(), resolution)
         y = np.linspace(self.Yfine.min(), self.Yfine.max(), resolution)
         X, Y = np.meshgrid(x, y, indexing='ij')

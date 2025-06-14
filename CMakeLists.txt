@@ -121,6 +121,9 @@ include_directories("/home/pernillechristie/rapidjson/include")
 include_directories(${Python3_INCLUDE_DIRS})
 include_directories(${Python3_NumPy_INCLUDE_DIRS})
 
+# Copy Python script to the build dir so it can be found at runtime
+configure_file(${CMAKE_SOURCE_DIR}/Python/src/Spline.py ${CMAKE_BINARY_DIR}/Spline.py COPYONLY)
+
 # --- Sources ---
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/Cpp/src/Forward/*.cpp
@@ -129,7 +132,10 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 
 # --- Executable ---
 # add_executable(main ${SOURCES} main.cpp)
-add_executable(main ${SOURCES} surfaceTester.cpp)
+# add_executable(main ${SOURCES} surfaceTester.cpp)
+file(GLOB VALIDATION_SOURCES "Cpp/src/Validation/*.cpp")
+
+add_executable(main ${SOURCES} ${VALIDATION_SOURCES})
 
 target_link_libraries(main
     PRIVATE Eigen3::Eigen

@@ -63,7 +63,7 @@
     ],
     "monitor_size": 1,
     "seed": 42,
-    "halfWidth_x": 0.35,
+    "halfWidth_x": 1.0,
     "halfWidth_y": 0.35,
     "halfWidth_z": 2.0,
     "resolution": 10,
@@ -76,10 +76,12 @@
         -1.0
     ],
     "betas": [
-        0.0
+        0.0,
+        0.2,
+        1.5
     ],
     "alpha": 0.86,
-    "lambda_n": 1,
-    "minLambda": 0.7,
+    "lambda_n": 5,
+    "minLambda": 0.3,
     "maxLambda": 0.7
 }

@@ -58,11 +58,11 @@ void SystemAssembler::assembleSystem(
         MatrixX3d x_mu = points.row(mu);
         Vector3d t1 = tau1.row(mu);
         Vector3d t2 = tau2.row(mu);
-
-        b(mu)       = -E_inc_new.row(mu).dot(t1);
-        b(mu + M)   = -E_inc_new.row(mu).dot(t2);
-        b(mu + 2*M) = -H_inc_new.row(mu).dot(t1);
-        b(mu + 3*M) = -H_inc_new.row(mu).dot(t2);
+        
+        b(mu)       = -t1.dot(E_inc_new.row(mu));
+        b(mu + M)   = -t2.dot(E_inc_new.row(mu));
+        b(mu + 2*M) = -t1.dot(H_inc_new.row(mu));
+        b(mu + 3*M) = -t2.dot(H_inc_new.row(mu));
         
 
         for (int nu = 0; nu < Nprime; ++nu) {
