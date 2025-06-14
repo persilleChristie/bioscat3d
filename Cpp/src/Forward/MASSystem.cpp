@@ -62,15 +62,6 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
         // radius = 1/max(maxcurvature, 1.0)
         double radius = 1.0 / std::max(maxcurvature, 1.0);
 
-        bool radius1 = true;
-        bool radius10 = false;
-
-        if (radius1){
-            radius = 1.0;
-        } else if (radius10) {
-            radius = 10.0;
-        }
-
         std::cout << "Radius: " << radius << std::endl;
 
         this->aux_points_int_ = result_aux[0] - ((1 - alpha) * radius) * result_aux[1]; 

@@ -44,8 +44,8 @@ ConstantsModel constantsModel;
 
 int main() {
     // Choose one true value amongs these
-    constexpr bool Surface0 = true;
-    constexpr bool Surface1 = false; 
+    constexpr bool Surface0 = false;
+    constexpr bool Surface1 = true; 
     constexpr bool Surface10 = false;
 
     // Choose one true value amongs these

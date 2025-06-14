@@ -78,10 +78,8 @@ inline Eigen::Matrix<double, Eigen::Dynamic,
 /// @return A vector of Eigen::MatrixX3d containing points, normals, tangents1, and tangents2.
 /// @throws std::runtime_error if the shapes of the NumPy arrays do not match the expected dimensions.
 inline std::vector<Eigen::MatrixX3d> call_spline(py::object spline, int resolution) {
-    std::cout << "[C++] Calling spline.calculate_points with resolution = " << resolution << std::endl;
 
     py::tuple result = spline.attr("calculate_points")(resolution);
-    std::cout << "[C++] Received tuple of size " << result.size() << std::endl;
 
     const auto py_points = result[0].cast<py::array_t<double>>();
     const auto py_normals = result[1].cast<py::array_t<double>>();
@@ -89,29 +87,15 @@ inline std::vector<Eigen::MatrixX3d> call_spline(py::object spline, int resoluti
     const auto py_tangents2 = result[3].cast<py::array_t<double>>();
 
     const int rows = py_points.shape(0), cols = py_points.shape(1);
-    std::cout << "[C++] py_points.shape = (" << rows << ", " << cols << ")" << std::endl;
 
     if (cols != 3) throw std::runtime_error("Expected shape (N, 3) for points");
     if (py_normals.shape(1) != 3) throw std::runtime_error("Expected shape (N, 3) for normals");
-
-    // Dump first 5 points from Python memory directly
-    const auto ptr = static_cast<double*>(py_points.request().ptr);
-    std::cout << "[C++] Sample raw points from py_points:" << std::endl;
-    for (int i = 0; i < std::min(5, rows); ++i) {
-        std::cout << "  Point " << i << ": "
-                  << ptr[i * 3 + 0] << ", "
-                  << ptr[i * 3 + 1] << ", "
-                  << ptr[i * 3 + 2] << std::endl;
-    }
 
     // Convert
     const auto points = numpy2eigen(py_points, rows, cols);
     const auto normals = numpy2eigen(py_normals, rows, cols);
     const auto tangents1 = numpy2eigen(py_tangents1, rows, cols);
     const auto tangents2 = numpy2eigen(py_tangents2, rows, cols);
-
-    std::cout << "[C++] Sample Eigen points after conversion:" << std::endl;
-    std::cout << points.block(0, 0, std::min(5, rows), 3) << std::endl;
 
     return {points, normals, tangents1, tangents2};
 }
