@@ -195,7 +195,8 @@ void computeLinearCombinations(Eigen::MatrixX3cd& outE,
     const Eigen::MatrixX3d& evalPoints,
     int polarization_idx,
     std::vector<std::shared_ptr<FieldCalculator>> dipoles,
-    const Eigen::MatrixXcd& amplitudes
+    const Eigen::MatrixXcd& amplitudes, 
+    bool nearField
     ){
 
     int M = evalPoints.rows();
@@ -204,16 +205,30 @@ void computeLinearCombinations(Eigen::MatrixX3cd& outE,
 
     int N = static_cast<int>(dipoles.size()) / 2;
 
-    for (int i = 0; i < N; ++i) {
-        dipoles[2 * i]->computeFields(Ei, Hi, evalPoints);
+    if (nearField){
+        for (int i = 0; i < N; ++i) {
+            dipoles[2 * i]->computeFields(Ei, Hi, evalPoints);
 
-        outE += amplitudes.row(polarization_idx)(i) * Ei;
-        outH += amplitudes.row(polarization_idx)(i) * Hi;
+            outE += amplitudes.row(polarization_idx)(i) * Ei;
+            outH += amplitudes.row(polarization_idx)(i) * Hi;
 
-        dipoles[2 * i + 1]->computeFields(Ei, Hi, evalPoints);
+            dipoles[2 * i + 1]->computeFields(Ei, Hi, evalPoints);
 
-        outE += amplitudes.row(polarization_idx)(i + N) * Ei;
-        outH += amplitudes.row(polarization_idx)(i + N) * Hi;
+            outE += amplitudes.row(polarization_idx)(i + N) * Ei;
+            outH += amplitudes.row(polarization_idx)(i + N) * Hi;
+        }
+    } else {
+       for (int i = 0; i < N; ++i) {
+            dipoles[2 * i]->computeFarFields(Ei, Hi, evalPoints);
+
+            outE += amplitudes.row(polarization_idx)(i) * Ei;
+            outH += amplitudes.row(polarization_idx)(i) * Hi;
+
+            dipoles[2 * i + 1]->computeFarFields(Ei, Hi, evalPoints);
+
+            outE += amplitudes.row(polarization_idx)(i + N) * Ei;
+            outH += amplitudes.row(polarization_idx)(i + N) * Hi;
+        } 
     }
 }
 
@@ -224,8 +239,20 @@ void FieldCalculatorTotal::computeFields(
     const Eigen::MatrixX3d& evalPoints,
     int polarization_idx
 ) const {
-    computeLinearCombinations(outE, outH, evalPoints, polarization_idx, dipoles_, amplitudes_);
+    computeLinearCombinations(outE, outH, evalPoints, polarization_idx, dipoles_, amplitudes_, true);
 }
+
+
+void FieldCalculatorTotal::computeFarFields(
+    Eigen::MatrixX3cd& outE,
+    Eigen::MatrixX3cd& outH,
+    const Eigen::MatrixX3d& evalPoints,
+    int polarization_idx
+) const {
+    computeLinearCombinations(outE, outH, evalPoints, polarization_idx, dipoles_, amplitudes_, false);
+}
+
+
 
 Eigen::VectorXd FieldCalculatorTotal::computePower(
     const Surface& surface
@@ -253,16 +280,16 @@ Eigen::VectorXd FieldCalculatorTotal::computePower(
         outE = Eigen::MatrixX3cd::Zero(N,3);
         outH = Eigen::MatrixX3cd::Zero(N,3);
 
-        computeFields(outE, outH, points, j);
+        computeFarFields(outE, outH, points, j);
         integral = 0.0;  
 
         for (int i = 0; i < N; ++i){
-            cross = 0.5 * outE.row(i).cross(outH.row(i).conjugate());
+            cross = outE.row(i).cross(outH.row(i).conjugate());
             integrand = cross.dot(normals.row(i));
-            integral += integrand * dA;
+            integral += integrand;
         }
 
-        integral_vec(j) = integral.real();
+        integral_vec(j) = 0.5 * integral.real() * dA;
 
     }
 
@@ -281,13 +308,13 @@ std::vector<Eigen::VectorXd> FieldCalculatorTotal::computeTangentialError(int po
     Eigen::MatrixX3cd intE = Eigen::MatrixX3cd::Zero(N, 3);
     Eigen::MatrixX3cd intH = Eigen::MatrixX3cd::Zero(N, 3); 
 
-    computeLinearCombinations(intE, intH, control_points, polarization_index, dipoles_, amplitudes_);
+    computeLinearCombinations(intE, intH, control_points, polarization_index, dipoles_, amplitudes_, true);
 
     // Compute field from exterior points 
     Eigen::MatrixX3cd extE = Eigen::MatrixX3cd::Zero(N, 3);
     Eigen::MatrixX3cd extH = Eigen::MatrixX3cd::Zero(N, 3); 
 
-    computeLinearCombinations(extE, extH, control_points, polarization_index, dipoles_ext_, amplitudes_ext_);
+    computeLinearCombinations(extE, extH, control_points, polarization_index, dipoles_ext_, amplitudes_ext_, true);
 
     // Compute incident field
     Eigen::MatrixX3cd incE(N, 3), incH(N, 3);

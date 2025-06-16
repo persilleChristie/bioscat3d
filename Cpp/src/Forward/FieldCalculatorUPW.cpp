@@ -58,3 +58,14 @@ void FieldCalculatorUPW::computeFields(
     }
 }
 
+
+void FieldCalculatorUPW::computeFarFields(
+    Eigen::MatrixX3cd& outE,
+    Eigen::MatrixX3cd& outH,
+    const Eigen::MatrixX3d& evalPoints,
+    int polarization_idx // Only used in total fields
+) const {
+    std::cout << "No far fields to be calculated, calculating full field expression" << std::endl;
+    computeFields(outE, outH, evalPoints);
+}
+

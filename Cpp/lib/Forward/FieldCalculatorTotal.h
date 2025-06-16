@@ -36,6 +36,13 @@ public:
         int polarization_idx = 0
     ) const override;
 
+    void computeFarFields(
+        Eigen::MatrixX3cd& outE,
+        Eigen::MatrixX3cd& outH,
+        const Eigen::MatrixX3d& evalPoints,
+        int polarization_idx = 0
+    ) const override;
+
     /// @brief Computes the total power radiated by the surface.
     /// @details This method computes the total power radiated by the surface based on the electric and magnetic fields.
     /// It integrates the Poynting vector over the surface area defined by the evaluation points and normals.
