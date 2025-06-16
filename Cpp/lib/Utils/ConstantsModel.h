@@ -43,10 +43,24 @@ struct ConstantsModel {
     /// Getter for alpha
     double getAlpha() const { return alpha; }
 
+        /// Setter for fixed radius
+    void setFixedRadius(double radius) {
+        if (radius >= 0) {
+            fixedRadius = radius;
+        } else {
+            std::cerr << "Error: fixed radius must be >= 0. Resetting to 0.\n";
+            fixedRadius = 0;
+        }
+    }
+
+    /// Getter for fixed radius
+    double getFixedRadius() const { return fixedRadius; }
+
 
 private:
     int auxpts_pr_lambda;
     double alpha;
+    int fixedRadius = 0; // Default to 0, meaning no fixed radius
 };
 
 // Global instance

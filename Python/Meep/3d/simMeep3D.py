@@ -22,7 +22,6 @@ cell_size = mp.Vector3(2*half_x + 2*pml_thickness,
                        2*half_y + 2*pml_thickness,
                        2*half_z + 2*pml_thickness)
 
-#omega = params["omega"]
 betas = params["betas"]
 # Material
 epsilon1 = params["epsilon1"] 

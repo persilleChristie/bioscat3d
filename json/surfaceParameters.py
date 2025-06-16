@@ -4,7 +4,7 @@ import json
 import os
 
 def generate_surface_params(
-    keyword = "Meep", # postfix to name JSON file
+    keyword = "Ten", # postfix to name JSON file
     halfWidth_x=1.5, # 1.50
     halfWidth_y=1.5, # 1.50
     halfWidth_z=2.0,
@@ -12,16 +12,16 @@ def generate_surface_params(
     pml_thickness = 2, # Meep parameter
     seed=42, # For surface bump creation
     monitor_size = 1, # monitors are placed with center at +/- monitor_size/2 in all directions
-    num_bumps=100,
+    num_bumps=10,
     hights_bumps = [0.02, 0.15], #should be in [20, 150] nm
     sigmas_bumps = [0.02, 0.075], #should correspond to lambde < width bumps, sigme < lambda/4
     epsilon1 = 2.56, # substrate epsilon value ???
     alpha = 0.86, # disctance scale for source points in MAS
     omega = 1.0, # What does this represent
     k = [0 ,0 , -1.0],
-    numBetas = 7, # makes unidistant betas on the interval [0, pi/2]
-    lambda_n = 7, # number of wavelengths to be used in the simulation
-    minLambda = 0.20, # minimum wavelength 0.25
+    numBetas = 4, # makes unidistant betas on the interval [0, pi/2]
+    lambda_n = 4, # number of wavelengths to be used in the simulation
+    minLambda = 0.60, # minimum wavelength 0.25
     maxLambda = 0.80, # maximum wavelength 0.8
 ):
     

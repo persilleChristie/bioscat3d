@@ -77,14 +77,14 @@ void FieldCalculatorTotal::constructor(bool verbose)
     // For tests
     std::string fileex;
     // Choose one true value amongs these
-    bool Surface0 = false;
-    bool Surface1 = true; 
-    bool Surface10 = false;
+    // bool Surface0 = false;
+    // bool Surface1 = true; 
+    // bool Surface10 = false;
 
 
     // Choose one true value amongs these
-    bool radius1 = true;
-    bool radius10 = false;
+    // bool radius1 = true;
+    // bool radius10 = false;
     
 
     for (int i = 0; i < B; ++i){

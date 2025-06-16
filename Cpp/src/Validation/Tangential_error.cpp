@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include "rapidjson/document.h" 
 #include "rapidjson/istreamwrapper.h"
 #include "../../lib/Utils/Constants.h"
@@ -105,12 +106,24 @@ std::tuple<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd> generateSurface(in
     return {X_fine, Y_fine, Z_fine};
 }
 
+auto tag = [](double lambda) {
+    std::ostringstream ss;
+    ss << std::fixed << std::setprecision(3) << lambda;
+    std::string s = ss.str();
+    s.erase(std::remove(s.begin(), s.end(), '.'), s.end()); // remove decimal
+    if (s.size() > 3) s = s.substr(0, 3); // optional: limit to 3 digits
+    return s;
+};
+
+
 
 int main(){
     // ------------- Changes to what is plotted --------------
     // Min max nr of auxiliary points
     int min_auxpoints = 2;
     int max_auxpoints = 5;
+    int fixedRadius = 1; // fixedRadius > 0 means that the radius is fixed, otherwise max curvature is used
+    constantsModel.setFixedRadius(fixedRadius);  
 
     // json path controlling surface, polarizations and wavelengths
     const char* jsonPath = "../json/surfaceParamsTen.json";
@@ -187,9 +200,6 @@ int main(){
             return 1;
         }
 
-
-        int count = 0;
-
         for (auto lambda : lambdas){
             constants.setWavelength(lambda);
             std::cout << "Running MASSystem with lambda: " << lambda << std::endl;
@@ -203,20 +213,15 @@ int main(){
                 auto errors = field.computeTangentialError(b);
 
                 Export::saveRealVectorCSV("../CSV/TangentialErrorsE/E_tangential_error1_auxpts" + std::to_string(ap) + 
-                                            "_lambda" + std::to_string(count) + "_beta" + std::to_string(b) + ".csv", errors[0]);
+                                            "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[0]);
                 Export::saveRealVectorCSV("../CSV/TangentialErrorsE/E_tangential_error2_auxpts" + std::to_string(ap) + 
-                                            "_lambda" + std::to_string(count) + "_beta" + std::to_string(b) + ".csv", errors[0]);
+                                            "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[1]);
                 Export::saveRealVectorCSV("../CSV/TangentialErrorsH/H_tangential_error1_auxpts" + std::to_string(ap) + 
-                                            "_lambda" + std::to_string(count) + "_beta" + std::to_string(b) + ".csv", errors[0]);
+                                            "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[2]);
                 Export::saveRealVectorCSV("../CSV/TangentialErrorsH/H_tangential_error2_auxpts" + std::to_string(ap) + 
-                                            "_lambda" + std::to_string(count) + "_beta" + std::to_string(b) + ".csv", errors[0]);
+                                            "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[3]);
             }
-                
-                
-            count++;
         }
     }
-
-
     return 0;
 }

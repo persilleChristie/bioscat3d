@@ -23,3 +23,6 @@ __pycache__/
 
 # Ignore all HTML files
 *.html
+
+Python/Plots/ResultsFixedRadius/*
+Python/Plots/ResultsVariableRadius/*

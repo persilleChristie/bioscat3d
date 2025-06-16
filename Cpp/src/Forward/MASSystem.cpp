@@ -60,7 +60,14 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
         
         // Calculate point values and save in class
         // radius = 1/max(maxcurvature, 1.0)
-        double radius = 1.0 / std::max(maxcurvature, 1.0);
+        double radius;
+        if (constantsModel.getFixedRadius() > 0) {
+            radius = constantsModel.getFixedRadius();
+        }
+        else {
+            std::cout << "Using max curvature to calculate radius: " << radius << std::endl;
+            radius = 1.0 / std::max(maxcurvature, 1.0);
+        }
 
         std::cout << "Radius: " << radius << std::endl;
 
