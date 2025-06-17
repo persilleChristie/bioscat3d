@@ -5,8 +5,9 @@ import re
 import os
 
 # Adjust path as needed
-folder = "../../CSV/TangentialErrorsE/"
-pattern = os.path.join(folder, "E_tangential_error1_*.csv")
+folderRead = "../../CSV/auxStats/"
+folderWrite = "../../Plots/auxStats/"
+pattern = os.path.join(folderRead, "E_tangential_error1_*.csv")
 
 # Match parts of the filename
 regex = r"E_tangential_error1_auxpts(\d+)_lambda(\d+)_beta(\d+)\.csv"
@@ -29,7 +30,7 @@ for file in glob.glob(pattern):
         plt.tight_layout()
 
         # Optional: save each plot
-        outname = f"ResultsFixedRadius/plot_Et1_auxpts{auxpts}_lambda{lam:.3f}_beta{beta:.3f}.png"
+        outname = os.path.join(folderWrite, f"Et1_auxpts{auxpts}_lambda{lam:.3f}_beta{beta:.3f}.png")
         plt.savefig(outname)
 
         # Or display directly

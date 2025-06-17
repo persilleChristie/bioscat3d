@@ -46,7 +46,7 @@ plt.ylabel("Error")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
-plt.savefig(f"Et1_auxpts{auxpts}_by_lambda.png")
+plt.savefig(f"ResultsFixedRadius/Et1_auxpts{auxpts}_by_lambda.png")
 plt.close()
 
 # ------------ Plot: Fixed lambda, varying beta ------------

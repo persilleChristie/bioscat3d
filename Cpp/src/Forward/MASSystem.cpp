@@ -45,7 +45,7 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
         this->tau2_ = result[3];
 
         // Calculate control points on surface and translate to Eigen
-        const auto control_result = PybindUtils::call_spline(spline, test_point_res);
+        const auto control_result = PybindUtils::call_spline(spline, 3*test_point_res);
 
         this->control_points_ = control_result[0];
         this->control_tangents1_ = control_result[2];
@@ -66,7 +66,7 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
         }
         else {
             std::cout << "Using max curvature to calculate radius: " << radius << std::endl;
-            radius = 1.0 / std::max(maxcurvature, 1.0);
+            radius = 1.0/std::max(maxcurvature, 0.1);
         }
 
         std::cout << "Radius: " << radius << std::endl;

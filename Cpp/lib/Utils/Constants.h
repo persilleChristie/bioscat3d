@@ -22,9 +22,9 @@ struct Constants {
 
     // Physical constants
     static constexpr double n0       = 1.0;              // Refractive index of air
-    static constexpr double epsilon0 = 1; // Normalized permittivity of free space (in arbitrary units) // 8.8541878188e-12; // Permittivity of free space
-    static constexpr double epsilon1 = 2.56;             // Substrate epsilon value????
-    static constexpr double mu0      = 1; // Normalized permeability of free space (in arbitrary units) // 1.25663706127e-6; // Permeability of free space
+    static constexpr double epsilon0 = 8.8541878188e-12; // Normalized permittivity of free space (in arbitrary units) // 8.8541878188e-12; // Permittivity of free space
+    static constexpr double epsilon1 = 2.56*8.8541878188e-12;             // Substrate epsilon value????
+    static constexpr double mu0      = 1.25663706127e-6; // Normalized permeability of free space (in arbitrary units) // 1.25663706127e-6; // Permeability of free space
     static constexpr double Iel      = 1.0;              // Source current (default value)
 
     static constexpr double eta0 = sqrt(mu0/epsilon0); // 377.0;            // 377 Ohm, impedance of free space
