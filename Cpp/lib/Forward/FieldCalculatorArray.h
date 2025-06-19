@@ -59,6 +59,7 @@ private:
     Eigen::VectorXd arrayWeights_;
     Eigen::MatrixX3d arrayPositions_;
     double largeDim_;
+    double halfDim_;
 
     void constructor();
 };
