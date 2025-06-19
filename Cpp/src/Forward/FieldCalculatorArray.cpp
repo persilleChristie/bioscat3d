@@ -31,6 +31,8 @@ void FieldCalculatorArray::constructor()
     double dimension = points.col(0).maxCoeff() - points.col(0).minCoeff();
     double half_dim = dimension/2.0;
 
+    this->halfDim_ = half_dim;
+
     int N = std::ceil(largeDim_/dimension);
 
     this->arrayWeights_ = Eigen::VectorXd::Constant(N * N, 1.0);
@@ -42,9 +44,9 @@ void FieldCalculatorArray::constructor()
     for (int i = 0; i < N; ++i){
         for (int j = 0; j < N; ++j){
             
-            arrayPositions.row(N * i + j) << -half_dim + i * 1.0/N * dimension, 
-                                             -half_dim + j * 1.0/N * dimension, 
-                                              0;
+            arrayPositions.row(N * i + j) << i * dimension, 
+                                             j * dimension, 
+                                             0;
 
         };
     };
@@ -76,9 +78,10 @@ void FieldCalculatorArray::computeFarFields(
 
     FieldTotal_->computeFields(outE, outH, evalPoints, polarization_idx);
     Eigen::Vector3d x;
+    Eigen::Vector3d arrayOrigin (halfDim_, halfDim_, 0.0);
 
     for (int j = 0; j < M; ++j){
-        x = evalPoints.row(j).normalized();
+        x = (evalPoints.row(j).transpose() - arrayOrigin).normalized();
 
         std::complex<double> arrayFactor = 0.0;
 

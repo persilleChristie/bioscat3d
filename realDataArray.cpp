@@ -80,11 +80,11 @@ int main() {
     double rough_size_min = 0.5;
     double rough_size_max = 1.0;  // Roughly how big the patch should be
 
-    bool variable_patch_size = false;
+    bool variable_patch_size = true;
     
     double lambda_min = 0.25;
     double lambda_max = 0.75;
-    int lambda_nr = 100;
+    int lambda_nr = 20;
 
     double beta_min = 0.0;
     double beta_max = constants.pi/2;
