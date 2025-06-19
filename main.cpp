@@ -10,6 +10,7 @@
 #include "Cpp/lib/Utils/ConstantsModel.h"
 #include "Cpp/lib/Forward/MASSystem.h"
 #include "Cpp/lib/Forward/FieldCalculatorTotal.h"
+#include "Cpp/lib/Forward/FieldCalculatorArray.h"
 #include "Cpp/lib/Utils/UtilsExport.h"
 #include "Cpp/lib/Utils/UtilsPybind.h"
 
@@ -178,6 +179,7 @@ int main() {
 
     // ------------ Run python code ---------------
     // Should this be scoped to ensure Python interpreter is started and stopped correctly?
+    std::cout << "starting python" << std::endl;
     py::scoped_interpreter guard{}; // Start Python interpreter
     py::module sys = py::module::import("sys");
     sys.attr("path").attr("insert")(1, ".");  // Add local dir to Python path
@@ -203,7 +205,9 @@ int main() {
 
 
         // Instantiate Python class
+        std::cout << "Spline reached" << std::endl;
         spline = SplineClass(X_np, Y_np, Z_np);
+        std::cout << "Spline called" << std::endl;
 
 
     } catch (const py::error_already_set &e) {
@@ -247,16 +251,18 @@ int main() {
             // std::cout << "Polarizations: " << mas.getPolarizations().transpose() << std::endl;
             // std::cout << "----------------------------------------" << std::endl;
 
-            std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
-            FieldCalculatorTotal field(mas, true);
+            // std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
+            // FieldCalculatorTotal field(mas, true);
 
-            auto errors = field.computeTangentialError(0);
+            // auto errors = field.computeTangentialError(0);
 
-            Export::saveRealVectorCSV("../CSV/E_tangential_error1_" + std::to_string(count) + ".csv", errors[0]);
-            Export::saveRealVectorCSV("../CSV/E_tangential_error2_" + std::to_string(count) + ".csv", errors[1]);
-            Export::saveRealVectorCSV("../CSV/H_tangential_error1_" + std::to_string(count) + ".csv", errors[2]);
-            Export::saveRealVectorCSV("../CSV/H_tangential_error2_" + std::to_string(count) + ".csv", errors[3]);
+            // Export::saveRealVectorCSV("../CSV/E_tangential_error1_" + std::to_string(count) + ".csv", errors[0]);
+            // Export::saveRealVectorCSV("../CSV/E_tangential_error2_" + std::to_string(count) + ".csv", errors[1]);
+            // Export::saveRealVectorCSV("../CSV/H_tangential_error1_" + std::to_string(count) + ".csv", errors[2]);
+            // Export::saveRealVectorCSV("../CSV/H_tangential_error2_" + std::to_string(count) + ".csv", errors[3]);
             
+            std::cout << "Running FieldCalculatorArray..." <<  std::endl;
+            FieldCalculatorArray field(mas, 20, true);
             
             
             count++;

@@ -73,18 +73,6 @@ void FieldCalculatorTotal::constructor(bool verbose)
     // Allocate space for amplitudes
     Eigen::MatrixXcd amplitudes(B, N);
     Eigen::MatrixXcd amplitudes_ext(B, N);
-
-    // For tests
-    std::string fileex;
-    // Choose one true value amongs these
-    // bool Surface0 = false;
-    // bool Surface1 = true; 
-    // bool Surface10 = false;
-
-
-    // Choose one true value amongs these
-    // bool radius1 = true;
-    // bool radius10 = false;
     
 
     for (int i = 0; i < B; ++i){
@@ -109,21 +97,7 @@ void FieldCalculatorTotal::constructor(bool verbose)
 
         if (verbose){
             std::cout << "System assembled in " << duration_assemble.count() << " seconds" << std::endl;
-        };
-        // Eigen::JacobiSVD<Eigen::MatrixXcd> svd(A);
-        // const auto& singularValues = svd.singularValues();
-        // double maxSV = singularValues(0);
-        // double minSV = singularValues(singularValues.size() - 1);
-
-        // double condnr;
-    
-        // if (minSV == 0) {
-        //     condnr = std::numeric_limits<double>::infinity(); // Matrix is singular
-        // } else {
-        //     condnr = maxSV / minSV;
-        // }
-    
-        // std::cout << "Condition number system matrix: " << condnr << std::endl << std::endl;
+        }
 
 
         // ----------------- Solve system and time --------------------
@@ -132,9 +106,6 @@ void FieldCalculatorTotal::constructor(bool verbose)
         };
 
         auto start_solve = std::chrono::high_resolution_clock::now();
-        
-        // Eigen::BDCSVD<Eigen::MatrixXcd> svd1(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
-        // Eigen::VectorXcd amps = svd1.solve(b);
 
         auto amps = UtilsSolvers::solveQR(A, b);
 
@@ -148,34 +119,6 @@ void FieldCalculatorTotal::constructor(bool verbose)
         
         amplitudes.row(i) = amps.head(N);
         amplitudes_ext.row(i) = amps.tail(N);
-
-    
-    //     if (Surface0){
-    //         fileex = "Zero";
-
-    //     } else if (Surface1){
-    //         fileex = "One";
-            
-    //     }  else if (Surface10){
-    //         fileex = "Ten";
-
-    //     } 
-
-    //     if (radius1){
-
-    //     fileex += "_014";
-
-    //     } else if (radius10) {
-
-    //     fileex += "_0014";
-    // }
-
-
-    //     Export::saveMatrixCSV("../CSV/PN/MAS_data/systemMatrix" + fileex + ".csv", A);
-
-    //     Export::saveVectorCSV("../CSV/PN/MAS_data/solution" + fileex + ".csv", amps);
-
-    //     Export::saveVectorCSV("../CSV/PN/MAS_data/rhs" + fileex + ".csv", b);
 
     }
 
@@ -216,7 +159,7 @@ void computeLinearCombinations(Eigen::MatrixX3cd& outE,
 
             outE += amplitudes.row(polarization_idx)(i + N) * Ei;
             outH += amplitudes.row(polarization_idx)(i + N) * Hi;
-        }
+        };
     } else {
        for (int i = 0; i < N; ++i) {
             dipoles[2 * i]->computeFarFields(Ei, Hi, evalPoints);
@@ -228,7 +171,7 @@ void computeLinearCombinations(Eigen::MatrixX3cd& outE,
 
             outE += amplitudes.row(polarization_idx)(i + N) * Ei;
             outH += amplitudes.row(polarization_idx)(i + N) * Hi;
-        } 
+        };
     }
 }
 
