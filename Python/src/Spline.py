@@ -3,7 +3,7 @@ from scipy.interpolate import bisplev, bisplrep
 
 class Spline:
     def __init__(self, Xfine, Yfine, Zfine, S = 0.5):
-        print("Incoming shapes:", Xfine.shape, Yfine.shape, Zfine.shape)
+        # print("Incoming shapes:", Xfine.shape, Yfine.shape, Zfine.shape)
         self.Xfine = Xfine
         self.Yfine = Yfine
         self.Zfine = Zfine

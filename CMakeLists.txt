@@ -87,8 +87,8 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 
 # --- Build target ---
 add_executable(main ${SOURCES} Cpp/src/Validation/Tangential_error.cpp)
-#add_executable(main ${SOURCES} surfaceTester.cpp)
-#add_executable(main ${SOURCES} pcnTester.cpp)
+# add_executable(main ${SOURCES} surfaceTester.cpp)
+# add_executable(main ${SOURCES} pcnTester.cpp)
 
 target_link_libraries(main PRIVATE Eigen3::Eigen ${PYTHON_LIBRARY})
 # Apply proper flags based on build type
@@ -98,7 +98,7 @@ else()
     target_compile_options(main PRIVATE -Wall -Wextra -O2)
 endif()
 
-# cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
+# # cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
 
 # cmake_minimum_required(VERSION 3.14)
 # project(bioscat3d)
@@ -128,8 +128,8 @@ endif()
 # )
 
 # # --- Executable ---
-# # add_executable(main ${SOURCES} main.cpp)
-# add_executable(main ${SOURCES} surfaceTester.cpp)
+# add_executable(main ${SOURCES} realDataArray.cpp)
+# # add_executable(main ${SOURCES} surfaceTester.cpp)
 
 # target_link_libraries(main
 #     PRIVATE Eigen3::Eigen

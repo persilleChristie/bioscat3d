@@ -4,9 +4,9 @@ import json
 import os
 
 def generate_surface_params(
-    keyword = "Ten", # postfix to name JSON file
-    halfWidth_x=1.5,#*1e-6, # 1.50
-    halfWidth_y=1.5,#*1e-6, # 1.50
+    keyword = "PseudoReal05", # postfix to name JSON file
+    halfWidth_x=0.25, #1.5,#*1e-6, # 1.50
+    halfWidth_y=0.25, #1.5,#*1e-6, # 1.50
     halfWidth_z=2.0,#*1e-6,
     resolution=10, # Meep parameter  
     pml_thickness = 2, # Meep parameter

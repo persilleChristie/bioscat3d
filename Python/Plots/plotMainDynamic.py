@@ -20,8 +20,8 @@ plt.rcParams.update({
 # ------------------------------
 # Configuration
 # ------------------------------
-folder_read = "../../CSV/TangentialErrorsEFixedUnits10FromTen"
-folder_out = "TangentialErrorsEFixedUnits10FromTenDynamic"
+folder_read = "../../CSV/TangentialErrorsEFixedUnits10FromPseudoReal05"
+folder_out = "TangentialErrorsEFixedUnits10FromPseudoReal05"
 df = load_error_summary_df(folder_read)
 
 unique_lambdas = sorted(df["lam"].unique())
@@ -327,7 +327,12 @@ for aux in sorted(df["auxpts"].unique()):
 
         vmin = heatmap_data.min().min()
         vmax = heatmap_data.max().max()
-        norm = TwoSlopeNorm(vmin=vmin, vcenter=0.05, vmax=vmax)
+
+        if vmin < 0.05 < vmax:
+            norm = TwoSlopeNorm(vmin=vmin, vcenter=0.05, vmax=vmax)
+        else:
+            norm = None  # fallback to default linear normalization
+
 
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.heatmap(heatmap_data, annot=True, fmt=".2e",

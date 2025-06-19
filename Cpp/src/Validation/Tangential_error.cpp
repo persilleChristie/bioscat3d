@@ -124,10 +124,10 @@ int main(){
     // ------------- Changes to what is plotted --------------
     // Min max nr of auxiliary points
     int min_auxpoints = 2;
-    int max_auxpoints = 4;
-    std::string postfix = "FixedUnits100";  // for outpu files, tangential errors.
-    std::string inputPostfix = "Ten"; // for input json file, surface parameters.
-    double fixedRadius = 10.0;
+    int max_auxpoints = 5;
+    std::string postfix = "FixedUnits10";  // for outpu files, tangential errors.
+    std::string inputPostfix = "PseudoReal05"; // for input json file, surface parameters.
+    double fixedRadius = 1.0;
     // fixedRadius > 0 means that the radius is fixed
     // fixedRadius < 0 means no guard in place for large curvature
     // fixedRadius = 0 means that the radius is calculated from the maximum curvature with a guard
@@ -182,6 +182,17 @@ int main(){
 
         // -------------------- Generate surface --------------------
         auto [X_fine, Y_fine, Z_fine] = generateSurface(N_fine, dimension, bumpData);
+
+        // // save html surface plot to file
+        // std::string surfacePlotPath = "../HTML/SurfacePlot" + postfix + "From" + inputPostfix + ".html";
+        // Export::saveSurfacePlotHTML(X_fine, Y_fine, Z_fine, surfacePlotPath);
+        // std::cout << "Surface plot saved to: " << surfacePlotPath << std::endl;
+        // // save surface data to CSV file
+        // std::string surfaceDataPath = "../CSV/SurfaceData" + postfix + "From" + inputPostfix + ".csv";
+        // Export::saveRealMatrixCSV(surfaceDataPath, X_fine, Y_fine, Z_fine);
+        // std::cout << "Surface data saved to: " << surfaceDataPath << std::endl;
+
+
 
 
         // ----------------- Run python code -----------------
