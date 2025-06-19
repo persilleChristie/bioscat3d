@@ -15,6 +15,8 @@
 #include "../../lib/Forward/FieldCalculatorTotal.h"
 #include "../../lib/Utils/UtilsExport.h"
 #include "../../lib/Utils/UtilsPybind.h"
+#include <filesystem>
+
 
 Constants constants;
 ConstantsModel constantsModel;
@@ -122,12 +124,20 @@ int main(){
     // ------------- Changes to what is plotted --------------
     // Min max nr of auxiliary points
     int min_auxpoints = 2;
-    int max_auxpoints = 3;
-    int fixedRadius = 0; // fixedRadius > 0 means that the radius is fixed, otherwise max curvature is used
-    constantsModel.setFixedRadius(fixedRadius);  
+    int max_auxpoints = 4;
+    std::string postfix = "FixedUnits100";  // for outpu files, tangential errors.
+    std::string inputPostfix = "Ten"; // for input json file, surface parameters.
+    double fixedRadius = 10.0;
+    // fixedRadius > 0 means that the radius is fixed
+    // fixedRadius < 0 means no guard in place for large curvature
+    // fixedRadius = 0 means that the radius is calculated from the maximum curvature with a guard
+    constantsModel.setFixedRadius(fixedRadius);
+    // set file postfix
+    
 
     // json path controlling surface, polarizations and wavelengths
-    const char* jsonPath = "../json/surfaceParamsTen.json";
+    std::string jsonPathStr = "../json/surfaceParams" + inputPostfix + ".json";
+    const char* jsonPath = jsonPathStr.c_str();  // Only needed if a C-style string is required
 
 
     // ------------- Load json file --------------
@@ -201,6 +211,12 @@ int main(){
             return 1;
         }
 
+        std::string dirE = "../CSV/TangentialErrorsE" + postfix + "From" + inputPostfix;
+        std::string dirH = "../CSV/TangentialErrorsH" + postfix + "From" + inputPostfix;
+
+        std::filesystem::create_directories(dirE);
+        std::filesystem::create_directories(dirH);
+
         for (auto lambda : lambdas){
             constants.setWavelength(lambda);
             std::cout << "Running MASSystem with lambda: " << lambda << std::endl;
@@ -210,19 +226,42 @@ int main(){
             std::cout << "Running FieldCalculatorTotal..." <<  std::endl;
             FieldCalculatorTotal field(mas, true);
 
-            for (int b = 0; b < B; ++b){
+            // for (int b = 0; b < B; ++b){
+            //     std::cout << "Computing tangential fields for beta: " << betas(b) << std::endl;
+            //     auto errors = field.computeTangentialError(b);
+            //     std::cout << "Tangential errors computed." << std::endl;
+            //     // Save tangential errors to CSV files          
+            //     Export::saveRealVectorCSV("../CSV/TangentialErrorsE"+ postfix + "From" + inputPostfix +"/E_tangential_error1_auxpts" + std::to_string(ap) + 
+            //                                 "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[0]);
+            //     Export::saveRealVectorCSV("../CSV/TangentialErrorsE"+ postfix + "From" + inputPostfix +"/E_tangential_error2_auxpts" + std::to_string(ap) + 
+            //                                 "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[1]);
+            //     Export::saveRealVectorCSV("../CSV/TangentialErrorsH"+ postfix + "From" + inputPostfix +"/H_tangential_error1_auxpts" + std::to_string(ap) + 
+            //                                 "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[2]);
+            //     Export::saveRealVectorCSV("../CSV/TangentialErrorsH"+ postfix + "From" + inputPostfix +"/H_tangential_error2_auxpts" + std::to_string(ap) + 
+            //                                 "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[3]);
+            //     std::cout << "Saved tangential errors for beta: " << betas(b) << std::endl;
+            // }
+            for (int b = 0; b < B; ++b) {
                 std::cout << "Computing tangential fields for beta: " << betas(b) << std::endl;
                 auto errors = field.computeTangentialError(b);
                 std::cout << "Tangential errors computed." << std::endl;
-                // Save tangential errors to CSV files                
-                Export::saveRealVectorCSV("../CSV/TangentialErrorsEFixed/E_tangential_error1_auxpts" + std::to_string(ap) + 
-                                            "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[0]);
-                Export::saveRealVectorCSV("../CSV/TangentialErrorsEFixed/E_tangential_error2_auxpts" + std::to_string(ap) + 
-                                            "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[1]);
-                Export::saveRealVectorCSV("../CSV/TangentialErrorsHFixed/H_tangential_error1_auxpts" + std::to_string(ap) + 
-                                            "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[2]);
-                Export::saveRealVectorCSV("../CSV/TangentialErrorsHFixed/H_tangential_error2_auxpts" + std::to_string(ap) + 
-                                            "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[3]);
+
+                Export::saveRealVectorCSV(
+                    dirE + "/E_tangential_error1_auxpts" + std::to_string(ap) +
+                    "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[0]);
+
+                Export::saveRealVectorCSV(
+                    dirE + "/E_tangential_error2_auxpts" + std::to_string(ap) +
+                    "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[1]);
+
+                Export::saveRealVectorCSV(
+                    dirH + "/H_tangential_error1_auxpts" + std::to_string(ap) +
+                    "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[2]);
+
+                Export::saveRealVectorCSV(
+                    dirH + "/H_tangential_error2_auxpts" + std::to_string(ap) +
+                    "_lambda" + tag(lambda) + "_beta" + tag(betas(b)) + ".csv", errors[3]);
+
                 std::cout << "Saved tangential errors for beta: " << betas(b) << std::endl;
             }
         }

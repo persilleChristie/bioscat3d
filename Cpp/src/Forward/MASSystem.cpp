@@ -28,7 +28,7 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
 
         std::cout << "Generating surface" << std::endl;
 
-        const double maxcurvature = spline.attr("max_curvature").cast<double>();
+        double maxcurvature = spline.attr("max_curvature").cast<double>();
         std::cout << "Max curvature: " << maxcurvature << std::endl;
 
         // --------- Generate test points -----------
@@ -63,11 +63,17 @@ MASSystem::MASSystem(const py::object spline, const double dimension,
         double radius;
         if (constantsModel.getFixedRadius() > 0) {
             radius = constantsModel.getFixedRadius();
+            std::cout << "Using fixed radius: " << radius << std::endl;
         }
-        else {
-            std::cout << "Using max curvature to calculate radius: " << radius << std::endl;
-            radius = 1.0/std::max(maxcurvature, 0.1);
+        else if (constantsModel.getFixedRadius() < 0) {
+            std::cout << "Using no Guardrails" << std::endl;
+            radius = 1.0/maxcurvature;
         }
+        else{
+            std::cout << "Using max curvature to calculate radius with guardrails: " << radius << std::endl;
+            radius = 1.0/std::max(maxcurvature, 1.0);
+        }
+        std::cout << "Max curvature after guardrail: " << maxcurvature << std::endl;
 
         std::cout << "Radius: " << radius << std::endl;
 

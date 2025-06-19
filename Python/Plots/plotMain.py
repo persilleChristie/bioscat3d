@@ -1,20 +1,32 @@
 import os
 import matplotlib.pyplot as plt
 from plotUtils import load_error_summary_df, plot_error_vector_from_file
+import seaborn as sns
+import matplotlib.cm as cm
+from plotUtils import plot_stat_vs_variable
 
 # ------------------------------
 # Configuration
 # ------------------------------
-folder_read = "../../CSV/TangentialErrorsECurvNoGuard"
-folder_out = "TangentialErrorsECurvNoGuard"
+folder_read = "../../CSV/TangentialErrorsEFixedUnitsFromTen"
+folder_out = "TangentialErrorsEFixedUnitsFromTen"
 df = load_error_summary_df(folder_read)
 
+# Style config: consistent across all plots
+unique_lambdas = sorted(df["lam"].unique())
+#lambda_colors = plt.colormaps.get_cmap("tab10", len(unique_lambdas))
+lambda_colors = plt.colormaps.get_cmap("tab10")
+
+#lambda_to_color = {lam: lambda_colors(i) for i, lam in enumerate(unique_lambdas)}
+lambda_to_color = {lam: lambda_colors(i % lambda_colors.N) for i, lam in enumerate(unique_lambdas)}
+tau_to_linestyle = {"tau1": "-", "tau2": "--"}
+
 # ------------------------------
-# Plotting Task 1: All τ₁ and τ₂ error vectors
+# Task 1: All τ₁ and τ₂ error vectors (individual and grid)
 # ------------------------------
 for tau in ["tau1", "tau2"]:
     df_tau = df[df["tau_type"] == tau]
-    
+
     folder_individual = os.path.join(folder_out, tau, "individual")
     folder_grid = os.path.join(folder_out, tau, "grid")
     os.makedirs(folder_individual, exist_ok=True)
@@ -24,8 +36,21 @@ for tau in ["tau1", "tau2"]:
     for _, row in df_tau.iterrows():
         fig, ax = plt.subplots()
         filepath = os.path.join(folder_read, row["filename"])
-        plot_error_vector_from_file(filepath, ax=ax)
+
+        plot_error_vector_from_file(
+            filepath, ax=ax, linestyle=tau_to_linestyle[tau]
+        )
+
+        lam = row["lam"]
+        beta = row["beta"]
+        auxpts = row["auxpts"]
+        ax.set_title(f"{tau}: λ={lam:.3f}, β={beta:.3f}, auxpts={auxpts}", fontsize=10)
+        ax.set_xlabel("Point Index")
+        ax.set_ylabel("Error Magnitude")
+        ax.grid(True)
+
         outname = row["filename"].replace(".csv", ".png")
+        fig.tight_layout()
         fig.savefig(os.path.join(folder_individual, outname), dpi=150)
         plt.close(fig)
 
@@ -39,9 +64,19 @@ for tau in ["tau1", "tau2"]:
         r, c = divmod(idx, ncols)
         ax = axes[r][c]
         filepath = os.path.join(folder_read, row["filename"])
-        plot_error_vector_from_file(filepath, ax=ax)
 
-    # Remove empty subplots
+        plot_error_vector_from_file(
+            filepath, ax=ax, linestyle=tau_to_linestyle[tau]
+        )
+
+        lam = row["lam"]
+        beta = row["beta"]
+        auxpts = row["auxpts"]
+        ax.set_title(f"λ={lam:.3f}, β={beta:.3f}", fontsize=8)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    # Remove unused subplots
     for idx in range(len(df_tau), nrows * ncols):
         r, c = divmod(idx, ncols)
         fig.delaxes(axes[r][c])
@@ -50,88 +85,220 @@ for tau in ["tau1", "tau2"]:
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     fig.savefig(os.path.join(folder_grid, f"{tau}_grid.png"), dpi=150)
     plt.close(fig)
-from plotUtils import plot_stat_vs_variable
+
 
 # ------------------------------
-# Plotting Task 2: Summary plots of mean_error (flat output structure)
+# Task 2: max_error vs β for each λ (individual + grid)
 # ------------------------------
 from plotUtils import plot_stat_vs_variable
 
-summary_root = os.path.join(folder_out, "summary")
-metric = "mean_error"
+summary_folder = os.path.join(folder_out, "summary")
+os.makedirs(summary_folder, exist_ok=True)
 
-# --- 1. Plot vs β for each λ individually + subplot grid ---
-folder_beta = os.path.join(summary_root, f"{metric}_vs_beta")
+metric = "max_error"     # Default as per user preference
+aux_fixed = 5            # Fixed number of auxiliary points to filter by
+ncols = 2
+dpi = 150
+
+folder_beta = os.path.join(summary_folder, f"{metric}_vs_beta")
 os.makedirs(folder_beta, exist_ok=True)
-lambdas = sorted(df["lam"].unique())
 
-ncols = 3
+lambdas = sorted(df["lam"].unique())
 nrows = (len(lambdas) + ncols - 1) // ncols
-fig, axes = plt.subplots(nrows, ncols, figsize=(5*ncols, 4*nrows), squeeze=False)
+fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4 * nrows), squeeze=False)
 
 for idx, lam in enumerate(lambdas):
-    df_lam = df[df["lam"] == lam]
+    df_lam = df[(df["lam"] == lam) & (df["auxpts"] == aux_fixed)]
+
+    # --- Individual Plot ---
     fig_indiv, ax = plt.subplots()
-    save_path = os.path.join(folder_beta, f"lam{int(1000*lam):03d}.png")
-    plot_stat_vs_variable(df_lam, x="beta", y=metric, hue="tau_type", ax=ax,
-                          title=f"{metric} vs β (λ = {lam:.3f})", save_path=save_path)
+    for tau in ["tau1", "tau2"]:
+        df_sub = df_lam[df_lam["tau_type"] == tau]
+        if not df_sub.empty:
+            ax.plot(
+                df_sub["beta"],
+                df_sub[metric],
+                label=f"{tau}",
+                linestyle=tau_to_linestyle[tau],
+                color=lambda_to_color[lam],
+                marker="o"
+            )
+    ax.set_title(f"{metric} vs β (λ = {lam:.3f})")
+    ax.set_xlabel("β")
+    ax.set_ylabel(metric)
+    ax.grid(True)
+    ax.legend()
+    fig_indiv.tight_layout()
+    fig_indiv.savefig(os.path.join(folder_beta, f"lam{int(1000*lam):03d}.png"), dpi=dpi)
     plt.close(fig_indiv)
 
+    # --- Grid Plot ---
     r, c = divmod(idx, ncols)
-    plot_stat_vs_variable(df_lam, x="beta", y=metric, hue="tau_type", ax=axes[r][c],
-                          title=f"λ = {lam:.3f}")
+    ax_grid = axes[r][c]
+    for tau in ["tau1", "tau2"]:
+        df_sub = df_lam[df_lam["tau_type"] == tau]
+        if not df_sub.empty:
+            ax_grid.plot(
+                df_sub["beta"],
+                df_sub[metric],
+                label=f"{tau}",
+                linestyle=tau_to_linestyle[tau],
+                color=lambda_to_color[lam],
+                marker="o"
+            )
+    ax_grid.set_title(f"λ = {lam:.3f}")
+    ax_grid.set_xlabel("β")
+    ax_grid.set_ylabel(metric)
+    ax_grid.grid(True)
+    ax_grid.legend(fontsize=8)
 
-for i in range(len(lambdas), nrows*ncols):
+# Remove empty subplots
+for i in range(len(lambdas), nrows * ncols):
     r, c = divmod(i, ncols)
     fig.delaxes(axes[r][c])
 
-fig.suptitle(f"{metric} vs β — all λ", fontsize=16)
+fig.suptitle(f"{metric} vs β (fixed auxpts = {aux_fixed})", fontsize=16)
 fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-fig.savefig(os.path.join(folder_beta, "all_lambdas_grid.png"), dpi=150)
+fig.savefig(os.path.join(folder_beta, "all_lambdas_grid.png"), dpi=dpi)
 plt.close(fig)
 
-# --- 2. Plot vs λ for each β individually + subplot grid ---
-folder_lambda = os.path.join(summary_root, f"{metric}_vs_lambda")
-os.makedirs(folder_lambda, exist_ok=True)
-betas = sorted(df["beta"].unique())
 
-ncols = 3
-nrows = (len(betas) + ncols - 1) // ncols
-fig, axes = plt.subplots(nrows, ncols, figsize=(5*ncols, 4*nrows), squeeze=False)
 
-for idx, beta in enumerate(betas):
-    df_beta = df[df["beta"] == beta]
-    fig_indiv, ax = plt.subplots()
-    save_path = os.path.join(folder_lambda, f"beta{int(1000*beta):03d}.png")
-    plot_stat_vs_variable(df_beta, x="lam", y=metric, hue="tau_type", ax=ax,
-                          title=f"{metric} vs λ (β = {beta:.3f})", save_path=save_path)
-    plt.close(fig_indiv)
+# ------------------------------
+# Task 3: Max error vs λ for each fixed β (with all τ₁ and τ₂ in same plots)
+# ------------------------------
+folder_summary = os.path.join(folder_out, "summary", "max_error_vs_lambda")
+folder_indiv = os.path.join(folder_summary, "individual")
+os.makedirs(folder_indiv, exist_ok=True)
 
+# Filter only fixed auxpts
+df_fixed_aux = df[df["auxpts"] == aux_fixed]
+unique_betas = sorted(df_fixed_aux["beta"].unique())
+
+# --- Individual plots ---
+for beta in unique_betas:
+    df_beta = df_fixed_aux[df_fixed_aux["beta"] == beta]
+    fig, ax = plt.subplots()
+
+    for tau in ["tau1", "tau2"]:
+        df_tau = df_beta[df_beta["tau_type"] == tau]
+        ax.plot(
+            df_tau["lam"],
+            df_tau["max_error"],
+            label=f"{tau}",
+            linestyle=tau_to_linestyle[tau],
+            marker="o"
+        )
+
+    ax.set_title(f"Max error vs λ for β = {beta:.3f}")
+    ax.set_xlabel("λ")
+    ax.set_ylabel("Max Error")
+    ax.grid(True)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(os.path.join(folder_indiv, f"beta{int(beta*1000):03d}.png"), dpi=150)
+    plt.close(fig)
+
+# --- Grid of subplots ---
+n = len(unique_betas)
+ncols = 2
+nrows = (n + ncols - 1) // ncols
+fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4 * nrows), squeeze=False)
+
+for idx, beta in enumerate(unique_betas):
     r, c = divmod(idx, ncols)
-    plot_stat_vs_variable(df_beta, x="lam", y=metric, hue="tau_type", ax=axes[r][c],
-                          title=f"β = {beta:.3f}")
+    ax = axes[r][c]
+    df_beta = df_fixed_aux[df_fixed_aux["beta"] == beta]
 
-for i in range(len(betas), nrows*ncols):
-    r, c = divmod(i, ncols)
+    for tau in ["tau1", "tau2"]:
+        df_tau = df_beta[df_beta["tau_type"] == tau]
+        ax.plot(
+            df_tau["lam"],
+            df_tau["max_error"],
+            label=f"{tau}",
+            linestyle=tau_to_linestyle[tau],
+            marker="o"
+        )
+
+    ax.set_title(f"β = {beta:.3f}")
+    ax.set_xlabel("λ")
+    ax.set_ylabel("Max Error")
+    ax.grid(True)
+    ax.legend(fontsize=8)
+
+# Remove empty subplots
+for idx in range(n, nrows * ncols):
+    r, c = divmod(idx, ncols)
     fig.delaxes(axes[r][c])
 
-fig.suptitle(f"{metric} vs λ — all β", fontsize=16)
+fig.suptitle("Max error vs λ for each β (auxpts = 5)", fontsize=16)
 fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-fig.savefig(os.path.join(folder_lambda, "all_betas_grid.png"), dpi=150)
+fig.savefig(os.path.join(folder_summary, "all_betas_grid.png"), dpi=150)
 plt.close(fig)
 
-# --- 3. Plot vs auxpts for each λ (individual only) ---
-folder_aux_lam = os.path.join(summary_root, f"{metric}_vs_auxpts")
-os.makedirs(folder_aux_lam, exist_ok=True)
-for lam in lambdas:
-    df_lam = df[df["lam"] == lam]
-    save_path = os.path.join(folder_aux_lam, f"lam{int(1000*lam):03d}.png")
-    plot_stat_vs_variable(df_lam, x="auxpts", y=metric, hue="tau_type",
-                          title=f"{metric} vs auxpts (λ = {lam:.3f})", save_path=save_path)
 
-# --- 4. Plot vs auxpts for each β (individual only) ---
-for beta in betas:
+# ------------------------------
+# Task 4: max_error vs auxpts for each fixed β (all λ curves)
+# ------------------------------
+folder_summary = os.path.join(folder_out, "summary", "max_error_vs_auxpts_by_beta")
+folder_indiv = os.path.join(folder_summary, "individual")
+os.makedirs(folder_indiv, exist_ok=True)
+
+unique_betas = sorted(df["beta"].unique())
+
+for beta in unique_betas:
     df_beta = df[df["beta"] == beta]
-    save_path = os.path.join(folder_aux_lam, f"beta{int(1000*beta):03d}.png")
-    plot_stat_vs_variable(df_beta, x="auxpts", y=metric, hue="tau_type",
-                          title=f"{metric} vs auxpts (β = {beta:.3f})", save_path=save_path)
+    fig, ax = plt.subplots()
+
+    for lam in unique_lambdas:
+        for tau in ["tau1", "tau2"]:
+            df_plot = df_beta[(df_beta["lam"] == lam) & (df_beta["tau_type"] == tau)]
+            if not df_plot.empty:
+                ax.plot(
+                    df_plot["auxpts"],
+                    df_plot["max_error"],
+                    label=f"λ = {lam:.3f}, {tau}",
+                    linestyle=tau_to_linestyle[tau],
+                    color=lambda_to_color[lam],
+                    marker="o"
+                )
+
+    ax.set_title(f"Max error vs auxpts for β = {beta:.3f}")
+    ax.set_xlabel("Auxiliary Points")
+    ax.set_ylabel("Max Error")
+    ax.grid(True)
+    ax.legend(fontsize=8)
+    fig.tight_layout()
+    fig.savefig(os.path.join(folder_indiv, f"beta{int(beta*1000):03d}.png"), dpi=150)
+    plt.close(fig)
+
+
+
+# ------------------------------
+# Task 5: Heatmap of max error across (λ, β) for fixed auxpts
+# ------------------------------
+
+folder_heatmap = os.path.join(folder_out, "summary", "heatmaps")
+os.makedirs(folder_heatmap, exist_ok=True)
+
+# Only fixed auxpts
+df_heatmap = df[df["auxpts"] == aux_fixed]
+
+for tau in ["tau1", "tau2"]:
+    df_tau = df_heatmap[df_heatmap["tau_type"] == tau]
+
+    # Pivot table: rows = lambda, cols = beta, values = max_error
+    heatmap_data = df_tau.pivot(index="lam", columns="beta", values="max_error")
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.heatmap(heatmap_data, annot=True, fmt=".2e", cmap="viridis", ax=ax)
+
+    ax.set_title(f"Heatmap of max error (auxpts = {aux_fixed}, {tau})", fontsize=14)
+    ax.set_xlabel("β")
+    ax.set_ylabel("λ")
+
+    # Save
+    fname = f"heatmap_max_error_{tau}_auxpts{aux_fixed}.png"
+    fig.tight_layout()
+    fig.savefig(os.path.join(folder_heatmap, fname), dpi=150)
+    plt.close(fig)

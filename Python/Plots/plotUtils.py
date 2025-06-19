@@ -1,12 +1,12 @@
 import os
 import glob
 import re
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
 def load_error_summary_df(folder_read):
-    import os, glob, re
-    import pandas as pd
 
     all_rows = []
 
@@ -92,40 +92,18 @@ def plot_stat_vs_variable(df, x, y="mean_error", hue="tau_type",
 
     return ax
 
-def plot_error_vector_from_file(filepath, ax=None, hline=0.05, title=None, label=None):
-    import pandas as pd
-    import os
-    import re
-    import matplotlib.pyplot as plt
+def plot_error_vector_from_file(filepath, ax=None, **kwargs):
+    """
+    Plots the error vector stored in a CSV file. Passes kwargs to ax.plot.
+    """
+
+    data = pd.read_csv(filepath, header=None).squeeze("columns")
 
     if ax is None:
         fig, ax = plt.subplots()
 
-    data = pd.read_csv(filepath, header=None).squeeze("columns")
-    ax.plot(data.index, data.values, marker=".", linestyle="-", label=label)
-
-    if title is None:
-        fname = os.path.basename(filepath)
-        match = re.search(r"E_tangential_error(\d)_auxpts(\d+)_lambda(\d+)_beta(\d+)\.csv", fname)
-        if match:
-            tau = f"τ{match.group(1)}"
-            auxpts = int(match.group(2))
-            lam = int(match.group(3)) / 1000
-            beta = int(match.group(4)) / 1000
-            title = f"{tau}: auxpts={auxpts}, λ={lam:.3f}, β={beta:.3f}"
-        else:
-            title = fname
-
-    ax.set_title(title)
-    ax.set_xlabel("Point index")
-    ax.set_ylabel("Error magnitude")
+    ax.plot(data.values, **kwargs)
+    ax.set_title(os.path.basename(filepath).replace(".csv", ""))
+    ax.set_xlabel("Index")
+    ax.set_ylabel("Error")
     ax.grid(True)
-
-    if hline is not None:
-        ax.axhline(hline, linestyle="--", color="red", linewidth=1)
-
-    if label:
-        ax.legend()
-
-    return ax
-

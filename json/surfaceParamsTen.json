@@ -63,9 +63,9 @@
     ],
     "monitor_size": 1,
     "seed": 42,
-    "halfWidth_x": 1.5e-06,
-    "halfWidth_y": 1.5e-06,
-    "halfWidth_z": 2e-06,
+    "halfWidth_x": 1.5,
+    "halfWidth_y": 1.5,
+    "halfWidth_z": 2,
     "resolution": 10,
     "pml_thickness": 2,
     "omega": 1.0,
@@ -83,6 +83,6 @@
     ],
     "alpha": 0.86,
     "lambda_n": 4,
-    "minLambda": 6e-07,
-    "maxLambda": 8e-07
+    "minLambda": 0.6,
+    "maxLambda": 0.8
 }
