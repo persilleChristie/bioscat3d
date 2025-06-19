@@ -13,9 +13,9 @@ def generate_surface_params(
     seed=42, # For surface bump creation
     monitor_size = 1, # monitors are placed with center at +/- monitor_size/2 in all directions
     num_bumps=10,
-    uniform=False, # If True, bumps are uniformly distributed in the area
-    heights_bumps = [0.02, 0.15],#*1e-6, #should be in [20, 150] nm
-    sigmas_bumps = [0.02, 0.075],#*1e-6, #should correspond to lambda < width bumps, sigme < lambda/4
+    uniform=True, # If True, bumps are uniformly distributed in the area
+    heights_bumps = [0.07, 0.8],#*1e-6, #should be in [20, 150] nm
+    sigmas_bumps = [0.20, 0.030],#*1e-6, #should correspond to lambda < width bumps, sigme < lambda/4
     epsilon1 = 2.56, # substrate epsilon value ???
     alpha = 0.86, # disctance scale for source points in MAS
     omega = 1.0, # What does this represent
