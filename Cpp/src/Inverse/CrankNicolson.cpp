@@ -68,11 +68,6 @@ void CrankNicolson::constructor(){
         Y.col(i) = y;
     }
 
-    std::cout << "X range: " << X.minCoeff() << " to " << X.maxCoeff() << std::endl;
-    std::cout << "Y range: " << Y.minCoeff() << " to " << Y.maxCoeff() << std::endl;
-    std::cout << "Shape: " << X.rows() << " x " << X.cols() << std::endl;
-
-
     this->X_ = X;
     this->Y_ = Y;
 
@@ -110,16 +105,15 @@ void CrankNicolson::constructor(){
 /// and calculates the log-likelihood based on the difference between the computed fields and the measured data.
 /// @note The log-likelihood is computed as -0.5 * gamma * (Eout - data)^2, where Eout is the computed electric field at the data points.
 double CrankNicolson::logLikelihood(Eigen::MatrixXd& Zvals){
-    
-    std::cout << "Loglike: Line 96" << std::endl;
+
     auto Z_np = PybindUtils::eigen2numpy(Zvals);
 
-    std::cout << "loglike: Line 99" << std::endl;
     py::object spline = SplineClass_(X_np_, Y_np_, Z_np);  
-    std::cout << "loglike: Line 101" << std::endl;
+
     MASSystem mas(spline, dimension_, kinc_, polarization_);
-    std::cout << "loglike: Line 103" << std::endl;
+    
     FieldCalculatorTotal field(mas);
+    
     int M = data_points_.rows();
 
     Eigen::MatrixX3cd Eout = Eigen::MatrixX3cd::Zero(M, 3);    
@@ -157,7 +151,7 @@ void CrankNicolson::run(bool verbose){
 
    
     // --------- Generate initial guess ---------
-    auto previous = GaussianProcess::sample_gp_on_grid_rbf_fast(X_, Y_, l, sigma, genGP);
+    auto previous = GaussianProcess::sample_gp_on_grid_SE_fast(X_, Y_, l, sigma, genGP);
 
     logLikelihoodPrev = logLikelihood(previous);
 
@@ -170,7 +164,7 @@ void CrankNicolson::run(bool verbose){
     // --------- Run update ---------
     for (int i = 0; i < iterations_; ++i){
         // Draw samples
-        proposal = GaussianProcess::sample_gp_on_grid_rbf_fast(X_, Y_, l, sigma, genGP);
+        proposal = GaussianProcess::sample_gp_on_grid_SE_fast(X_, Y_, l, sigma, genGP);
 
         // Define new proposal
         proposal = sqrt(1 - 2 * delta_) * previous + sqrt(2 * delta_) * proposal;

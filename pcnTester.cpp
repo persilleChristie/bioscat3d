@@ -7,6 +7,7 @@
 #include "rapidjson/document.h" 
 #include "rapidjson/istreamwrapper.h"
 #include "Cpp/lib/Utils/Constants.h"
+#include "Cpp/lib/Utils/ConstantsModel.h"
 #include "Cpp/lib/Forward/MASSystem.h"
 #include "Cpp/lib/Forward/FieldCalculatorTotal.h"
 #include "Cpp/lib/Utils/UtilsExport.h"
@@ -14,6 +15,7 @@
 #include "Cpp/lib/Inverse/CrankNicolson.h"
 
 Constants constants;
+ConstantsModel constantsModel;
 
 int main(){
     
@@ -106,7 +108,7 @@ int main(){
     constants.setWavelength(lambda);
 
     // ------------- Decide highest number of auxilliary points --------------
-    int N_fine = static_cast<int>(std::ceil(sqrt(2) * constants.auxpts_pr_lambda * dimension / (0.3 * lambda)));
+    int N_fine = static_cast<int>(std::ceil(sqrt(2) * constantsModel.getAuxPtsPrLambda() * dimension / (0.3 * lambda)));
     std::cout << "Number of fine points: " << N_fine << std::endl;
 
 
@@ -146,7 +148,6 @@ int main(){
     }
 
     // ------------ Run python code ---------------
-    // Should this be scoped to ensure Python interpreter is started and stopped correctly?
     py::scoped_interpreter guard{}; // Start Python interpreter
     py::module sys = py::module::import("sys");
     sys.attr("path").attr("insert")(1, ".");  // Add local dir to Python path
