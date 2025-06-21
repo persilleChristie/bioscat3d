@@ -20,8 +20,9 @@ plt.rcParams.update({
 # ------------------------------
 # Configuration
 # ------------------------------
-folder_read = "../../CSV/TangentialErrorsEFixedUnits10FromPseudoReal05"
-folder_out = "TangentialErrorsEFixedUnits10FromPseudoReal05"
+folder_out = "dim1mum/TangentialErrorsEFixedUnits50FromOne"
+folder_read = "../../CSV/"+folder_out
+
 df = load_error_summary_df(folder_read)
 
 unique_lambdas = sorted(df["lam"].unique())

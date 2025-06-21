@@ -5,6 +5,9 @@ import re
 import pandas as pd
 import matplotlib.pyplot as plt
 
+import numpy as np
+import plotly.graph_objects as go
+
 
 def load_error_summary_df(folder_read):
 
@@ -107,3 +110,38 @@ def plot_error_vector_from_file(filepath, ax=None, **kwargs):
     ax.set_xlabel("Index")
     ax.set_ylabel("Error")
     ax.grid(True)
+
+def plot_surface_from_xyz(folder, postfix, input_postfix, output_html=None):
+    """
+    Load X, Y, Z CSVs and generate a 3D surface plot.
+
+    Args:
+        folder (str): Folder where the CSV files are stored.
+        postfix (str): Tag for output surface.
+        input_postfix (str): Input surface tag.
+        output_html (str): Optional path for saving .html output. If None, saved in the same folder.
+    """
+    base = f"Surface{postfix}From{input_postfix}"
+    path_x = os.path.join(folder, f"{base}_X.csv")
+    path_y = os.path.join(folder, f"{base}_Y.csv")
+    path_z = os.path.join(folder, f"{base}_Z.csv")
+
+    X = np.loadtxt(path_x, delimiter=",")
+    Y = np.loadtxt(path_y, delimiter=",")
+    Z = np.loadtxt(path_z, delimiter=",")
+
+    fig = go.Figure(data=[go.Surface(x=X, y=Y, z=Z)])
+    fig.update_layout(title=f"Surface Plot: {base}",
+                      margin=dict(l=0, r=0, t=50, b=0),
+                      scene=dict(
+                          xaxis_title="X",
+                          yaxis_title="Y",
+                          zaxis_title="Z"
+                      ))
+
+    if output_html is None:
+        output_html = os.path.join(folder, f"{base}.html")
+    
+    fig.write_html(output_html)
+    print(f"[✓] Surface plot saved to: {output_html}")
+

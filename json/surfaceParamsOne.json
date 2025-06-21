@@ -1,16 +1,16 @@
 {
     "bumpData": [
         {
-            "x0": -0.08782191680684626,
-            "y0": 0.3155000144869413,
-            "height": 0.15,
-            "sigma": 0.075
+            "x0": 0.028891491255676027,
+            "y0": 0.0076787335373113,
+            "height": 0.7499938402809436,
+            "sigma": 0.07343477075909277
         }
     ],
     "monitor_size": 1,
     "seed": 42,
-    "halfWidth_x": 0.35,
-    "halfWidth_y": 0.35,
+    "halfWidth_x": 0.5,
+    "halfWidth_y": 0.5,
     "halfWidth_z": 2.0,
     "resolution": 10,
     "pml_thickness": 2,
@@ -22,10 +22,13 @@
         -1.0
     ],
     "betas": [
-        0.0
+        0.0,
+        0.5235987755982988,
+        1.0471975511965976,
+        1.5707963267948966
     ],
     "alpha": 0.86,
-    "lambda_n": 1,
-    "minLambda": 0.7,
-    "maxLambda": 0.7
+    "lambda_n": 7,
+    "minLambda": 0.2,
+    "maxLambda": 0.8
 }

@@ -118,16 +118,42 @@ auto tag = [](double lambda) {
     return s;
 };
 
+using namespace pybind11::literals;
+
+void plotSurfaceDirectly(const Eigen::MatrixXd& X, const Eigen::MatrixXd& Y, const Eigen::MatrixXd& Z, const std::string& html_out = "surface_plot.html") {
+    pybind11::gil_scoped_acquire gil;
+    auto np = pybind11::module_::import("numpy");
+    auto go = pybind11::module_::import("plotly.graph_objects");
+
+    auto X_np = pybind11::cast(X);
+    auto Y_np = pybind11::cast(Y);
+    auto Z_np = pybind11::cast(Z);
+
+    auto surface = go.attr("Surface")("x"_a = X_np, "y"_a = Y_np, "z"_a = Z_np);
+    auto fig = go.attr("Figure")(pybind11::make_tuple(surface));
+
+    fig.attr("update_layout")(
+        "title"_a = "Surface Plot",
+        "autosize"_a = true,
+        "margin"_a = pybind11::dict("l"_a = 0, "r"_a = 0, "t"_a = 50, "b"_a = 0),
+        "scene"_a = pybind11::dict("xaxis_title"_a = "X", "yaxis_title"_a = "Y", "zaxis_title"_a = "Z")
+    );
+
+    fig.attr("write_html")(html_out);
+    std::cout << "[✓] Surface plot written to: " << html_out << std::endl;
+}
+
+
 
 
 int main(){
     // ------------- Changes to what is plotted --------------
     // Min max nr of auxiliary points
-    int min_auxpoints = 2;
-    int max_auxpoints = 5;
-    std::string postfix = "FixedUnits10";  // for outpu files, tangential errors.
-    std::string inputPostfix = "PseudoReal05"; // for input json file, surface parameters.
-    double fixedRadius = 1.0;
+    int min_auxpoints = 6;
+    int max_auxpoints = 7;
+    std::string postfix = "FixedUnits50";  // for outpu files, tangential errors.
+    std::string inputPostfix = "One"; // for input json file, surface parameters.
+    double fixedRadius = 5.0;
     // fixedRadius > 0 means that the radius is fixed
     // fixedRadius < 0 means no guard in place for large curvature
     // fixedRadius = 0 means that the radius is calculated from the maximum curvature with a guard
@@ -182,17 +208,6 @@ int main(){
 
         // -------------------- Generate surface --------------------
         auto [X_fine, Y_fine, Z_fine] = generateSurface(N_fine, dimension, bumpData);
-
-        // // save html surface plot to file
-        // std::string surfacePlotPath = "../HTML/SurfacePlot" + postfix + "From" + inputPostfix + ".html";
-        // Export::saveSurfacePlotHTML(X_fine, Y_fine, Z_fine, surfacePlotPath);
-        // std::cout << "Surface plot saved to: " << surfacePlotPath << std::endl;
-        // // save surface data to CSV file
-        // std::string surfaceDataPath = "../CSV/SurfaceData" + postfix + "From" + inputPostfix + ".csv";
-        // Export::saveRealMatrixCSV(surfaceDataPath, X_fine, Y_fine, Z_fine);
-        // std::cout << "Surface data saved to: " << surfaceDataPath << std::endl;
-
-
 
 
         // ----------------- Run python code -----------------

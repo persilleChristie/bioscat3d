@@ -82,7 +82,7 @@
         1.5707963267948966
     ],
     "alpha": 0.86,
-    "lambda_n": 4,
-    "minLambda": 0.6,
+    "lambda_n": 7,
+    "minLambda": 0.2,
     "maxLambda": 0.8
 }
