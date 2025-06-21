@@ -31,24 +31,36 @@ namespace py = pybind11;
 CrankNicolson::CrankNicolson(const double dimension, 
                         const Eigen::Vector3d& kinc, 
                         const double polarization,
-                        const Eigen::MatrixX3cd& data, 
-                        const Eigen::MatrixX3d& data_points,
+                        const double power, 
+                        const SurfacePlane& plane,
+                        std::string kernel_type,
                         const double delta, 
                         const double gamma, 
                         const int iterations)
     : dimension_(dimension), kinc_(kinc), 
         polarization_(Eigen::VectorXd::Constant(1, polarization)),
-        data_(data), data_points_(data_points), delta_(delta), 
+        power_(power), plane_(plane), delta_(delta), 
         gamma_(gamma), iterations_(iterations) { 
         
-        constructor();
+        int fail = constructor(kernel_type);
         
-        std::cout << "pCN initialized succesfully" << std::endl;
+        if (not fail){
+            std::cout << "pCN initialized succesfully" << std::endl;
+        }
     }
 
 /// @brief Constructor for CrankNicolson class
 /// This method generates the grid of points and initializes the Python spline class for further calculations.
-void CrankNicolson::constructor(){
+int CrankNicolson::constructor(std::string kernel_type){
+
+    if (kernel_type == "Matern"){
+        this->SE_kernel_ = false;
+    } else if (kernel_type == "SE") {
+        this->SE_kernel_ = true;
+    } else {
+        std::cerr << "Wrong kernel type, allowed types are 'Matern' and 'SE'." << std::endl;
+        return 1;
+    }
 
     // --------- Generate grid ---------
     int N = static_cast<int>(std::ceil(sqrt(2) * constantsModel.getAuxPtsPrLambda() * dimension_ / constants.getWavelength()));
@@ -92,10 +104,10 @@ void CrankNicolson::constructor(){
     } catch (const py::error_already_set &e) {
         std::cerr << "Python error: " << e.what() << "\n";
 
-        return;
+        return 1;
     }
     
-
+    return 0;
 }
 
 /// @brief Computes the log-likelihood of the data given the surface represented by Zvals.
@@ -113,16 +125,10 @@ double CrankNicolson::logLikelihood(Eigen::MatrixXd& Zvals){
     MASSystem mas(spline, dimension_, kinc_, polarization_);
     
     FieldCalculatorTotal field(mas);
-    
-    int M = data_points_.rows();
 
-    Eigen::MatrixX3cd Eout = Eigen::MatrixX3cd::Zero(M, 3);    
-    Eigen::MatrixX3cd Hout = Eigen::MatrixX3cd::Zero(M, 3);
+    Eigen::VectorXd power = field.computePower(plane_);
 
-    field.computeFields(Eout, Hout, data_points_);
-
-    double loglike = -0.5 * gamma_ * (Eout.rowwise().squaredNorm()
-                                        - data_.rowwise().squaredNorm()).squaredNorm();
+    double loglike = -0.5 * gamma_ * (power(0) - power_) * (power(0) - power_);
     
     return loglike;
 }
@@ -134,7 +140,7 @@ double CrankNicolson::logLikelihood(Eigen::MatrixXd& Zvals){
 /// based on the log-likelihood of the proposed surface and the previous surface. If the proposal is accepted,
 /// it updates the previous surface and log-likelihood; otherwise, it retains the previous surface.
 /// The method also tracks the number of accepted proposals and can print this information if verbose is true.
-void CrankNicolson::run(bool verbose){
+void CrankNicolson::run(double l, double tau, int p, bool verbose){
     double logLikelihoodPrev, logLikelihoodProp;
     double alpha;
 
@@ -146,12 +152,15 @@ void CrankNicolson::run(bool verbose){
     // Initialize Gaussian Process generator
     std::mt19937 genGP(std::random_device{}());
 
-    double l = 0.2;
-    double sigma = 0.2;
-
    
     // --------- Generate initial guess ---------
-    auto previous = GaussianProcess::sample_gp_on_grid_SE_fast(X_, Y_, l, sigma, genGP);
+    Eigen::MatrixXd previous; 
+
+    if (SE_kernel_){
+        previous = GaussianProcess::sample_gp_on_grid_SE_fast(X_, Y_, l, tau, genGP);
+    } else {
+        previous = GaussianProcess::sample_gp_on_grid_matern_fast(X_, Y_, l, tau, p, genGP);
+    }
 
     logLikelihoodPrev = logLikelihood(previous);
 
@@ -164,7 +173,11 @@ void CrankNicolson::run(bool verbose){
     // --------- Run update ---------
     for (int i = 0; i < iterations_; ++i){
         // Draw samples
-        proposal = GaussianProcess::sample_gp_on_grid_SE_fast(X_, Y_, l, sigma, genGP);
+        if (SE_kernel_){
+            proposal = GaussianProcess::sample_gp_on_grid_SE_fast(X_, Y_, l, tau, genGP);
+        } else {
+            proposal = GaussianProcess::sample_gp_on_grid_matern_fast(X_, Y_, l, tau, p, genGP);
+        }
 
         // Define new proposal
         proposal = sqrt(1 - 2 * delta_) * previous + sqrt(2 * delta_) * proposal;
@@ -187,7 +200,7 @@ void CrankNicolson::run(bool verbose){
         } // else previous = previous, so nothing is done
 
         totalcount.push_back(counter);
-        // ????? TODO: Update delta, gamma ?????
+        
     }
 
     if (verbose){

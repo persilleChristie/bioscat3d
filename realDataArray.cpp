@@ -35,14 +35,12 @@ auto tag = [](double lambda) {
 double callSplineClass(double width, double rough_size, int grid_size, 
                         const Eigen::VectorXd& x_large, const Eigen::MatrixXd& data, py::object& spline){
     // --------------------- Divide grid ---------------------------
-    int scale = std::floor(width / rough_size);
+    double scale = width / rough_size;
     int grid_size_small = std::floor(grid_size/scale);
     double small_dim = x_large(grid_size_small - 1); 
-    double half_dim_small = 0.5 * small_dim;
-
 
     // ------------- Generate grid -------------
-    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(grid_size_small, 0, half_dim_small);
+    Eigen::VectorXd x = Eigen::VectorXd::LinSpaced(grid_size_small, 0, small_dim);
 
     Eigen::MatrixXd X_fine = x.replicate(1, grid_size_small);           // column vector → N rows, N columns
     Eigen::MatrixXd Y_fine = x.transpose().replicate(grid_size_small, 1); // row vector → N rows, N columns
@@ -78,11 +76,13 @@ double callSplineClass(double width, double rough_size, int grid_size,
 int main() {
     // --------------------. Controlable variables -----------------------
     double rough_size_min = 0.5;
-    double rough_size_max = 1.0;  // Roughly how big the patch should be
+    double rough_size_max = 2.0;  // Roughly how big the patch should be
 
-    bool variable_patch_size = true;
+    bool variable_patch_size = false;
+
+    double radius = 5.0;
     
-    double lambda_min = 0.25;
+    double lambda_min = 0.4;
     double lambda_max = 0.75;
     int lambda_nr = 20;
 
@@ -90,7 +90,9 @@ int main() {
     double beta_max = constants.pi/2;
     int beta_nr = 2;
 
-    int surface_nr = 3;
+    int surface_nr = 1;
+
+    bool arrayEq = false;
 
     Eigen::Vector3d k (0, 0, -1);
 
@@ -104,6 +106,9 @@ int main() {
     Eigen::VectorXd lambdas = Eigen::VectorXd::LinSpaced(lambda_nr, lambda_min, lambda_max);
     Eigen::VectorXd betas = Eigen::VectorXd::LinSpaced(beta_nr, beta_min, beta_max);
     Eigen::VectorXd rough_sizes = Eigen::VectorXd::LinSpaced(lambda_nr, rough_size_min, rough_size_max);
+
+    // Update constants
+    constantsModel.setFixedRadius(radius);
 
     // --------------------- Load file ---------------------------
     std::string filePath = "../Python/RealData/DataSmooth/gaussian_" + std::to_string(surface_nr) + ".txt"; // Replace with your file path
@@ -197,20 +202,36 @@ int main() {
         MASSystem mas(spline, small_dim, k, betas);
             
         std::cout << "Running FieldCalculatorArray..." <<  std::endl;
-        FieldCalculatorArray field(mas, width, false);
+        std::unique_ptr<FieldCalculator> field;
 
-        fluxes.row(count) = field.computePower(surface);
+        if (arrayEq) {
+            field = std::make_unique<FieldCalculatorArray>(mas, width, false);
+        } else {
+            field = std::make_unique<FieldCalculatorTotal>(mas, false);
+        }
+
+        fluxes.row(count) = field->computePower(surface);
         std::cout << "Flux computed and saved!" << std::endl;
 
         
         count++;
 
     };
+
+    std::string radius_ex = "radius";
+
+    if (radius > 0){
+        radius_ex += "Fixed_" + tag(radius);
+    } else if (radius < 0) {
+        radius_ex += "MC";
+    } else {
+        radius_ex += "Guard";
+    };
     
     std::string nameex = (variable_patch_size) ? "variablePatchSize" : "constantPatchSize_" + tag(rough_size_max);
 
     Export::saveRealMatrixCSV("../CSV/FluxRealData/ArrayEq_surface" + std::to_string(surface_nr) 
-                                + nameex + "_lambdamin_" + tag(lambda_min) 
+                                + nameex + "_" + radius_ex + "_lambdamin_" + tag(lambda_min) 
                                 + "_lambdamax_" + tag(lambda_max) + "_betanr_" + std::to_string(beta_nr) 
                                 + ".csv", fluxes);
     

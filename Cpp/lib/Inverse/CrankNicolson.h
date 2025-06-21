@@ -5,6 +5,7 @@
 #include <pybind11/embed.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include "../Forward/SurfacePlane.h"
 
 
 class CrankNicolson {
@@ -12,13 +13,14 @@ class CrankNicolson {
         CrankNicolson(const double dimension,
                         const Eigen::Vector3d& kinc, 
                         const double polarization,
-                        const Eigen::MatrixX3cd& data, 
-                        const Eigen::MatrixX3d& data_points,
+                        const double power, 
+                        const SurfacePlane& plane,
+                        const std::string kernel_type,
                         const double delta, 
                         const double gamma, 
                         const int iterations); // Find a way to include covariance function?
 
-        void run(bool verbose = false);
+        void run(double l, double tau, int p = 0, bool verbose = false);
 
     private:
         // MAS constants
@@ -32,14 +34,15 @@ class CrankNicolson {
         pybind11::object SplineClass_;
 
         // pCN
-        const Eigen::MatrixX3cd data_;
-        const Eigen::MatrixX3d data_points_;
+        const double power_;
+        SurfacePlane plane_;
         const double delta_;
         const double gamma_;
         const int iterations_;
+        bool SE_kernel_;
 
 
-        void constructor();
+        int constructor(std::string kernel_type);
         double logLikelihood(Eigen::MatrixXd& points);
 
         

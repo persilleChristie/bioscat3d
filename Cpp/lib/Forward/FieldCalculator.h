@@ -28,6 +28,10 @@ public:
         int polarization_idx = 0 // Only used in total fields
     ) const = 0;
 
+    virtual Eigen::VectorXd computePower(
+        const Surface& surface
+    ) const = 0;
+
     /// @brief Compute the tangential components of the electric and magnetic fields.
     /// @param outE Output matrix for electric field components (Nx3 complex numbers).
     /// @param outH Output matrix for magnetic field components (Nx3 complex numbers).

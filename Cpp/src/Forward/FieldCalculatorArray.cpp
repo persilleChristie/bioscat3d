@@ -99,7 +99,7 @@ void FieldCalculatorArray::computeFarFields(
 
 Eigen::VectorXd FieldCalculatorArray::computePower(
     const Surface& surface
-){
+) const {
     Eigen::MatrixX3d points = surface.getPoints();
     Eigen::MatrixX3d normals = surface.getNormals();
     int N = points.rows();

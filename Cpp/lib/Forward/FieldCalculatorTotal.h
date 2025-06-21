@@ -50,7 +50,7 @@ public:
     /// @return A vector containing the total power for each polarization. 
     Eigen::VectorXd computePower(
         const Surface& surface
-    );
+    ) const override;
 
     /// @brief Gets the amplitudes of the fields.
     /// @details This method returns the amplitudes of the fields as a matrix, where each row corresponds to a polarization

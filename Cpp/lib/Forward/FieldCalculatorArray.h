@@ -50,7 +50,7 @@ public:
     /// @return A vector containing the total power for each polarization. 
     Eigen::VectorXd computePower(
         const Surface& surface
-    );
+    ) const override;
 
 
 private:

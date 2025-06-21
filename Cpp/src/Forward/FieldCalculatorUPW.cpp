@@ -69,3 +69,11 @@ void FieldCalculatorUPW::computeFarFields(
     computeFields(outE, outH, evalPoints);
 }
 
+
+Eigen::VectorXd FieldCalculatorUPW::computePower(
+    const Surface& Surface
+) const {
+    std::cout << "Compute power not implemented for UPW" << std::endl;
+    Eigen::VectorXd empty = Eigen::VectorXd::Zero(3);
+    return empty;
+}

@@ -199,7 +199,7 @@ void FieldCalculatorTotal::computeFarFields(
 
 Eigen::VectorXd FieldCalculatorTotal::computePower(
     const Surface& surface
-){
+) const {
     Eigen::MatrixX3d points = surface.getPoints();
     Eigen::MatrixX3d normals = surface.getNormals();
     int N = points.rows();

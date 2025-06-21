@@ -3,6 +3,7 @@
 
 #include "FieldCalculator.h"
 #include "../Utils/Constants.h"
+#include "Surface.h"
 #include <Eigen/Dense>
 #include <complex>
 
@@ -54,6 +55,10 @@ public:
         Eigen::MatrixX3cd& outH,
         const Eigen::MatrixX3d& evalPoints,
         int polarization_idx = 0 // Only used in total fields
+    ) const override;
+
+    Eigen::VectorXd computePower(
+        const Surface& surface
     ) const override;
 
 };
