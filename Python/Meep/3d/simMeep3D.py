@@ -39,9 +39,10 @@ lambda_min = params["minLambda"]
 lambda_max = params["maxLambda"]
 lambda_n = params["lambda_n"]
 
-
-fcen = 1/((lambda_max-lambda_min)/2)
-df = lambda_max-lambda_min
+frq_min = 1 / lambda_max
+frq_max = 1 / lambda_min
+fcen = 0.5 * (frq_min + frq_max)
+df = frq_max - frq_min
 nfrq = lambda_n
 
 

@@ -2,6 +2,7 @@
 #define FIELDCALCULATOR_H
 
 #include <Eigen/Dense>
+#include "Surface.h"
 
 /// @brief Base class for field calculators.
 /// @details This class defines the

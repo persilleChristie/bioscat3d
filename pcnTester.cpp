@@ -122,10 +122,6 @@ int main(){
         Y_fine.col(i) = y;
     }
 
-    // suggestion:
-    // X_fine = x.transpose().replicate(N_fine, 1); // rows = N_fine, cols = N_fine
-    // Y_fine = y.replicate(1, N_fine);             // rows = N_f
-
     Eigen::MatrixXd Z_fine = Eigen::MatrixXd::Constant(N_fine, N_fine, 0);
 
     if (Surface1 || Surface10){
@@ -182,34 +178,26 @@ int main(){
     // Generate field calculator (inverse crime)
     FieldCalculatorTotal truefield(mas, true);
 
-    // Generate measure-points
-    Eigen::MatrixX3d measurepts(10,3);
-    measurepts << 10,10,10,
-                  5, 7, 4,
-                  1, 1, 1,
-                  2, 4, 2,
-                  -1, -2, -3,
-                  0, 2, 1,
-                  1.2, 2.3, 3.4,
-                  5.5, 5.5, 5.5,
-                  4, 6, 8,
-                  9, 5, 6;
-
-    int n = measurepts.rows();
-    Eigen::MatrixX3cd Etrue = Eigen::MatrixX3cd::Zero(n,3);
-    Eigen::MatrixX3cd Htrue = Eigen::MatrixX3cd::Zero(n,3); 
+    // Defining surface
+    Eigen::Vector3d corner(-10, -10, 10);
+    Eigen::Vector3d basis1(1, 0, 0);
+    Eigen::Vector3d basis2(0, 1, 0);
+    SurfacePlane surface(corner, basis1, basis2, 10, 10, 50);
 
     // Calculate measured field
-    truefield.computeFields(Etrue, Htrue, measurepts);
+    double power = truefield.computePower(surface)(0);
 
     // Parameters
     double delta = 0.01;
     double gamma = 100000.0;
     int iterations = 1500;
+    std::string kernel_type = "SE";
 
-    CrankNicolson pcn(dimension, k, beta_vec[0], Etrue, measurepts, delta, gamma, iterations);
+    CrankNicolson pcn(dimension, k, beta_vec[0], power, surface, kernel_type, delta, gamma, iterations);
 
-    pcn.run(true);
+    double l = 0.1;
+    double tau = 0.1;
+    Eigen::MatrixXd estimate = pcn.run(l, tau, true);
 
 
     return 0;

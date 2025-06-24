@@ -20,7 +20,7 @@ class CrankNicolson {
                         const double gamma, 
                         const int iterations); // Find a way to include covariance function?
 
-        void run(double l, double tau, int p = 0, bool verbose = false);
+        Eigen::MatrixXd run(double l, double tau, int p = 0, bool verbose = false);
 
     private:
         // MAS constants

@@ -168,6 +168,9 @@ include_directories("/home/pernillechristie/rapidjson/include")
 include_directories(${Python3_INCLUDE_DIRS})
 include_directories(${Python3_NumPy_INCLUDE_DIRS})
 
+# --- Copy Python file to build dir ---
+configure_file(${CMAKE_SOURCE_DIR}/Python/src/Spline.py ${CMAKE_BINARY_DIR}/Spline.py COPYONLY)
+
 # --- Sources ---
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/Cpp/src/Forward/*.cpp
@@ -175,7 +178,10 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 
 # --- Executable ---
-add_executable(main ${SOURCES} realDataArray.cpp)
+add_executable(main ${SOURCES} MeepComparison.cpp)
+# add_executable(main ${SOURCES} realDataValidation.cpp)
+# add_executable(main ${SOURCES} realDataFull.cpp)
+# add_executable(main ${SOURCES} realDataArray.cpp)
 # add_executable(main ${SOURCES} surfaceTester.cpp)
 # add_executable(main ${SOURCES} pcnTester.cpp)
 # add_executable(main ${SOURCES} gpTester.cpp)

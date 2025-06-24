@@ -82,8 +82,8 @@ int main() {
 
     double radius = 5.0;
     
-    double lambda_min = 0.4;
-    double lambda_max = 0.75;
+    double lambda_min = 0.7;
+    double lambda_max = 0.8;
     int lambda_nr = 20;
 
     double beta_min = 0.0;
@@ -91,8 +91,6 @@ int main() {
     int beta_nr = 2;
 
     int surface_nr = 1;
-
-    bool arrayEq = false;
 
     Eigen::Vector3d k (0, 0, -1);
 
@@ -202,15 +200,10 @@ int main() {
         MASSystem mas(spline, small_dim, k, betas);
             
         std::cout << "Running FieldCalculatorArray..." <<  std::endl;
-        std::unique_ptr<FieldCalculator> field;
-
-        if (arrayEq) {
-            field = std::make_unique<FieldCalculatorArray>(mas, width, false);
-        } else {
-            field = std::make_unique<FieldCalculatorTotal>(mas, false);
-        }
-
-        fluxes.row(count) = field->computePower(surface);
+    
+        FieldCalculatorArray field(mas, width, false);
+  
+        fluxes.row(count) = field.computePower(surface);
         std::cout << "Flux computed and saved!" << std::endl;
 
         

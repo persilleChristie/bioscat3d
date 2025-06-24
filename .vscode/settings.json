@@ -96,7 +96,8 @@
         "ranges": "cpp",
         "valarray": "cpp",
         "regex": "cpp",
-        "any": "cpp"
+        "any": "cpp",
+        "specialfunctions": "cpp"
     },
 
     "cmake.sourceDirectory": "${workspaceFolder}",

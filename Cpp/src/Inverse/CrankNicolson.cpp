@@ -140,10 +140,10 @@ double CrankNicolson::logLikelihood(Eigen::MatrixXd& Zvals){
 /// based on the log-likelihood of the proposed surface and the previous surface. If the proposal is accepted,
 /// it updates the previous surface and log-likelihood; otherwise, it retains the previous surface.
 /// The method also tracks the number of accepted proposals and can print this information if verbose is true.
-void CrankNicolson::run(double l, double tau, int p, bool verbose){
+Eigen::MatrixXd CrankNicolson::run(double l, double tau, int p, bool verbose){
     double logLikelihoodPrev, logLikelihoodProp;
     double alpha;
-
+    
     // Initialize uniform generator
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
@@ -169,6 +169,11 @@ void CrankNicolson::run(double l, double tau, int p, bool verbose){
     int counter = 0;
     std::vector<int> accepted = {};
     std::vector<int> totalcount = {};
+    std::vector<double> acceptedLikelihoods = {};
+
+    int burnin = std::floor(iterations_ / 2.0);
+
+    Eigen::MatrixXd estimate = Eigen::MatrixXd::Zero(previous.rows(), previous.cols());
 
     // --------- Run update ---------
     for (int i = 0; i < iterations_; ++i){
@@ -196,32 +201,33 @@ void CrankNicolson::run(double l, double tau, int p, bool verbose){
             logLikelihoodPrev = logLikelihoodProp;
 
             counter += 1;
-            accepted.push_back(i);
+
+
+            if (verbose){
+                if (counter % 10 == 0){
+                    std::cout << counter << " proposals accepted in iteration " << i << std::endl;
+                }
+            }
+
         } // else previous = previous, so nothing is done
+
+
+        if (i >= burnin) {
+            estimate += previous;
+        }
+        
+        acceptedLikelihoods.push_back(logLikelihoodPrev);
 
         totalcount.push_back(counter);
         
     }
 
-    if (verbose){
-        std::cout << "Number of accepted proposals: " << totalcount[size(totalcount) - 1] << std::endl;
-    }
-
-    // // std::cout << "Surface: " << previous << std::endl;
-    // Export::saveRealVectorCSV("Estimate.csv", previous.col(2));
     
-    // std::ofstream file("totalcount.csv");
-    // if (file.is_open()) {
-    //     for (size_t i = 0; i < totalcount.size(); ++i) {
-    //         file << totalcount[i];
-    //         if (i < totalcount.size() - 1)
-    //             file << ",";
-    //     }
-    //     file << "\n";
-    //     file.close();
-    //     std::cout << "CSV file written successfully.\n";
-    // } else {
-    //     std::cerr << "Unable to open file.\n";
-    // }
+    if (verbose){
+        std::cout << "pCN done! Number of accepted proposals: " << counter << std::endl;
+    }   
 
+    estimate *= 1 / std::ceil(iterations_ / 2.0);
+
+    return estimate;
 }
