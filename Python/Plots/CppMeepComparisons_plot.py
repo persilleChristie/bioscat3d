@@ -16,8 +16,8 @@ plt.rcParams.update({
 
 # --- Configuration ---
 csv_dir = "../../CSV/MeepFlux"
-file_pattern = os.path.join(csv_dir, "Flux_*.csv")
-num_betas = 7  # Set this to your actual beta resolution
+file_pattern = os.path.join(csv_dir, "Ten_Flux_*.csv")
+num_betas = 4  # Set this to your actual beta resolution
 beta_vals = np.linspace(0, np.pi / 2, num_betas)
 
 
@@ -35,7 +35,7 @@ surface_data = {}
 
 for filepath in files:
     filename = os.path.basename(filepath)
-    match = re.match(r"Flux_(\w+)_lambdamin_(\d+)_lambdamax_(\d+)\.csv", filename)
+    match = re.match(r"Ten_Flux_(\w+)_lambdamin_(\d+)_lambdamax_(\d+)\.csv", filename)
     if not match:
         continue
     surface, lam_min_tag, lam_max_tag = match.groups()
@@ -72,7 +72,7 @@ for surface, data in surface_data.items():
     plt.legend(title="Polarisation Angle")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/{surface}_flux_vs_lambda.png")
+    plt.savefig(f"{output_dir}/Ten_{surface}_flux_vs_lambda.png")
     plt.close()
 
     # Plot flux vs. beta for each lambda
@@ -85,7 +85,7 @@ for surface, data in surface_data.items():
     plt.legend(title="Wavelength")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/{surface}_flux_vs_beta.png")
+    plt.savefig(f"{output_dir}/Ten_{surface}_flux_vs_beta.png")
     plt.close()
 
 print(f"Plots saved in {output_dir}/")

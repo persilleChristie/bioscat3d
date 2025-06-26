@@ -121,7 +121,7 @@ auto tag = [](double lambda) {
 
 int main() {
     // --------------------. Controlable variables -----------------------
-    std::string inputPostfix = "NormalNewGeom"; // for input json file, surface parameters.
+    std::string inputPostfix = "Ten"; // for input json file, surface parameters.
     double fixedRadius = 5.0;
     constantsModel.setFixedRadius(fixedRadius);
     
@@ -253,17 +253,17 @@ int main() {
 
     };
 
-    Export::saveRealMatrixCSV("../CSV/MeepFlux/Flux_Z1_lambdamin_" + tag(lambda_min) 
+    Export::saveRealMatrixCSV("../CSV/MeepFlux/" + inputPostfix + "_Flux_Z1_lambdamin_" + tag(lambda_min) 
                                 + "_lambdamax_" + tag(lambda_max) + ".csv", fluxesZ1);
-    Export::saveRealMatrixCSV("../CSV/MeepFlux/Flux_Z2_lambdamin_" + tag(lambda_min) 
+    Export::saveRealMatrixCSV("../CSV/MeepFlux/" + inputPostfix + "_Flux_Z2_lambdamin_" + tag(lambda_min) 
                                 + "_lambdamax_" + tag(lambda_max) + ".csv", fluxesZ2);
-    Export::saveRealMatrixCSV("../CSV/MeepFlux/Flux_Y1_lambdamin_" + tag(lambda_min) 
+    Export::saveRealMatrixCSV("../CSV/MeepFlux/" + inputPostfix + "_Flux_Y1_lambdamin_" + tag(lambda_min) 
                                 + "_lambdamax_" + tag(lambda_max) + ".csv", fluxesY1);
-    Export::saveRealMatrixCSV("../CSV/MeepFlux/Flux_Y2_lambdamin_" + tag(lambda_min) 
+    Export::saveRealMatrixCSV("../CSV/MeepFlux/" + inputPostfix + "_Flux_Y2_lambdamin_" + tag(lambda_min) 
                                 + "_lambdamax_" + tag(lambda_max) + ".csv", fluxesY2);
-    Export::saveRealMatrixCSV("../CSV/MeepFlux/Flux_X1_lambdamin_" + tag(lambda_min) 
+    Export::saveRealMatrixCSV("../CSV/MeepFlux/" + inputPostfix + "_Flux_X1_lambdamin_" + tag(lambda_min) 
                                 + "_lambdamax_" + tag(lambda_max) + ".csv", fluxesX1);
-    Export::saveRealMatrixCSV("../CSV/MeepFlux/Flux_X2_lambdamin_" + tag(lambda_min) 
+    Export::saveRealMatrixCSV("../CSV/MeepFlux/" + inputPostfix + "_Flux_X2_lambdamin_" + tag(lambda_min) 
                                 + "_lambdamax_" + tag(lambda_max) + ".csv", fluxesX2);
 
     return 0;
